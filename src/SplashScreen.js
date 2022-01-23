@@ -1,12 +1,11 @@
-import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 
 import GlobalStyle from "../utils/GlobalStyle";
 
 const SplashScreen = ({ navigation }) => {
-  const [splash, setSplash] = useState(true);
   useEffect(() => {
     getData();
     console.log("useEffect in SplashScreen");
@@ -14,7 +13,7 @@ const SplashScreen = ({ navigation }) => {
 
   const getData = () => {
     try {
-      AsyncStorageLib.getItem("UserInfo").then((value) => {
+      AsyncStorageLib.getItem("userInfo").then((value) => {
         if (value != null) {
           console.log("getData from SplashScreen -> Main");
           navigation.replace("Main");

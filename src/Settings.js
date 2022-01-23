@@ -62,80 +62,85 @@ export default function Settings({ navigation }) {
 
   return (
     <KeyboardAvoidingWrapper>
-      <SafeAreaView style={GlobalStyle.MainContainer}>
-        <View style={GlobalStyle.Container}>
-          <Pressable style={GlobalStyle.Settings} onPress={navToMain}>
-            <Image
-              style={GlobalStyle.SettingButton}
-              source={require("../assets/close.png")}
-            />
-          </Pressable>
-          <Text style={GlobalStyle.Title}>Settings</Text>
-          <View
-            style={{
-              justifyContent: "space-evenly",
-              height: 200,
+      <SafeAreaView
+        style={[
+          GlobalStyle.MainContainer,
+          {
+            justifyContent: "space-around",
+          },
+        ]}
+      >
+        <Pressable style={GlobalStyle.Settings} onPress={navToMain}>
+          <Image
+            style={GlobalStyle.SettingButton}
+            source={require("../assets/close.png")}
+          />
+        </Pressable>
+        <Text style={GlobalStyle.Title}>Settings</Text>
+        <View
+          style={{
+            justifyContent: "space-evenly",
+            height: 200,
+          }}
+        >
+          <TextInput
+            style={GlobalStyle.Input}
+            placeholder="New Name"
+            value={name}
+            onChange={(value) => {
+              setName(value);
             }}
-          >
+          />
+          <View>
             <TextInput
-              style={GlobalStyle.Input}
-              placeholder="New Name"
-              value={name}
-              onChange={(value) => {
-                setName(value);
-              }}
-            />
-            <View>
-              <TextInput
-                contextMenuHidden={true}
-                style={[
-                  GlobalStyle.Input,
-                  {
-                    borderWidth: 0,
-                  },
-                ]}
-                placeholder="Plate Number"
-                value={plateNumber}
-                onChangeText={(value) => setPlateNumber(value)}
-                keyboardType="number-pad"
-                maxLength={8}
-                backgroundColor="transparent"
-              ></TextInput>
-              <Image
-                source={require("../assets/plate.png")}
-                style={GlobalStyle.Plate}
-              ></Image>
-            </View>
+              contextMenuHidden={true}
+              style={[
+                GlobalStyle.Input,
+                {
+                  borderWidth: 0,
+                },
+              ]}
+              placeholder="Plate Number"
+              value={plateNumber}
+              onChangeText={(value) => setPlateNumber(value)}
+              keyboardType="number-pad"
+              maxLength={8}
+              backgroundColor="transparent"
+            ></TextInput>
+            <Image
+              source={require("../assets/plate.png")}
+              style={GlobalStyle.Plate}
+            ></Image>
           </View>
-          <View
-            style={{
-              justifyContent: "space-evenly",
-              height: 200,
-            }}
+        </View>
+        <View
+          style={{
+            justifyContent: "space-evenly",
+            height: 200,
+          }}
+        >
+          <Pressable
+            style={({ pressed }) => [
+              GlobalStyle.Pressable,
+              {
+                backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
+              },
+            ]}
+            onPress={updateData}
           >
-            <Pressable
-              style={({ pressed }) => [
-                GlobalStyle.Pressable,
-                {
-                  backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
-                },
-              ]}
-              onPress={updateData}
-            >
-              <Text style={GlobalStyle.ButtonText}>Update And Continue</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                GlobalStyle.Pressable,
-                {
-                  backgroundColor: pressed ? "rose" : "red",
-                },
-              ]}
-              onPress={removeDataAndLogout}
-            >
-              <Text style={GlobalStyle.ButtonText}>Logout</Text>
-            </Pressable>
-          </View>
+            <Text style={GlobalStyle.ButtonText}>Update And Continue</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              GlobalStyle.Pressable,
+              {
+                backgroundColor: pressed ? "rose" : "red",
+              },
+            ]}
+            onPress={removeDataAndLogout}
+          >
+            <Text style={GlobalStyle.ButtonText}>Logout</Text>
+          </Pressable>
         </View>
       </SafeAreaView>
     </KeyboardAvoidingWrapper>
