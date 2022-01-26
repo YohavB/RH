@@ -2,6 +2,8 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   MainContainer: {
+    // borderColor: "yellow",
+    // borderWidth: 1,
     width: "100%",
     height: "100%",
     backgroundColor: "#2169B6",
@@ -41,12 +43,14 @@ export default StyleSheet.create({
   BlockingButton: {
     backgroundColor: "#fff",
     width: 150,
-    height: 30,
-    borderRadius: 10,
+    height: 50,
+    borderRadius: 15,
+    marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
   },
   Settings: {
+    zIndex: 2,
     position: "absolute",
     left: "88%",
     top: "5%",
@@ -71,7 +75,13 @@ export default StyleSheet.create({
     width: 300,
     height: 50,
   },
-  LittlePlate: { position: "absolute", zIndex: -1, width: 50, height: 10 },
+  LittlePlate: {
+    position: "absolute",
+    zIndex: -1,
+    width: 50,
+    height: 10,
+    right: 2,
+  },
   ContainerCars: {
     width: "100%",
     height: "80%",
@@ -86,7 +96,7 @@ export default StyleSheet.create({
   },
   ContainerCarPicture: {
     flex: 1,
-    height: "100%",
+    height: "70%",
     justifyContent: "space-evenly",
     alignContent: "center",
     alignItems: "center",
@@ -98,7 +108,7 @@ export default StyleSheet.create({
   ContainerActionMain: {
     flex: 5,
     height: "100%",
-    justifyContent: "space-around",
+    justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
   },

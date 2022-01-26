@@ -1,14 +1,19 @@
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { Alert, Text, TextInput, View, Pressable, Image } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useDispatch } from "react-redux";
+import { setUserName, setCarNumber } from "./redux/action";
+
+import { SafeAreaView } from "react-native-safe-area-context";
 import GlobalStyle from "../utils/GlobalStyle";
 import KeyboardAvoidingWrapper from "../utils/KeyboardAvoidingWrapper";
 
 const Login = ({ navigation }) => {
   const [name, setName] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
+
+  const dispatch = useDispatch();
 
   const validatePlate = (value) => {
     value = value.replace(/[^0-9]/g, "");
@@ -28,9 +33,10 @@ const Login = ({ navigation }) => {
           plateNumber: plateNumber,
         };
         await AsyncStorageLib.setItem("userInfo", JSON.stringify(userInfo));
-        console.log("set data from login and nav to main");
-
-        //post to database
+        console.log("setData from Login and -> Main");
+        dispatch(setUserName(name));
+        dispatch(setCarNumber(plateNumber));
+        //postToDB
         navigation.replace("Main");
       } catch (error) {
         console.log(error);
@@ -39,7 +45,7 @@ const Login = ({ navigation }) => {
     }
   };
 
-  const postAndStore = () => {
+  const postToDB = () => {
     //post to database
   };
 

@@ -6,19 +6,11 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from "react-native";
+import GlobalStyle from "./GlobalStyle";
 
 const KeyboardAvoidingWrapper = ({ children }) => {
   return (
-    <KeyboardAvoidingView
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: "dodgerblue",
-        alignItems: "center",
-        justifyContent: "center",
-        alignContent: "center",
-      }}
-    >
+    <KeyboardAvoidingView style={GlobalStyle.MainContainer}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         {children}
       </TouchableWithoutFeedback>

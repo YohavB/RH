@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
+
+import { useDispatch } from "react-redux";
+import { setUserName, setCarNumber } from "./redux/action";
 
 import GlobalStyle from "../utils/GlobalStyle";
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
-    getData();
     console.log("useEffect in SplashScreen");
+    getData();
   }, []);
+
+  const dispatch = useDispatch();
 
   const getData = () => {
     try {
@@ -17,6 +22,9 @@ const SplashScreen = ({ navigation }) => {
         if (value != null) {
           console.log("getData from SplashScreen -> Main");
           navigation.replace("Main");
+          let userInfo = JSON.parse(value);
+          dispatch(setUserName(userInfo.name));
+          dispatch(setCarNumber(userInfo.plateNumber));
         } else {
           console.log("No Data found from SplashScreen -> Login");
           navigation.replace("Login");

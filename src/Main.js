@@ -1,6 +1,8 @@
-import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
+
+import { useSelector, useDispatch } from "react-redux";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import GlobalStyle from "../utils/GlobalStyle";
 import KeyboardAvoidingWrapper from "../utils/KeyboardAvoidingWrapper";
@@ -9,37 +11,22 @@ export default function Main({ navigation }) {
   const [blocked, setBlocked] = useState(false);
   const [blockingSaved, setBlockingSaved] = useState(false);
   const [needToGo, setNeedToGo] = useState(false);
-  const [name, setName] = useState("");
-  const [plateNumber, setPlateNumber] = useState("");
   const [blockedPlateNumber, setBlockedPlateNumber] = useState("");
   const [driverBlockingYou, setDriverBlockingYou] = useState("Dor");
   const [carBlockingYou, setCarBlockingYou] = useState("12345678");
 
+  const { userName, carNumber } = useSelector((state) => state.userReducer);
+
   useEffect(() => {
-    getData();
     console.log("useEffect in Main");
   }, []);
-
-  const getData = () => {
-    try {
-      AsyncStorageLib.getItem("userInfo").then((value) => {
-        if (value != null) {
-          console.log("getData from Main");
-          let userInfo = JSON.parse(value);
-          setName(userInfo.name);
-          setPlateNumber(userInfo.plateNumber);
-        }
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const validateBolckingCar = () => {
     setBlockingSaved(!blockingSaved);
   };
 
   const navToSettings = () => {
+    console.log("SETINNG");
     navigation.navigate("Settings");
   };
 
@@ -73,10 +60,10 @@ export default function Main({ navigation }) {
           />
         </Pressable>
         <View>
-          <Text style={GlobalStyle.Title}>Hi {name} !</Text>
+          <Text style={GlobalStyle.Title}>Hi {userName} !</Text>
           <Text style={GlobalStyle.Text}>
             Enter the Car's Plate Number that you're blocking. Plate :{" "}
-            {blockedPlateNumber}
+            {blockedPlateNumber}, redux text {userName}, {carNumber}
           </Text>
         </View>
         <View style={GlobalStyle.ContainerCars}>
@@ -135,7 +122,7 @@ export default function Main({ navigation }) {
                   style={GlobalStyle.BlockingButton}
                   onPress={validateBolckingCar}
                 >
-                  <Text>I'm blocking this Car</Text>
+                  <Text>I'm blocking that Car</Text>
                 </Pressable>
               </View>
             ) : (
@@ -144,7 +131,9 @@ export default function Main({ navigation }) {
                   style={GlobalStyle.BlockingButton}
                   onPress={validateBolckingCar}
                 >
-                  <Text>Inform the driver that you are going</Text>
+                  <Text style={{ textAlign: "center" }}>
+                    Inform the driver that you are going
+                  </Text>
                 </Pressable>
               </View>
             )}
@@ -164,7 +153,7 @@ export default function Main({ navigation }) {
                   editable={false}
                   style={GlobalStyle.InputLittlePlate}
                   backgroundColor="transparent"
-                  value={plateNumber}
+                  value={carNumber}
                 ></TextInput>
                 <Image
                   source={require("../assets/plate.png")}
@@ -184,7 +173,7 @@ export default function Main({ navigation }) {
                   },
                 ]}
                 backgroundColor="transparent"
-                value={plateNumber}
+                value={carNumber}
               ></TextInput>
               <Image
                 source={require("../assets/plate.png")}
@@ -194,15 +183,30 @@ export default function Main({ navigation }) {
           </View>
           {/* THIRD PART */}
           <View style={GlobalStyle.ContainerCar}>
-            {blocked ? (
-              <View style={GlobalStyle.ContainerActionMain}>
-                {/* <Pressable onPress={INeedToGo}>
+            <View
+              style={[
+                GlobalStyle.ContainerCarPicture,
+                { paddingBottom: "20%" },
+              ]}
+            >
+              {blocked ? (
+                <Pressable onPress={INeedToGo}>
                   <Image
                     style={GlobalStyle.Car}
                     source={require("../assets/grey-car.png")}
                   />
-                </Pressable> */}
-
+                </Pressable>
+              ) : (
+                <View></View>
+              )}
+            </View>
+            {blocked ? (
+              <View
+                style={[
+                  GlobalStyle.ContainerActionMain,
+                  { paddingBottom: "30%" },
+                ]}
+              >
                 <Text style={GlobalStyle.Text}>
                   Seems Like {driverBlockingYou} ({carBlockingYou}) is blocking
                   you !
@@ -220,10 +224,16 @@ export default function Main({ navigation }) {
                 </Pressable>
               </View>
             ) : (
-              <View style={GlobalStyle.ContainerCar}>
+              <View
+                style={[
+                  GlobalStyle.ContainerActionMain,
+                  { paddingBottom: "30%" },
+                ]}
+              >
                 <Text style={GlobalStyle.Text}>
-                  Seems like anyone is blocking you, you free to go !
+                  Seems like anyone is blocking you !
                 </Text>
+                <Text style={GlobalStyle.Text}>You're free to go !</Text>
               </View>
             )}
           </View>
