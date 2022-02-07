@@ -52,7 +52,7 @@ const Login = ({ navigation }) => {
   return (
     <KeyboardAvoidingWrapper>
       <SafeAreaView
-        style={[GlobalStyle.MainContainer, { justifyContent: "start" }]}
+        style={[GlobalStyle.MainContainer, { justifyContent: "flex-start" }]}
       >
         <Text style={GlobalStyle.Title}>Welcome To Rush Hour</Text>
         <Text style={GlobalStyle.Text}>
