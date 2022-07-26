@@ -16,10 +16,26 @@ export default function App() {
     <Provider store={Store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ header: () => null }}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Main" component={Main} />
-          <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen
+            name="SplashScreen"
+            component={SplashScreen}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Main"
+            component={Main}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={Settings}
+            options={{ gestureEnabled: false }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
