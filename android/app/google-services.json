@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "864165576083",
+    "project_id": "rushhour-yohavb",
+    "storage_bucket": "rushhour-yohavb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864165576083:android:0c6350ba4337690a40bc66",
+        "android_client_info": {
+          "package_name": "com.rushhour"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTk0uX6U_vABHf-hGaVSNhj2HRWPaNELc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
