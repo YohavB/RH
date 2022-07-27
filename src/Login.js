@@ -9,9 +9,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import GlobalStyle from "../utils/GlobalStyle";
 import KeyboardAvoidingWrapper from "../utils/KeyboardAvoidingWrapper";
 
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
+
 const Login = ({ navigation }) => {
+  const [userInfo, setUserInfo] = useState("");
   const [name, setName] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
+  const [isSigninInProgress, setIsSigninInProgress] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -46,7 +54,45 @@ const Login = ({ navigation }) => {
   };
 
   const postToDB = () => {
-    //post to database
+    //post to databases
+  };
+
+  const signInWithGoogle = async () => {
+    console.log("Loggin with Google");
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      setUserInfo(userInfo);
+      console.log(userInfo);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        console.log("Sign in Cancelled");
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+        console.log("Sign in already in progress");
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+        console.log("Play service is not available");
+      } else {
+        // some other error happened
+        console.log(error.message);
+      }
+    }
+  };
+
+  const printUser = () => {
+    console.log("PrintingUserInfo");
+    console.log(userInfo);
+  };
+
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      setUserInfo(null); // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -96,6 +142,7 @@ const Login = ({ navigation }) => {
             ></Image>
           </View>
         </View>
+    
         <Pressable
           style={({ pressed }) => [
             GlobalStyle.Pressable,
@@ -103,13 +150,36 @@ const Login = ({ navigation }) => {
               backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
             },
           ]}
-          onPress={validateData}
+          onPress={printUser}
         >
-          <Text style={GlobalStyle.ButtonText}>Save and Continue</Text>
+          <Text style={GlobalStyle.ButtonText}>Print user info</Text>
         </Pressable>
+        
+        <GoogleSigninButton
+          style={{ width: 192, height: 48 }}
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={signInWithGoogle}
+          disabled={isSigninInProgress}
+        />
       </SafeAreaView>
     </KeyboardAvoidingWrapper>
   );
 };
 
 export default Login;
+
+// userInfoClass
+// {
+//   idToken: string,
+//   serverAuthCode: string,
+//   scopes: Array<string>, // on iOS this is empty array if no additional scopes are defined
+//   user: {
+//     email: string,
+//     id: string,
+//     givenName: string,
+//     familyName: string,
+//     photo: string, // url
+//     name: string // full name
+//   }
+// }

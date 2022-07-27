@@ -465,6 +465,7 @@ DEPENDENCIES:
   - Firebase
   - FirebaseCore
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - GoogleSignIn (~> 6.2.2)
   - GoogleUtilities
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -681,6 +682,6 @@ SPEC CHECKSUMS:
   RNScreens: 4a1af06327774490d97342c00aee0c2bafb497b7
   Yoga: 99652481fcd320aefa4a7ef90095b95acd181952
 
-PODFILE CHECKSUM: 578f655c23bf500a67d2d318a9ec137f59b1a4bc
+PODFILE CHECKSUM: fdf83c4da66702ca3f7001bf97bc447672bf1616
 
 COCOAPODS: 1.11.2

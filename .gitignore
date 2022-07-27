@@ -43,6 +43,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
+Podfile.lock
 
 # Android/IntelliJ
 #
@@ -52,6 +53,7 @@ build/
 local.properties
 *.iml
 *.hprof
+gradle.properties
 
 # node.js
 #
@@ -75,5 +77,6 @@ buck-out/
 .expo/
 web-build/
 dist/
+package-lock.json
 
 # @end expo-cli
