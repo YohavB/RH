@@ -100,7 +100,7 @@ export default function Settings({ navigation }) {
         <Pressable style={GlobalStyle.Settings} onPress={navToMain}>
           <Image
             style={GlobalStyle.SettingButton}
-            source={require("../assets/close.png")}
+            source={require("../assets/images/close.png")}
           />
         </Pressable>
         <View
@@ -146,7 +146,7 @@ export default function Settings({ navigation }) {
                 backgroundColor="transparent"
               ></TextInput>
               <Image
-                source={require("../assets/plate.png")}
+                source={require("../assets/images/plate.png")}
                 style={GlobalStyle.Plate}
               ></Image>
             </View>

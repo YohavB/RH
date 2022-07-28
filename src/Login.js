@@ -16,7 +16,7 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 const Login = ({ navigation }) => {
-  const [userInfo, setUserInfo] = useState("");
+  const [userInfo, setUserInfo] = useState("empty");
   const [name, setName] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [isSigninInProgress, setIsSigninInProgress] = useState(false);
@@ -87,6 +87,7 @@ const Login = ({ navigation }) => {
   };
 
   const signOut = async () => {
+    console.log("Sign Out");
     try {
       await GoogleSignin.signOut();
       setUserInfo(null); // Remember to remove the user from your app's state as well
@@ -137,12 +138,23 @@ const Login = ({ navigation }) => {
               backgroundColor="transparent"
             ></TextInput>
             <Image
-              source={require("../assets/plate.png")}
+              source={require("../assets/images/plate.png")}
               style={GlobalStyle.Plate}
             ></Image>
           </View>
         </View>
-    
+        <Pressable
+          style={({ pressed }) => [
+            GlobalStyle.Pressable,
+            {
+              backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
+            },
+          ]}
+          onPress={signInWithGoogle}
+        >
+          <Text style={GlobalStyle.ButtonText}>Signout</Text>
+        </Pressable>
+
         <Pressable
           style={({ pressed }) => [
             GlobalStyle.Pressable,
@@ -154,7 +166,7 @@ const Login = ({ navigation }) => {
         >
           <Text style={GlobalStyle.ButtonText}>Print user info</Text>
         </Pressable>
-        
+
         <GoogleSigninButton
           style={{ width: 192, height: 48 }}
           size={GoogleSigninButton.Size.Wide}

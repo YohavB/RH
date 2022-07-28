@@ -50,13 +50,14 @@ export default function Main({ navigation }) {
     setNeedToGo(true);
   };
 
+
   return (
     <KeyboardAvoidingWrapper>
       <SafeAreaView style={GlobalStyle.MainContainer}>
         <Pressable style={GlobalStyle.Settings} onPress={navToSettings}>
           <Image
             style={GlobalStyle.SettingButton}
-            source={require("../assets/settings.png")}
+            source={require("../assets/images/settings.png")}
           />
         </Pressable>
         <View>
@@ -73,7 +74,7 @@ export default function Main({ navigation }) {
               <Pressable>
                 <Image
                   style={GlobalStyle.Car}
-                  source={require("../assets/grey-car.png")}
+                  source={require("../assets/images/grey-car.png")}
                 />
               </Pressable>
               {blockingSaved ? (
@@ -86,7 +87,7 @@ export default function Main({ navigation }) {
                     value={blockedPlateNumber}
                   ></TextInput>
                   <Image
-                    source={require("../assets/plate.png")}
+                    source={require("../assets/images/plate.png")}
                     style={GlobalStyle.LittlePlate}
                   ></Image>
                 </View>
@@ -113,7 +114,7 @@ export default function Main({ navigation }) {
                     backgroundColor="transparent"
                   ></TextInput>
                   <Image
-                    source={require("../assets/plate.png")}
+                    source={require("../assets/images/plate.png")}
                     style={GlobalStyle.Plate}
                   ></Image>
                 </View>
@@ -144,7 +145,7 @@ export default function Main({ navigation }) {
               <Pressable>
                 <Image
                   style={GlobalStyle.Car}
-                  source={require("../assets/red-car.png")}
+                  source={require("../assets/images/red-car.png")}
                 />
               </Pressable>
               <View>
@@ -156,7 +157,7 @@ export default function Main({ navigation }) {
                   value={carNumber}
                 ></TextInput>
                 <Image
-                  source={require("../assets/plate.png")}
+                  source={require("../assets/images/plate.png")}
                   style={GlobalStyle.LittlePlate}
                 ></Image>
               </View>
@@ -176,7 +177,7 @@ export default function Main({ navigation }) {
                 value={carNumber}
               ></TextInput>
               <Image
-                source={require("../assets/plate.png")}
+                source={require("../assets/images/plate.png")}
                 style={GlobalStyle.Plate}
               ></Image>
             </View>
@@ -193,7 +194,7 @@ export default function Main({ navigation }) {
                 <Pressable onPress={INeedToGo}>
                   <Image
                     style={GlobalStyle.Car}
-                    source={require("../assets/grey-car.png")}
+                    source={require("../assets/images/grey-car.png")}
                   />
                 </Pressable>
               ) : (

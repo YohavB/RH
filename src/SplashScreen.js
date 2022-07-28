@@ -6,6 +6,10 @@ import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { setUserName, setCarNumber } from "./redux/action";
 
+import * as Device from 'expo-device';
+
+import * as Notifications from 'expo-notifications';
+
 import GlobalStyle from "../utils/GlobalStyle";
 
 import {
@@ -16,33 +20,33 @@ import {
 const SplashScreen = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState("");
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [expoToken, setExpoToken] = useState("");
 
   useEffect(() => {
     console.log("useEffect in SplashScreen");
     // getData();
     console.log("Google.configure");
-    GoogleSignin.configure({
-      //scopes: ["https://www.googleapis.com/auth/drive.readonly"], // what API you want to access on behalf of the user, default is email and profile
-      webClientId:
-        "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
-      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-      hostedDomain: "", // specifies a hosted domain restriction
-      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-      accountName: "", // [Android] specifies an account name on the device that should be used
-     // iosClientId: "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com", // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
-      googleServicePlistPath: "", // [iOS] if you renamed your GoogleService-Info file, new name here, e.g. GoogleService-Info-Staging
-      openIdRealm: "", // [iOS] The OpenID2 realm of the home web server. This allows Google to include the user's OpenID Identifier in the OpenID Connect ID token.
-      profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
-    });
+    googleConfigure();
+    registerForPushNotificationsAsync();
     isSignedInQuery();
     if (!isSignedIn) signInSilentlyFromGoogle();
     else {
       getCurrentUser();
       navigation.replace("Main");
-    }
+    } 
   }, []);
 
   const dispatch = useDispatch();
+
+  const googleConfigure = () => {
+    GoogleSignin.configure({
+      //scopes: ["https://www.googleapis.com/auth/drive.readonly"], // what API you want to access on behalf of the user, default is email and profile
+      webClientId:
+        "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
+      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+    });
+  };
 
   const getData = () => {
     try {
@@ -64,16 +68,19 @@ const SplashScreen = ({ navigation }) => {
   };
 
   const isSignedInQuery = async () => {
+    console.log("is SignedIn Query");
     const isSignedIn = await GoogleSignin.isSignedIn();
     setIsSignedIn(isSignedIn);
   };
 
   const getCurrentUser = async () => {
+    console.log("Get current user");
     const currentUser = await GoogleSignin.getCurrentUser();
     setUserInfo(currentUser);
   };
 
   const signInSilentlyFromGoogle = async () => {
+    console.log("signin silently");
     try {
       const userInfo = await GoogleSignin.signInSilently();
       setUserInfo(userInfo);
@@ -91,10 +98,41 @@ const SplashScreen = ({ navigation }) => {
     }
   };
 
+  const registerForPushNotificationsAsync = async () => {
+    console.log("register for push");
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log("The ExpoPushTOken of this device is " +token);
+      setExpoToken(token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={GlobalStyle.MainContainer}>
       <Image
-        source={require("../assets/RH.png")}
+        source={require("../assets/images/RH.png")}
         style={{ width: "100%", height: "60%" }}
       />
     </SafeAreaView>
