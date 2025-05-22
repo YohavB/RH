@@ -1,20 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Text,
-  View,
-  Animated,
-  Dimensions,
-  Easing,
-  TouchableOpacity,
-} from "react-native";
+import { Text, View, Animated, Dimensions, Easing } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import GlobalStyle, { Gradients } from "../../utils/GlobalStyle";
 
-// Get screen dimensions for animation calculations
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 const SplashScreen = ({ navigation }) => {
-  const [animationPhase, setAnimationPhase] = useState(0);
+  const [_, setAnimationPhase] = useState(0);
   const [animationComplete, setAnimationComplete] = useState(false);
 
   // Animation values
@@ -24,11 +16,22 @@ const SplashScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const carRotation = useRef(new Animated.Value(0)).current;
 
-  // Create interpolated rotation value
+  // Create interpolated rotation value - simplified to just use 0-2 range
   const rotateInterpolated = carRotation.interpolate({
-    inputRange: [0, 1, 2, 3],
-    outputRange: ["0deg", "-15deg", "0deg", "15deg"],
+    inputRange: [0, 1, 2],
+    outputRange: ["0deg", "-15deg", "0deg"],
   });
+
+  // Navigate to login page after animation completes
+  useEffect(() => {
+    if (animationComplete) {
+      const timer = setTimeout(() => {
+        navigation.replace("Login");
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [animationComplete, navigation]);
 
   // Start animation when component mounts
   useEffect(() => {
@@ -58,27 +61,27 @@ const SplashScreen = ({ navigation }) => {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // After initial fade in, start the car movement sequence
       setTimeout(() => startCarMovementSequence(), 300);
     });
   };
 
   const startCarMovementSequence = () => {
-    // Phase 1: Bottom rectangle (blocking car) moves diagonally to create space
     setAnimationPhase(1);
-    const initialBottomPosition = { x: 0, y: 0 };
-    const tempPosition = { x: 40, y: 40 };
+    // Animation positions
+    const initialPosition = { x: 0, y: 0 };
+    const moveOutPosition = { x: 40, y: 40 };
     const finalPosition = { x: 0, y: -45 };
-
-    // Move bottom car away with rotation
-    Animated.parallel([
-      Animated.timing(bottomRectAnim, {
-        toValue: tempPosition,
-        duration: 1000,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
+    
+    // Full animation sequence
+    Animated.sequence([
+      // 1. Move bottom car out of the way with rotation
+      Animated.parallel([
+        Animated.timing(bottomRectAnim, {
+          toValue: moveOutPosition,
+          duration: 1000,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+          useNativeDriver: true,
+        }),
         Animated.timing(carRotation, {
           toValue: 1,
           duration: 1000,
@@ -86,54 +89,40 @@ const SplashScreen = ({ navigation }) => {
           useNativeDriver: true,
         }),
       ]),
-    ]).start(() => {
-      // Phase 2: Top right rectangle (blocked car) exits downward
-      setAnimationPhase(2);
-
+      
+      // 2. Top car exits
       Animated.timing(topRightRectAnim, {
         toValue: { x: 0, y: height },
         duration: 1200,
         useNativeDriver: true,
-      }).start(() => {
-        // Phase 3 : Bottom car returns to starting position and immediately moves up
-        setAnimationPhase(3);
-
-        // Create a sequence that moves to original position and then immediately to final position
-        Animated.sequence([
-          Animated.parallel([
-            Animated.timing(bottomRectAnim, {
-              toValue: initialBottomPosition,
-              duration: 600,
-              easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-              useNativeDriver: true,
-            }),
-            Animated.sequence([
-              Animated.timing(carRotation, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-              }),
-              Animated.timing(carRotation, {
-                toValue: 2,
-                duration: 300,
-                useNativeDriver: true,
-              }),
-            ]),
-          ]),
+      }),
+      
+      // 3. Bottom car returns to original position then moves up
+      Animated.sequence([
+        // Return to starting position
+        Animated.parallel([
           Animated.timing(bottomRectAnim, {
-            toValue: finalPosition,
-            duration: 500,
+            toValue: initialPosition,
+            duration: 600,
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
             useNativeDriver: true,
-          })
-        ]).start(() => {
-          setAnimationComplete(true);
-        });
-      });
+          }),
+          Animated.timing(carRotation, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Move to final position
+        Animated.timing(bottomRectAnim, {
+          toValue: finalPosition,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start(() => {
+      setAnimationComplete(true);
     });
-  };
-
-  const goToLogin = () => {
-    navigation.replace("Login");
   };
 
   // Animation styles
@@ -178,41 +167,6 @@ const SplashScreen = ({ navigation }) => {
           <View style={GlobalStyle.SplashBottomRow}>
             <Animated.View style={bottomRectStyle} />
           </View>
-        </View>
-
-        {/* Dev controls */}
-        <View
-          style={{
-            position: "absolute",
-            bottom: 40,
-            flexDirection: "row",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <TouchableOpacity
-            onPress={startAnimation}
-            style={{
-              backgroundColor: "rgba(255,255,255,0.3)",
-              padding: 10,
-              borderRadius: 8,
-              marginHorizontal: 10,
-            }}
-          >
-            <Text style={{ color: "white" }}>Replay Animation</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={goToLogin}
-            style={{
-              backgroundColor: "rgba(255,255,255,0.3)",
-              padding: 10,
-              borderRadius: 8,
-              marginHorizontal: 10,
-            }}
-          >
-            <Text style={{ color: "white" }}>Continue to Login</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </LinearGradient>
