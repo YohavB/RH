@@ -11,6 +11,7 @@ export default StyleSheet.create({
     backgroundColor: Colors.white,
   },
   contentContainer: {
+    alignItems: "center",
     height: "70%",
     gap: 150,
   },
@@ -45,9 +46,8 @@ export default StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    width: 273,
+    width: "90%",
     padding: (11, 102, 11, 8),
-    alignItems: "flex-start",
   },
   googleButtonContent: {
     flexDirection: "row",
@@ -55,8 +55,6 @@ export default StyleSheet.create({
     justifyContent: "center",
   },
   googleIcon: {
-    width: 24,
-    height: 24,
     marginRight: 12,
   },
   googleButtonText: {
