@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Text, View, TextInput, Alert, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Colors } from "../styles/GlobalStyle";
@@ -8,7 +8,7 @@ import { createOrUpdateCar } from "../BE_Api/ApiCalls";
 import ScreenContainer from "../components/ScreenContainer";
 import CameraButton from "../components/CameraButton";
 
-const Welcome = ({ navigation }) => {
+const Welcome = ({ navigation, route }) => {
   const [plateNumber, setPlateNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -16,11 +16,18 @@ const Welcome = ({ navigation }) => {
   const userName = userInfo?.user?.name || "Ben";
   const userId = userInfo?.user?.id;
 
+  const isButtonDisabled = isLoading || plateNumber.replace(/[^a-zA-Z0-9]/g, '').trim().length < 6;
+  
   const dispatch = useDispatch();
   const inputRef = useRef(null);
 
-  const isButtonDisabled = isLoading || plateNumber.replace(/[^a-zA-Z0-9]/g, '').trim().length < 6;
-  
+  // Update plateNumber if we returned from the camera screen with a detected plate
+  useEffect(() => {
+    if (route.params?.detectedPlate) {
+      setPlateNumber(route.params.detectedPlate);
+    }
+  }, [route.params?.detectedPlate]);
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
     setIsFocused(false);
@@ -30,12 +37,8 @@ const Welcome = ({ navigation }) => {
     // First dismiss the keyboard if it's open
     dismissKeyboard();
     
-    // Then handle the camera functionality
-    console.log("Camera button pressed");
-    Alert.alert(
-      "Camera",
-      "Camera functionality will be implemented in the future."
-    );
+    // Navigate to the plate recognition screen
+    navigation.navigate("PlateRecognition");
   };
 
   const handlePlateSubmit = async () => {
