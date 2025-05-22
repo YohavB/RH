@@ -153,7 +153,6 @@ export default function Settings({ navigation }) {
                   borderRadius: 10,
                   textAlign: "center",
                   fontSize: 20,
-                  borderWidth: 0,
                 }}
                 placeholder="Plate Number"
                 value={carNumber}

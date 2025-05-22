@@ -8,6 +8,16 @@ export const Colors = {
   blue: "#2169B6",
   mainOrange: "#F5855F", // Main app color
   textDark: "#4f4f4f",
+  background: "#FFFFFF", // Background color for the entire app
+  inputBackground:"#F1F3F5",
+};
+
+// Define font families
+export const Fonts = {
+  regular: "Poppins_400Regular",
+  medium: "Poppins_500Medium",
+  semiBold: "Poppins_600SemiBold",
+  bold: "Poppins_700Bold",
 };
 
 export const Gradients = {
@@ -29,9 +39,29 @@ export default StyleSheet.create({
   },
   
   // Text styles
+  h1: {
+    fontSize: 36,
+    fontFamily: Fonts.bold,
+    color: Colors.textDark,
+  },
+  h2: {
+    fontSize: 24,
+    fontFamily: Fonts.bold,
+    color: Colors.textDark,
+  },
+  h3: {
+    fontSize: 20,
+    fontFamily: Fonts.semiBold,
+    color: Colors.textDark,
+  },
+  body: {
+    fontSize: 16,
+    fontFamily: Fonts.regular,
+    color: Colors.textDark,
+  },
   buttonText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
     color: Colors.textDark,
   },
   
@@ -49,5 +79,20 @@ export default StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 10,
     textAlign: "center",
+    fontFamily: Fonts.regular,
+  },
+  
+  // Global container style - use this for root containers
+  container: {
+    display: "flex",
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+
+  // Screen container - use this for individual screens
+  screenContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    padding: 16,
   },
 }); 

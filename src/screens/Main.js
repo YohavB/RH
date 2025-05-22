@@ -86,7 +86,7 @@ export default function Main({ navigation }) {
                   <TextInput
                     showSoftInputOnFocus={false}
                     editable={false}
-                    style={{ 
+                    style={{
                       borderWidth: 1,
                       width: 50,
                       height: 10,
@@ -123,7 +123,6 @@ export default function Main({ navigation }) {
                         borderRadius: 10,
                         textAlign: "center",
                         fontSize: 20,
-                        borderWidth: 0,
                       },
                     ]}
                     placeholder="Plate Number"

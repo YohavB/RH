@@ -1,12 +1,14 @@
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
-import { Text, View, Pressable, SafeAreaView } from "react-native";
+import { Text, View, Pressable } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { setUserIdFromDB, setUserInfo } from "../redux/actions";
+import { setUserInfo, setUserCars } from "../redux/actions";
 
 import styles from "../styles/LoginStyles";
-import { findCarByPlateNumber } from "../BE_Api/ApiCalls";
+import { getUsersCarsByUserId } from "../BE_Api/ApiCalls";
+import ScreenContainer from '../components/ScreenContainer';
 
+// Import the SVG file directly
 import GoogleLogo from "../../assets/google_logo.svg";
 
 const Login = ({ navigation }) => {
@@ -25,22 +27,46 @@ const Login = ({ navigation }) => {
     navigation.replace("Main");
   };
 
-  const manualLogin = () => {
-    // Temporary manual login for testing
-    const mockUserInfo = {
-      user: {
-        email: "test@example.com",
-        id: "12345",
-        name: "Test User",
-        photo: "https://via.placeholder.com/150",
-      },
-    };
-    dispatch(setUserInfo(mockUserInfo));
-    navigation.replace("Main");
+  const manualLogin = async () => {
+    setIsSigninInProgress(true);
+    try {
+      // Temporary manual login for testing
+      const mockUserInfo = {
+        user: {
+          email: "test@example.com",
+          id: "12345",
+          name: "Test User",
+          photo: "https://via.placeholder.com/150",
+        },
+      };
+      dispatch(setUserInfo(mockUserInfo));
+      
+      // Check if user has registered cars - in a real app, this would use the API
+      // For demo purposes, we'll use a mock approach
+      const mockHasRegisteredCars = false; // Set to true to bypass Welcome screen
+      
+      if (mockHasRegisteredCars) {
+        // Mock data for registered cars
+        const mockCars = [{
+          id: 1,
+          plateNumber: "ABC123",
+          userId: 12345
+        }];
+        dispatch(setUserCars(mockCars));
+        navigation.replace("Main");
+      } else {
+        // No cars registered, go to Welcome screen
+        navigation.replace("Welcome");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsSigninInProgress(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer>
       <View style={styles.contentContainer}>
         <View style={styles.headerContainer}>
           <Text style={styles.title}>Get started with</Text>
@@ -57,7 +83,7 @@ const Login = ({ navigation }) => {
           </View>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 

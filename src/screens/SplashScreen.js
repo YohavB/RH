@@ -3,6 +3,7 @@ import { Text, View, Animated, Dimensions, Easing } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Gradients } from "../styles/GlobalStyle";
 import styles from "../styles/SplashScreenStyles";
+import ScreenContainer from '../components/ScreenContainer';
 
 const { height } = Dimensions.get("window");
 
@@ -152,25 +153,27 @@ const SplashScreen = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient
-      colors={Gradients.orangeToPink.colors}
-      style={styles.container}
-      start={Gradients.orangeToPink.start}
-      end={Gradients.orangeToPink.end}
-    >
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>unBlock</Text>
-        <View style={styles.logoContainer}>
-          <View style={styles.topRow}>
-            <Animated.View style={topLeftRectStyle} />
-            <Animated.View style={topRightRectStyle} />
-          </View>
-          <View style={styles.bottomRow}>
-            <Animated.View style={bottomRectStyle} />
+    <ScreenContainer safeArea={false}>
+      <LinearGradient
+        colors={Gradients.orangeToPink.colors}
+        style={styles.container}
+        start={Gradients.orangeToPink.start}
+        end={Gradients.orangeToPink.end}
+      >
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>unBlock</Text>
+          <View style={styles.logoContainer}>
+            <View style={styles.topRow}>
+              <Animated.View style={topLeftRectStyle} />
+              <Animated.View style={topRightRectStyle} />
+            </View>
+            <View style={styles.bottomRow}>
+              <Animated.View style={bottomRectStyle} />
+            </View>
           </View>
         </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </ScreenContainer>
   );
 };
 

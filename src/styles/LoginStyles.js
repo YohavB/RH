@@ -1,35 +1,33 @@
 import { StyleSheet } from "react-native";
-import { Colors } from "./GlobalStyle";
+import { Colors, Fonts } from "./GlobalStyle";
 
 export default StyleSheet.create({
-  container: {
-    display: "flex",
+  contentContainer: {
+    paddingHorizontal: 48,
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    flex: 1,
-    backgroundColor: Colors.white,
-  },
-  contentContainer: {
-    alignItems: "center",
+    gap: 84,
     height: "70%",
-    gap: 150,
+  },
+  headerContainer: {
+    marginBottom: 60,
   },
   title: {
     fontSize: 36,
-    fontWeight: "700",
+    fontFamily: Fonts.medium,
     color: "#000",
     lineHeight: 46,
   },
   titleBrand: {
     fontSize: 42,
-    fontWeight: "900",
+    fontFamily: Fonts.bold,
     color: "#000",
     lineHeight: 50,
   },
   subtitle: {
     fontSize: 24,
-    fontWeight: "400",
+    fontFamily: Fonts.regular,
     color: Colors.mainOrange,
     marginTop: 16,
   },
@@ -55,11 +53,11 @@ export default StyleSheet.create({
     justifyContent: "center",
   },
   googleIcon: {
-    marginRight: 12,
+    marginRight: 20,
   },
   googleButtonText: {
     fontSize: 16,
-    fontWeight: "500",
+    fontFamily: Fonts.medium,
     color: Colors.textDark,
   },
 });
