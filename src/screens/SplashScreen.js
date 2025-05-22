@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Text, View, Animated, Dimensions, Easing } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import GlobalStyle, { Gradients } from "../../utils/GlobalStyle";
+import { Gradients } from "../styles/GlobalStyle";
+import styles from "../styles/SplashScreenStyles";
 
 const { height } = Dimensions.get("window");
 
@@ -127,12 +128,12 @@ const SplashScreen = ({ navigation }) => {
 
   // Animation styles
   const topLeftRectStyle = {
-    ...GlobalStyle.SplashRectangle,
+    ...styles.rectangle,
     opacity: topLeftRectAnim,
   };
 
   const topRightRectStyle = {
-    ...GlobalStyle.SplashRectangle,
+    ...styles.rectangle,
     opacity: fadeAnim,
     transform: [
       { translateX: topRightRectAnim.x },
@@ -141,7 +142,7 @@ const SplashScreen = ({ navigation }) => {
   };
 
   const bottomRectStyle = {
-    ...GlobalStyle.SplashRectangle,
+    ...styles.rectangle,
     opacity: fadeAnim,
     transform: [
       { translateX: bottomRectAnim.x },
@@ -153,18 +154,18 @@ const SplashScreen = ({ navigation }) => {
   return (
     <LinearGradient
       colors={Gradients.orangeToPink.colors}
-      style={GlobalStyle.SplashContainer}
+      style={styles.container}
       start={Gradients.orangeToPink.start}
       end={Gradients.orangeToPink.end}
     >
-      <View style={GlobalStyle.SplashContentContainer}>
-        <Text style={GlobalStyle.SplashTitle}>unBlock</Text>
-        <View style={GlobalStyle.SplashLogoContainer}>
-          <View style={GlobalStyle.SplashTopRow}>
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>unBlock</Text>
+        <View style={styles.logoContainer}>
+          <View style={styles.topRow}>
             <Animated.View style={topLeftRectStyle} />
             <Animated.View style={topRightRectStyle} />
           </View>
-          <View style={GlobalStyle.SplashBottomRow}>
+          <View style={styles.bottomRow}>
             <Animated.View style={bottomRectStyle} />
           </View>
         </View>

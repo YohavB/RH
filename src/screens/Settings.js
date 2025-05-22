@@ -2,7 +2,8 @@ import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlobalStyle from "../../utils/GlobalStyle";
+import GlobalStyle from "../styles/GlobalStyle";
+import styles from "../styles/SettingsStyles";
 import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
 
 import { useSelector, useDispatch } from "react-redux";

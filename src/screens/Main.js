@@ -4,7 +4,8 @@ import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlobalStyle, { Colors } from "../../utils/GlobalStyle";
+import { Colors } from "../styles/GlobalStyle";
+import styles from "../styles/MainStyles";
 import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
 
 export default function Main({ navigation }) {
@@ -56,27 +57,27 @@ export default function Main({ navigation }) {
 
   return (
     <KeyboardAvoidingWrapper>
-      <SafeAreaView style={GlobalStyle.MainContainer}>
-        <Pressable style={GlobalStyle.Settings} onPress={navToSettings}>
+      <SafeAreaView style={styles.mainContainer}>
+        <Pressable style={styles.settings} onPress={navToSettings}>
           <Image
-            style={GlobalStyle.SettingButton}
+            style={styles.settingButton}
             source={require("../../assets/images/settings.png")}
           />
         </Pressable>
         <View>
-          <Text style={GlobalStyle.Title}>Hi {userName} !</Text>
-          <Text style={GlobalStyle.Text}>
+          <Text style={{ fontSize: 60, textAlign: "center" }}>Hi {userName} !</Text>
+          <Text style={{ fontSize: 20, margin: 20, textAlign: "center" }}>
             Enter the Car's Plate Number that you're blocking. Plate :{" "}
             {blockedPlateNumber}, redux text {userName}, {carNumber}
           </Text>
         </View>
-        <View style={GlobalStyle.ContainerCars}>
+        <View style={styles.containerCars}>
           {/* FIRST PART */}
-          <View style={GlobalStyle.ContainerCar}>
-            <View style={GlobalStyle.ContainerCarPicture}>
+          <View style={styles.containerCar}>
+            <View style={styles.containerCarPicture}>
               <Pressable>
                 <Image
-                  style={GlobalStyle.Car}
+                  style={styles.car}
                   source={require("../../assets/images/grey-car.png")}
                 />
               </Pressable>
@@ -85,13 +86,21 @@ export default function Main({ navigation }) {
                   <TextInput
                     showSoftInputOnFocus={false}
                     editable={false}
-                    style={GlobalStyle.InputLittlePlate}
+                    style={{ 
+                      borderWidth: 1,
+                      width: 50,
+                      height: 10,
+                      textAlign: "center",
+                      fontSize: 8,
+                      fontWeight: "bold",
+                      borderColor: "transparent",
+                    }}
                     backgroundColor="transparent"
                     value={blockedPlateNumber}
                   ></TextInput>
                   <Image
                     source={require("../../assets/images/plate.png")}
-                    style={GlobalStyle.LittlePlate}
+                    style={styles.littlePlate}
                   ></Image>
                 </View>
               ) : (
@@ -99,13 +108,21 @@ export default function Main({ navigation }) {
               )}
             </View>
             {!blockingSaved ? (
-              <View style={GlobalStyle.ContainerActionMain}>
+              <View style={styles.containerActionMain}>
                 <View>
                   <TextInput
                     contextMenuHidden={true}
                     style={[
-                      GlobalStyle.Input,
                       {
+                        borderWidth: 1,
+                        padding: 10,
+                        width: 300,
+                        height: 50,
+                        borderColor: "#555",
+                        backgroundColor: "#fff",
+                        borderRadius: 10,
+                        textAlign: "center",
+                        fontSize: 20,
                         borderWidth: 0,
                       },
                     ]}
@@ -118,21 +135,21 @@ export default function Main({ navigation }) {
                   ></TextInput>
                   <Image
                     source={require("../../assets/images/plate.png")}
-                    style={GlobalStyle.Plate}
+                    style={styles.plate}
                   ></Image>
                 </View>
 
                 <Pressable
-                  style={GlobalStyle.BlockingButton}
+                  style={styles.blockingButton}
                   onPress={validateBolckingCar}
                 >
                   <Text>I'm blocking that Car</Text>
                 </Pressable>
               </View>
             ) : (
-              <View style={GlobalStyle.ContainerActionMain}>
+              <View style={styles.containerActionMain}>
                 <Pressable
-                  style={GlobalStyle.BlockingButton}
+                  style={styles.blockingButton}
                   onPress={validateBolckingCar}
                 >
                   <Text style={{ textAlign: "center" }}>
@@ -143,11 +160,11 @@ export default function Main({ navigation }) {
             )}
           </View>
           {/* SECOND PART */}
-          <View style={GlobalStyle.ContainerCar}>
-            <View style={GlobalStyle.ContainerCarPicture}>
+          <View style={styles.containerCar}>
+            <View style={styles.containerCarPicture}>
               <Pressable>
                 <Image
-                  style={GlobalStyle.Car}
+                  style={styles.car}
                   source={require("../../assets/images/red-car.png")}
                 />
               </Pressable>
@@ -155,48 +172,43 @@ export default function Main({ navigation }) {
                 <TextInput
                   showSoftInputOnFocus={false}
                   editable={false}
-                  style={GlobalStyle.InputLittlePlate}
+                  style={styles.inputLittlePlate}
                   backgroundColor="transparent"
                   value={carNumber}
                 ></TextInput>
                 <Image
                   source={require("../../assets/images/plate.png")}
-                  style={GlobalStyle.LittlePlate}
+                  style={styles.littlePlate}
                 ></Image>
               </View>
             </View>
 
-            <View style={GlobalStyle.ContainerActionMain}>
+            <View style={styles.containerActionMain}>
               <TextInput
                 showSoftInputOnFocus={false}
                 editable={false}
-                style={[
-                  GlobalStyle.Input,
-                  {
-                    borderWidth: 0,
-                  },
-                ]}
+                style={styles.input}
                 backgroundColor="transparent"
                 value={carNumber}
               ></TextInput>
               <Image
                 source={require("../../assets/images/plate.png")}
-                style={GlobalStyle.Plate}
+                style={styles.plate}
               ></Image>
             </View>
           </View>
           {/* THIRD PART */}
-          <View style={GlobalStyle.ContainerCar}>
+          <View style={styles.containerCar}>
             <View
               style={[
-                GlobalStyle.ContainerCarPicture,
+                styles.containerCarPicture,
                 { paddingBottom: "20%" },
               ]}
             >
               {blocked ? (
                 <Pressable onPress={INeedToGo}>
                   <Image
-                    style={GlobalStyle.Car}
+                    style={styles.car}
                     source={require("../../assets/images/grey-car.png")}
                   />
                 </Pressable>
@@ -207,17 +219,17 @@ export default function Main({ navigation }) {
             {blocked ? (
               <View
                 style={[
-                  GlobalStyle.ContainerActionMain,
+                  styles.containerActionMain,
                   { paddingBottom: "30%" },
                 ]}
               >
-                <Text style={GlobalStyle.Text}>
+                <Text style={styles.text}>
                   Seems Like {driverBlockingYou} ({carBlockingYou}) is blocking
                   you !
                 </Text>
                 <Pressable
                   style={[
-                    GlobalStyle.Input,
+                    styles.input,
                     { alignItems: "center", justifyContent: "center" },
                   ]}
                   onPress={INeedToGo}
@@ -230,14 +242,14 @@ export default function Main({ navigation }) {
             ) : (
               <View
                 style={[
-                  GlobalStyle.ContainerActionMain,
+                  styles.containerActionMain,
                   { paddingBottom: "30%" },
                 ]}
               >
-                <Text style={GlobalStyle.Text}>
+                <Text style={styles.text}>
                   Seems like anyone is blocking you !
                 </Text>
-                <Text style={GlobalStyle.Text}>You're free to go !</Text>
+                <Text style={styles.text}>You're free to go !</Text>
               </View>
             )}
           </View>

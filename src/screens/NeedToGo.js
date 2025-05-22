@@ -1,6 +1,7 @@
 import React from "react";
 import { TextInput, View, Text } from "react-native";
-import GlobalStyle from "../../utils/GlobalStyle";
+import GlobalStyle from "../styles/GlobalStyle";
+import styles from "../styles/NeedToGoStyles";
 
 export default function NeedToGo() {
   return (
