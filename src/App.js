@@ -7,13 +7,13 @@ import NeedToGo from "./screens/NeedToGo";
 import Settings from "./screens/Settings";
 import SplashScreen from "./screens/SplashScreen";
 import { Provider } from "react-redux";
-import { Store } from "./redux/store";
+import { store } from "./redux/store";
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <Provider store={Store}>
+    <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ header: () => null }}>
           <Stack.Screen

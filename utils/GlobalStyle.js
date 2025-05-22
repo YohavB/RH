@@ -2,11 +2,11 @@ import { StyleSheet } from "react-native";
 
 // Define common colors and gradients for reuse
 export const Colors = {
-  orange: '#FF9E4E',
-  pinkish: '#ED726B',
-  white: '#FFFFFF',
-  blue: '#2169B6',
-  mainOrange: '#F5855F', // Main app color
+  orange: "#FF9E4E",
+  pinkish: "#ED726B",
+  white: "#FFFFFF",
+  blue: "#2169B6",
+  mainOrange: "#F5855F", // Main app color
 };
 
 export const Gradients = {
@@ -129,43 +129,41 @@ export default StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
   },
-  
+
   // Splash Screen Styles
   SplashContainer: {
     flex: 1,
-    width: '100%',
+    width: "100%",
   },
   SplashContentContainer: {
     flex: 1,
-    paddingTop: 300,
-    paddingLeft: 107,
-    paddingRight: 105,
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
   SplashTitle: {
-    fontSize: 64,
-    fontWeight: '600',
-    color: 'white',
+    fontSize: 54,
+    fontWeight: "600",
+    color: "white",
+    marginBottom:10,
+    textAlign: "center",
   },
   SplashLogoContainer: {
-    alignItems: 'center',
-    marginBottom: 200,
+    alignItems: "center",
   },
   SplashTopRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginBottom: 8,
   },
   SplashBottomRow: {
-    alignItems: 'center',
+    alignSelf: "flex-end",
   },
   SplashRectangle: {
-    width: 40,
-    height: 40,
-    backgroundColor: 'white',
+    width: 26,
+    height: 37,
+    flexShrink: 0,
+    backgroundColor: "white",
     borderRadius: 4,
-  }
+  },
 });

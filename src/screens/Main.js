@@ -4,7 +4,7 @@ import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlobalStyle from "../../utils/GlobalStyle";
+import GlobalStyle, { Colors } from "../../utils/GlobalStyle";
 import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
 
 export default function Main({ navigation }) {
@@ -15,7 +15,10 @@ export default function Main({ navigation }) {
   const [driverBlockingYou, setDriverBlockingYou] = useState("Dor");
   const [carBlockingYou, setCarBlockingYou] = useState("12345678");
 
-  const { userName, carNumber } = useSelector((state) => state.userReducer);
+  // Fix Redux selector and provide default values
+  const userState = useSelector((state) => state.user) || {};
+  const userName = userState.userInfo?.user?.name || "User";
+  const carNumber = userState.userInfo?.carNumber || "12345678";
 
   useEffect(() => {
     console.log("useEffect in Main");

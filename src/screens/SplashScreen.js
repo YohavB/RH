@@ -1,42 +1,37 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Image, Text, View, Animated, Dimensions, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorageLib from "@react-native-async-storage/async-storage";
-import { LinearGradient } from 'expo-linear-gradient';
-
-import { useSelector, useDispatch } from "react-redux";
-import { setExpoToken, setUserInfo } from "../redux/actions";
-
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-
+import {
+  Text,
+  View,
+  Animated,
+  Dimensions,
+  Easing,
+  TouchableOpacity,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import GlobalStyle, { Gradients } from "../../utils/GlobalStyle";
 
-import {
-  GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
-
 // Get screen dimensions for animation calculations
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const SplashScreen = ({ navigation }) => {
-  const { expoToken, userInfo } = useSelector((state) => state.userReducer);
-
-  const [isSignedIn, setIsSignedIn] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
+  const [animationComplete, setAnimationComplete] = useState(false);
 
   // Animation values
   const topLeftRectAnim = useRef(new Animated.Value(0)).current;
   const topRightRectAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const bottomRectAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const carRotation = useRef(new Animated.Value(0)).current;
 
-  const dispatch = useDispatch();
+  // Create interpolated rotation value
+  const rotateInterpolated = carRotation.interpolate({
+    inputRange: [0, 1, 2, 3],
+    outputRange: ["0deg", "-15deg", "0deg", "15deg"],
+  });
 
+  // Start animation when component mounts
   useEffect(() => {
-    console.log("useEffect in SplashScreen");
-    initApp();
     startAnimation();
   }, []);
 
@@ -46,7 +41,9 @@ const SplashScreen = ({ navigation }) => {
     topRightRectAnim.setValue({ x: 0, y: 0 });
     bottomRectAnim.setValue({ x: 0, y: 0 });
     fadeAnim.setValue(0);
+    carRotation.setValue(0);
     setAnimationPhase(0);
+    setAnimationComplete(false);
 
     // Initial fade in of all rectangles
     Animated.parallel([
@@ -62,117 +59,81 @@ const SplashScreen = ({ navigation }) => {
       }),
     ]).start(() => {
       // After initial fade in, start the car movement sequence
-      setTimeout(() => startCarMovementSequence(), 500);
+      setTimeout(() => startCarMovementSequence(), 300);
     });
   };
 
   const startCarMovementSequence = () => {
-    // Phase 1: Bottom rectangle (blocking car) moves diagonally to bottom right
+    // Phase 1: Bottom rectangle (blocking car) moves diagonally to create space
     setAnimationPhase(1);
-    Animated.timing(bottomRectAnim, {
-      toValue: { x: 60, y: 60 },
-      duration: 1200,
-      useNativeDriver: true,
-    }).start(() => {
+    const initialBottomPosition = { x: 0, y: 0 };
+    const tempPosition = { x: 40, y: 40 };
+    const finalPosition = { x: 0, y: -45 };
+
+    // Move bottom car away with rotation
+    Animated.parallel([
+      Animated.timing(bottomRectAnim, {
+        toValue: tempPosition,
+        duration: 1000,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      }),
+      Animated.sequence([
+        Animated.timing(carRotation, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start(() => {
       // Phase 2: Top right rectangle (blocked car) exits downward
       setAnimationPhase(2);
+
       Animated.timing(topRightRectAnim, {
         toValue: { x: 0, y: height },
-        duration: 1500,
+        duration: 1200,
         useNativeDriver: true,
       }).start(() => {
-        // Phase 3: Bottom rectangle moves to take top right's place
+        // Phase 3 : Bottom car returns to starting position and immediately moves up
         setAnimationPhase(3);
-        Animated.timing(bottomRectAnim, {
-          toValue: { x: 48, y: -60 }, // Move to top-right position
-          duration: 1000,
-          useNativeDriver: true,
-        }).start();
+
+        // Create a sequence that moves to original position and then immediately to final position
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(bottomRectAnim, {
+              toValue: initialBottomPosition,
+              duration: 600,
+              easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+              useNativeDriver: true,
+            }),
+            Animated.sequence([
+              Animated.timing(carRotation, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+              }),
+              Animated.timing(carRotation, {
+                toValue: 2,
+                duration: 300,
+                useNativeDriver: true,
+              }),
+            ]),
+          ]),
+          Animated.timing(bottomRectAnim, {
+            toValue: finalPosition,
+            duration: 500,
+            useNativeDriver: true,
+          })
+        ]).start(() => {
+          setAnimationComplete(true);
+        });
       });
     });
   };
 
-  const initApp = async () => {
-    googleConfigure();
-    await registerForPushNotificationsAsync();
-    await setupSync();
-  };
-
-  const setupSync = async () => {
-    await isSignedInQuery();
-    !isSignedIn ? await signInSilentlyFromGoogle() : await getCurrentUser();
-  };
-
-  const googleConfigure = () => {
-    console.log("Google.configure");
-    GoogleSignin.configure({
-      //scopes: ["https://www.googleapis.com/auth/drive.readonly"], // what API you want to access on behalf of the user, default is email and profile
-      webClientId:
-        "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
-      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-    });
-  };
-
-  const isSignedInQuery = async () => {
-    console.log("is SignedIn Query");
-    const isSignedIn = await GoogleSignin.isSignedIn();
-    setIsSignedIn(isSignedIn);
-  };
-
-  const getCurrentUser = async () => {
-    console.log("Get current user");
-    const currentUser = await GoogleSignin.getCurrentUser();
-    dispatch(setUserInfo(currentUser));
-  };
-
-  const signInSilentlyFromGoogle = async () => {
-    console.log("signin silently");
-    try {
-      const userInfo = await GoogleSignin.signInSilently();
-      dispatch(setUserInfo(userInfo));
-      console.log("UserInfo from Google retrieved");
-      navigation.replace("Main");
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_REQUIRED) {
-        // user has not signed in yet
-        console.log("UserInfo from Google not retrieved need to sign in");
-        navigation.replace("Login");
-      } else {
-        // some other error
-        console.log("another error" + error.code + " : " + error.message);
-      }
-    }
-  };
-
-  const registerForPushNotificationsAsync = async () => {
-    console.log("register for push");
-    if (Device.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      const token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log("The ExpoPushToken of this device is " + token);
-      dispatch(setExpoToken(token));
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
+  const goToLogin = () => {
+    navigation.replace("Login");
   };
 
   // Animation styles
@@ -196,6 +157,7 @@ const SplashScreen = ({ navigation }) => {
     transform: [
       { translateX: bottomRectAnim.x },
       { translateY: bottomRectAnim.y },
+      { rotate: rotateInterpolated },
     ],
   };
 
@@ -216,6 +178,41 @@ const SplashScreen = ({ navigation }) => {
           <View style={GlobalStyle.SplashBottomRow}>
             <Animated.View style={bottomRectStyle} />
           </View>
+        </View>
+
+        {/* Dev controls */}
+        <View
+          style={{
+            position: "absolute",
+            bottom: 40,
+            flexDirection: "row",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <TouchableOpacity
+            onPress={startAnimation}
+            style={{
+              backgroundColor: "rgba(255,255,255,0.3)",
+              padding: 10,
+              borderRadius: 8,
+              marginHorizontal: 10,
+            }}
+          >
+            <Text style={{ color: "white" }}>Replay Animation</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={goToLogin}
+            style={{
+              backgroundColor: "rgba(255,255,255,0.3)",
+              padding: 10,
+              borderRadius: 8,
+              marginHorizontal: 10,
+            }}
+          >
+            <Text style={{ color: "white" }}>Continue to Login</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </LinearGradient>
