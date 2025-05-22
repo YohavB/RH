@@ -97,10 +97,10 @@ export default function Settings({ navigation }) {
 
   return (
     <KeyboardAvoidingWrapper>
-      <SafeAreaView style={GlobalStyle.MainContainer}>
-        <Pressable style={GlobalStyle.Settings} onPress={navToMain}>
+      <SafeAreaView style={{ width: "100%", height: "100%", backgroundColor: "#2169B6", alignItems: "center", justifyContent: "center", alignContent: "center" }}>
+        <Pressable style={{ zIndex: 2, position: "absolute", left: "88%", top: "5%", width: 50 }} onPress={navToMain}>
           <Image
-            style={GlobalStyle.SettingButton}
+            style={{ width: 40, height: 40 }}
             source={require("../../assets/images/close.png")}
           />
         </Pressable>
@@ -114,7 +114,7 @@ export default function Settings({ navigation }) {
             marginBottom: 20,
           }}
         >
-          <Text style={GlobalStyle.Title}>Settings</Text>
+          <Text style={styles.title}>Settings</Text>
           <View
             style={{
               justifyContent: "space-evenly",
@@ -124,7 +124,17 @@ export default function Settings({ navigation }) {
             <TextInput
               autoCapitalize="words"
               autoCorrect={false}
-              style={GlobalStyle.Input}
+              style={{
+                borderWidth: 1,
+                padding: 10,
+                width: 300,
+                height: 50,
+                borderColor: "#555",
+                backgroundColor: "#fff",
+                borderRadius: 10,
+                textAlign: "center",
+                fontSize: 20,
+              }}
               value={userName}
               placeholder="New Name"
               onChangeText={(value) => setName(value)}
@@ -133,12 +143,18 @@ export default function Settings({ navigation }) {
             <View>
               <TextInput
                 contextMenuHidden={true}
-                style={[
-                  GlobalStyle.Input,
-                  {
-                    borderWidth: 0,
-                  },
-                ]}
+                style={{
+                  borderWidth: 1,
+                  padding: 10,
+                  width: 300,
+                  height: 50,
+                  borderColor: "#555",
+                  backgroundColor: "#fff",
+                  borderRadius: 10,
+                  textAlign: "center",
+                  fontSize: 20,
+                  borderWidth: 0,
+                }}
                 placeholder="Plate Number"
                 value={carNumber}
                 onChangeText={(value) => validatePlate(value)}
@@ -148,7 +164,12 @@ export default function Settings({ navigation }) {
               ></TextInput>
               <Image
                 source={require("../../assets/images/plate.png")}
-                style={GlobalStyle.Plate}
+                style={{
+                  position: "absolute",
+                  zIndex: -1,
+                  width: 300,
+                  height: 50,
+                }}
               ></Image>
             </View>
           </View>
@@ -160,25 +181,25 @@ export default function Settings({ navigation }) {
           >
             <Pressable
               style={({ pressed }) => [
-                GlobalStyle.Pressable,
+                styles.pressable,
                 {
                   backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
                 },
               ]}
               onPress={updateData}
             >
-              <Text style={GlobalStyle.ButtonText}>Update And Continue</Text>
+              <Text style={styles.buttonText}>Update And Continue</Text>
             </Pressable>
             <Pressable
               style={({ pressed }) => [
-                GlobalStyle.Pressable,
+                styles.pressable,
                 {
                   backgroundColor: pressed ? "rose" : "red",
                 },
               ]}
               onPress={removeDataAndLogout}
             >
-              <Text style={GlobalStyle.ButtonText}>Logout</Text>
+              <Text style={styles.buttonText}>Logout</Text>
             </Pressable>
           </View>
         </View>

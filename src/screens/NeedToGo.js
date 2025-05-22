@@ -10,7 +10,17 @@ export default function NeedToGo() {
       <Text>
         To Starting using this app please enter your Name and your Plate Number
       </Text>
-      <TextInput style={GlobalStyle.Input}></TextInput>
+      <TextInput style={{ 
+        borderWidth: 1,
+        padding: 10,
+        width: 300,
+        height: 50,
+        borderColor: "#555",
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        textAlign: "center",
+        fontSize: 20,
+      }}></TextInput>
     </View>
   );
 }
