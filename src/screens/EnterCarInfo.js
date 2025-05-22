@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { Alert, Text, TextInput, View, Pressable, Image } from "react-native";
 
 import { useDispatch } from "react-redux";
-import { setUserName, setCarNumber } from "./redux/action";
+import { setUserName, setCarNumber } from "../redux/actions";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlobalStyle from "../utils/GlobalStyle";
-import KeyboardAvoidingWrapper from "../utils/KeyboardAvoidingWrapper";
+import GlobalStyle from "../../utils/GlobalStyle";
+import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
 
 import {
   GoogleSignin,
@@ -16,10 +16,10 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 const Login = ({ navigation }) => {
-  const [userInfo, setUserInfo] = useState("empty");
-  const [name, setName] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
   const [plateNumber, setPlateNumber] = useState("");
   const [isSigninInProgress, setIsSigninInProgress] = useState(false);
+  const [isValidPlate, setIsValidPlate] = useState(false)
 
   const dispatch = useDispatch();
 
@@ -29,7 +29,7 @@ const Login = ({ navigation }) => {
   };
 
   const validateData = async () => {
-    if (name.length == 0 || plateNumber.length < 6) {
+    if (plateNumber.length < 6) {
       Alert.alert(
         "*Horn Noise*",
         "It seems like some info is missing or not completed"
@@ -37,7 +37,6 @@ const Login = ({ navigation }) => {
     } else {
       try {
         var userInfo = {
-          name: name,
           plateNumber: plateNumber,
         };
         await AsyncStorageLib.setItem("userInfo", JSON.stringify(userInfo));
@@ -61,9 +60,23 @@ const Login = ({ navigation }) => {
     console.log("Loggin with Google");
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      setUserInfo(userInfo);
-      console.log(userInfo);
+      const user = await GoogleSignin.signIn();
+      console.log(user);
+      const currentUser = new UserInfo(
+        user.idToken,
+        user.serverAuthCode,
+        user.scopes,
+        new User(
+          user.user.email,
+          user.user.id,
+          user.user.givenName,
+          user.user.familyName,
+          user.user.photo,
+          user.user.name
+        )
+      );
+      setUserInfo(currentUser);
+      console.log(currentUser);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -102,24 +115,21 @@ const Login = ({ navigation }) => {
         style={[GlobalStyle.MainContainer, { justifyContent: "flex-start" }]}
       >
         <Text style={GlobalStyle.Title}>Welcome To Rush Hour</Text>
-        <Text style={GlobalStyle.Text}>
-          To Starting using this app please enter your Name and your Plate
-          Number
-        </Text>
+        <Text style={GlobalStyle.Text}>Please LogIn</Text>
         <View
           style={{
             justifyContent: "space-evenly",
             height: 200,
           }}
         >
-          <TextInput
+          {/* <TextInput
             autoCapitalize="words"
             autoCorrect={false}
             style={GlobalStyle.Input}
             placeholder="Name"
             onChangeText={(value) => setName(value)}
             maxLength={20}
-          ></TextInput>
+          ></TextInput> */}
 
           <View>
             <TextInput
@@ -143,36 +153,12 @@ const Login = ({ navigation }) => {
             ></Image>
           </View>
         </View>
-        <Pressable
-          style={({ pressed }) => [
-            GlobalStyle.Pressable,
-            {
-              backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
-            },
-          ]}
-          onPress={signInWithGoogle}
-        >
-          <Text style={GlobalStyle.ButtonText}>Signout</Text>
-        </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [
-            GlobalStyle.Pressable,
-            {
-              backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
-            },
-          ]}
-          onPress={printUser}
-        >
-          <Text style={GlobalStyle.ButtonText}>Print user info</Text>
-        </Pressable>
-
         <GoogleSigninButton
           style={{ width: 192, height: 48 }}
           size={GoogleSigninButton.Size.Wide}
           color={GoogleSigninButton.Color.Dark}
           onPress={signInWithGoogle}
-          disabled={isSigninInProgress}
+          disabled={isSigninInProgress && !isPlateValid}
         />
       </SafeAreaView>
     </KeyboardAvoidingWrapper>
@@ -180,18 +166,3 @@ const Login = ({ navigation }) => {
 };
 
 export default Login;
-
-// userInfoClass
-// {
-//   idToken: string,
-//   serverAuthCode: string,
-//   scopes: Array<string>, // on iOS this is empty array if no additional scopes are defined
-//   user: {
-//     email: string,
-//     id: string,
-//     givenName: string,
-//     familyName: string,
-//     photo: string, // url
-//     name: string // full name
-//   }
-// }

@@ -1,5 +1,22 @@
 import { StyleSheet } from "react-native";
 
+// Define common colors and gradients for reuse
+export const Colors = {
+  orange: '#FF9E4E',
+  pinkish: '#ED726B',
+  white: '#FFFFFF',
+  blue: '#2169B6',
+  mainOrange: '#F5855F', // Main app color
+};
+
+export const Gradients = {
+  orangeToPink: {
+    colors: [Colors.orange, Colors.pinkish],
+    start: { x: 0, y: 0 },
+    end: { x: 0, y: 1.09 },
+  },
+};
+
 export default StyleSheet.create({
   MainContainer: {
     // borderColor: "yellow",
@@ -112,4 +129,43 @@ export default StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
   },
+  
+  // Splash Screen Styles
+  SplashContainer: {
+    flex: 1,
+    width: '100%',
+  },
+  SplashContentContainer: {
+    flex: 1,
+    paddingTop: 300,
+    paddingLeft: 107,
+    paddingRight: 105,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 28,
+  },
+  SplashTitle: {
+    fontSize: 64,
+    fontWeight: '600',
+    color: 'white',
+  },
+  SplashLogoContainer: {
+    alignItems: 'center',
+    marginBottom: 200,
+  },
+  SplashTopRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  SplashBottomRow: {
+    alignItems: 'center',
+  },
+  SplashRectangle: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 4,
+  }
 });

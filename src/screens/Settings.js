@@ -2,11 +2,11 @@ import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlobalStyle from "../utils/GlobalStyle";
-import KeyboardAvoidingWrapper from "../utils/KeyboardAvoidingWrapper";
+import GlobalStyle from "../../utils/GlobalStyle";
+import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setUserName, setCarNumber, logout } from "./redux/action";
+import { setUserName, setCarNumber, logout } from "../redux/actions";
 
 export default function Settings({ navigation }) {
   const [name, setName] = useState("");
@@ -100,7 +100,7 @@ export default function Settings({ navigation }) {
         <Pressable style={GlobalStyle.Settings} onPress={navToMain}>
           <Image
             style={GlobalStyle.SettingButton}
-            source={require("../assets/images/close.png")}
+            source={require("../../assets/images/close.png")}
           />
         </Pressable>
         <View
@@ -146,7 +146,7 @@ export default function Settings({ navigation }) {
                 backgroundColor="transparent"
               ></TextInput>
               <Image
-                source={require("../assets/images/plate.png")}
+                source={require("../../assets/images/plate.png")}
                 style={GlobalStyle.Plate}
               ></Image>
             </View>

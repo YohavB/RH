@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "RushHour",
-    "description": "Blocking Without Being Blocked, RushHour is the solution for Jarking Jam",
+    "description": "Blocking Without Being Blocked, RushHour is the solution for Parking Jam",
     "slug": "RushHour",
     "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/RHlogo.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -22,21 +22,21 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.rushhour",
       "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/RHlogo.png"
     },
     "plugins": [
       ["@react-native-google-signin/google-signin"],
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
+          "icon": "./assets/images/logo.png",
           "iosDisplayInForeground": true,
           "sounds": [
             "./assets/images/sounds/car-horn.wav",
