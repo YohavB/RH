@@ -9,6 +9,7 @@ import Settings from "./screens/Settings";
 import SplashScreen from "./screens/SplashScreen";
 import Welcome from "./screens/Welcome";
 import PlateRecognitionScreen from "./screens/PlateRecognitionScreen";
+import UserCarsScreen from "./screens/UserCarsScreen";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import GlobalStyle, { Colors } from "./styles/GlobalStyle";
@@ -66,6 +67,11 @@ export default function App() {
             <Stack.Screen
               name="PlateRecognition"
               component={PlateRecognitionScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="UserCars"
+              component={UserCarsScreen}
               options={{ gestureEnabled: false }}
             />
             <Stack.Screen

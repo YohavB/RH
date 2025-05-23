@@ -53,23 +53,9 @@ const Welcome = ({ navigation, route }) => {
     try {
       // Save plate number in Redux
       dispatch(setCarPlate(plateNumber));
-
-      // In a real app, we would register the car with the API
-      // For demo purposes, we'll use a mock approach
-      console.log("Registering car with plate:", plateNumber);
-
-      // Mock successful car registration
-      const mockRegisteredCar = {
-        id: Math.floor(Math.random() * 1000),
-        plateNumber: plateNumber.toUpperCase(),
-        userId: userId,
-      };
-
-      // Update Redux with the registered car
-      dispatch(setUserCars([mockRegisteredCar]));
-
-      // Navigate to Main screen
-      navigation.replace("Main");
+      
+      // Navigate to UserCars screen with the plate number
+      navigation.navigate("UserCars", { detectedPlate: plateNumber });
     } catch (error) {
       console.error("Error registering car:", error);
       Alert.alert("Error", "Failed to register your car. Please try again.");

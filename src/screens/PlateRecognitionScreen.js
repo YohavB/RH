@@ -149,8 +149,8 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
       // Add the detected plate to Redux
       dispatch(setCarPlate(detectedPlate));
       
-      // Navigate back to Welcome screen with the detected plate
-      navigation.navigate("Welcome", { detectedPlate });
+      // Navigate to UserCars screen with the detected plate
+      navigation.navigate("UserCars", { detectedPlate });
     }
   };
   
