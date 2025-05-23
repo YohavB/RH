@@ -1,208 +1,157 @@
-import AsyncStorageLib from "@react-native-async-storage/async-storage";
-import React, { useState, useEffect } from "react";
-import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import GlobalStyle from "../styles/GlobalStyle";
-import styles from "../styles/SettingsStyles";
-import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  TouchableOpacity,
+  SafeAreaView
+} from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUserCars } from '../redux/actions';
+import ScreenContainer from '../components/ScreenContainer';
+import styles from '../styles/SettingsStyles';
+import { PersonIcon, CarIcon, BackIcon } from '../components/Icons';
+import SectionHeader from '../components/SectionHeader';
+import InfoField from '../components/InfoField';
+import CarCard from '../components/CarCard';
+import DeleteNotification from '../components/DeleteNotification';
 
-import { useSelector, useDispatch } from "react-redux";
-import { setUserName, setCarNumber, logout } from "../redux/actions";
-
-export default function Settings({ navigation }) {
-  const [name, setName] = useState("");
-  const [plateNumber, setPlateNumber] = useState("");
-
-  const { userName, carNumber } = useSelector((state) => state.userReducer);
+const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    getData();
-    console.log("useEffect in Settings");
-    console.log("name :" + { name } + " number :" + { plateNumber });
-  }, []);
-
-  const getData = () => {
-    try {
-      AsyncStorageLib.getItem("userInfo").then((value) => {
-        if (value != null) {
-          let userInfo = JSON.parse(value);
-          console.log(userInfo);
-          setName(userInfo.name);
-          setPlateNumber(userInfo.plateNumber);
-          dispatch(setUserName(userInfo.name));
-          dispatch(setCarNumber(userInfo.plateNumber));
-          console.log("setData from Settings");
-        }
-      });
-    } catch (error) {
-      console.log(error);
-    }
+  const { userInfo } = useSelector((state) => state.user) || {};
+  const { userCars } = useSelector((state) => state.car) || { userCars: [] };
+  
+  const [deletedCar, setDeletedCar] = useState(null);
+  const [showDeleteNotification, setShowDeleteNotification] = useState(false);
+  
+  // Mock user data - in a real app, this would come from Redux or API
+  const userData = {
+    name: userInfo?.user?.name || 'Ben Jacobs',
+    email: userInfo?.user?.email || 'Ben@sunbit.com',
+    phone: userInfo?.user?.phone || '058-089-2242',
   };
-
-  const validatePlate = (value) => {
-    value = value.replace(/[^0-9]/g, "");
-    setPlateNumber(value);
+  
+  // Handle deleting a car
+  const handleDeleteCar = (car) => {
+    // Store the deleted car info for notification
+    setDeletedCar({
+      make: car.make,
+      plateNumber: car.plateNumber
+    });
+    
+    // Update Redux state to remove the car
+    const updatedCars = userCars.filter(c => c.id !== car.id);
+    dispatch(setUserCars(updatedCars));
+    
+    // Show success notification
+    setShowDeleteNotification(true);
   };
-
-  const updateData = async () => {
-    if (name.length == 0 || plateNumber.length < 6) {
-      Alert.alert(
-        "*Horn Noise*",
-        "It seems like some info is missing or not completed"
-      );
-    } else {
-      try {
-        var userInfo = {
-          name: name,
-          plateNumber: plateNumber,
-        };
-        await AsyncStorageLib.setItem("userInfo", JSON.stringify(userInfo));
-        console.log("setData from Settings and -> Main");
-        dispatch(setUserName(name));
-        dispatch(setCarNumber(plateNumber));
-        //postToDB
-        navigation.replace("Main");
-      } catch (error) {
-        console.log(error);
-        Alert.alert("*Horn Noise*", "It seems something goes wrong");
-      }
-    }
+  
+  // Handle closing the delete notification
+  const handleCloseNotification = () => {
+    setShowDeleteNotification(false);
+    setDeletedCar(null);
   };
-
-  const removeDataAndLogout = async () => {
-    try {
-      await AsyncStorageLib.clear();
-      dispatch(logout);
-      console.log("clear data from settings and -> login");
-
-      navigation.replace("Login");
-    } catch (error) {
-      console.log(error);
-    }
+  
+  // Navigate to add car screen
+  const handleAddCar = () => {
+    navigation.navigate('Welcome');
   };
-
-  const navToMain = () => {
-    navigation.navigate("Main");
+  
+  // Handle back button press
+  const handleBack = () => {
+    navigation.goBack();
   };
-
-  const signOut = async () => {
-    try {
-      await GoogleSignin.signOut();
-      this.setState({ user: null }); // Remember to remove the user from your app's state as well
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+  
   return (
-    <KeyboardAvoidingWrapper>
-      <SafeAreaView style={{ width: "100%", height: "100%", backgroundColor: "#2169B6", alignItems: "center", justifyContent: "center", alignContent: "center" }}>
-        <Pressable style={{ zIndex: 2, position: "absolute", left: "88%", top: "5%", width: 50 }} onPress={navToMain}>
-          <Image
-            style={{ width: 40, height: 40 }}
-            source={require("../../assets/images/close.png")}
-          />
-        </Pressable>
-        <View
-          style={{
-            width: "100%",
-            height: "100%",
-            justifyContent: "flex-start",
-            alignContent: "center",
-            alignItems: "center",
-            marginBottom: 20,
-          }}
-        >
-          <Text style={styles.title}>Settings</Text>
-          <View
-            style={{
-              justifyContent: "space-evenly",
-              height: 200,
-            }}
-          >
-            <TextInput
-              autoCapitalize="words"
-              autoCorrect={false}
-              style={{
-                borderWidth: 1,
-                padding: 10,
-                width: 300,
-                height: 50,
-                borderColor: "#555",
-                backgroundColor: "#fff",
-                borderRadius: 10,
-                textAlign: "center",
-                fontSize: 20,
-              }}
-              value={userName}
-              placeholder="New Name"
-              onChangeText={(value) => setName(value)}
-              maxLength={20}
+    <ScreenContainer>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Header with back button */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <BackIcon />
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.contentContainer}>
+          {/* Personal Info Section */}
+          <View style={styles.section}>
+            <SectionHeader 
+              title="Personal info" 
+              icon={
+                <View style={styles.iconContainer}>
+                  <PersonIcon />
+                </View>
+              }
             />
-            <View>
-              <TextInput
-                contextMenuHidden={true}
-                style={{
-                  borderWidth: 1,
-                  padding: 10,
-                  width: 300,
-                  height: 50,
-                  borderColor: "#555",
-                  backgroundColor: "#fff",
-                  borderRadius: 10,
-                  textAlign: "center",
-                  fontSize: 20,
-                }}
-                placeholder="Plate Number"
-                value={carNumber}
-                onChangeText={(value) => validatePlate(value)}
-                keyboardType="number-pad"
-                maxLength={8}
-                backgroundColor="transparent"
-              ></TextInput>
-              <Image
-                source={require("../../assets/images/plate.png")}
-                style={{
-                  position: "absolute",
-                  zIndex: -1,
-                  width: 300,
-                  height: 50,
-                }}
-              ></Image>
+            
+            <View style={styles.infoContainer}>
+              <InfoField 
+                label="Name:" 
+                value={userData.name} 
+              />
+              
+              <InfoField 
+                label="Email:" 
+                value={userData.email} 
+              />
+              
+              <InfoField 
+                label="Phone:" 
+                value={userData.phone} 
+                style={{ marginBottom: 0 }}
+              />
             </View>
           </View>
-          <View
-            style={{
-              justifyContent: "space-evenly",
-              height: 200,
-            }}
-          >
-            <Pressable
-              style={({ pressed }) => [
-                styles.pressable,
-                {
-                  backgroundColor: pressed ? "rgb(210, 230, 255)" : "orange",
-                },
-              ]}
-              onPress={updateData}
+          
+          {/* Car Details Section */}
+          <View style={styles.section}>
+            <SectionHeader 
+              title="Car Details" 
+              icon={
+                <View style={styles.iconContainer}>
+                  <CarIcon />
+                </View>
+              }
+            />
+            
+            {/* Display user cars if any */}
+            {userCars && userCars.length > 0 ? (
+              userCars.map(car => (
+                <CarCard 
+                  key={car.id} 
+                  car={car} 
+                  onDelete={handleDeleteCar} 
+                />
+              ))
+            ) : (
+              <Text style={{ textAlign: 'center', marginBottom: 20 }}>
+                No cars added yet
+              </Text>
+            )}
+            
+            {/* Add another car button */}
+            <TouchableOpacity 
+              style={styles.addCarButton}
+              onPress={handleAddCar}
             >
-              <Text style={styles.buttonText}>Update And Continue</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.pressable,
-                {
-                  backgroundColor: pressed ? "rose" : "red",
-                },
-              ]}
-              onPress={removeDataAndLogout}
-            >
-              <Text style={styles.buttonText}>Logout</Text>
-            </Pressable>
+              <Text style={styles.addCarText}>Add another car</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
-    </KeyboardAvoidingWrapper>
+      </ScrollView>
+      
+      {/* Delete success notification */}
+      {deletedCar && (
+        <DeleteNotification
+          visible={showDeleteNotification}
+          make={deletedCar.make}
+          licensePlate={deletedCar.plateNumber}
+          onClose={handleCloseNotification}
+        />
+      )}
+    </ScreenContainer>
   );
-}
+};
+
+export default Settings;
