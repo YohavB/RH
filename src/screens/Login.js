@@ -56,7 +56,7 @@ const Login = ({ navigation }) => {
         navigation.replace("Main");
       } else {
         // No cars registered, go to Welcome screen
-        navigation.replace("Welcome");
+        navigation.replace("AddCarScreen");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -76,7 +76,7 @@ const Login = ({ navigation }) => {
 
         <Pressable style={styles.googleButton} onPress={manualLogin}>
           <View style={styles.googleButtonContent}>
-            <GoogleLogo width={24} height={24} style={styles.googleIcon} />
+            <GoogleLogo style={styles.googleIcon} />
             <Text style={styles.googleButtonText}>
               Sign in with Google
             </Text>

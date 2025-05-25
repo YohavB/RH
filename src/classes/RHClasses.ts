@@ -28,23 +28,26 @@ class UserDTO {
 // DTO for a car
 class CarDTO {
   plateNumber: string;
-  brand: string;
+  country: Countries;
+  brand: Brands;
   model: string;
-  color: string;
-  carLicenseExpireDate: Date | null;
+  color: Colors;
+  carLicenseExpireDate: string | null;
   isBlocking: boolean = false;
   isBlocked: boolean = false;
 
   constructor(
       plateNumber: string,
-      brand: string,
+      country: Countries,
+      brand: Brands,
       model: string,
-      color: string,
-      carLicenseExpireDate: Date | null = null,
+      color: Colors,
+      carLicenseExpireDate: string | null = null,
       isBlocking: boolean = false,
       isBlocked: boolean = false
   ) {
     this.plateNumber = plateNumber;
+    this.country = country;
     this.brand = brand;
     this.model = model;
     this.color = color;
@@ -86,18 +89,21 @@ enum CarStatus {
   BLOCKING = "BLOCKING",
 }
 
+// Enum for countries
+enum Countries {
+  IL = "IL",  // Israel
+  UNKNOWN = "UNKNOWN"
+}
+
+// Enum for brands
 enum Brands {
   AIWAYS = "Aiways",
-
-  // FREE	(	1	,	"Free"	)	,
   ALPHA_ROMEO = "Alpha Romeo",
   ASTON_MARTIN = "Aston Martin",
   AUDI = "Audi",
   AVTOVAZ = "AvtoVAZ",
   BENTLEY = "Bentley",
   BMW = "BMW",
-
-  //FREE= "Free",
   BUICK = "Buick",
   CADILLAC = "Cadillac",
   CENNTRO = "Cenntro",
@@ -112,8 +118,6 @@ enum Brands {
   DODGE = "Dodge",
   DONGFENG = "Dongfeng",
   DS = "DS",
-
-  // FREE= "FREE",
   FERRARI = "Ferrari",
   FIAT = "Fiat",
   FORD = "Ford",
@@ -141,8 +145,6 @@ enum Brands {
   LTI = "LTI",
   LYNK_AND_CO = "Lynk & Co",
   MAN = "Man",
-
-  // FREE	(	51	,	"FREE"	)	,
   MASERATI = "Maserati",
   MAXUS = "Maxus",
   MAZDA = "Mazda",
@@ -171,113 +173,52 @@ enum Brands {
   TELCO = "TELCO",
   TESLA = "Tesla",
   TOYOTA = "Toyota",
-
-  //  FREE	(	80	,	"FREE"	)	,
   VOLKSWAGEN = "Volkswagen",
-  VOLVO = "Volvo",
-  UNKNOWN = "Unknown",
+  UNKNOWN = "Unknown"
 }
 
+// Enum for colors
 enum Colors {
-  UNKNOWN = "Unknown",
-  PEARL_GREEN = "Pearl Green",
-  PEARL_BLACK = "Pearl Black",
-  PEARL_BLUE = "Pearl Blue",
-  METALLIC_YELLOW = "Metallic Yellow",
-  FROM_LANG_METALLIC = "From Lang Metallic",
-  METALLIC_DARK_GRAY = "Metallic Dark Gray",
-  AZURE_SILVER_METALLIC = "Azure Silver Metallic",
-  METALLIC_COPPER = "Metallic Copper",
-  METALLIC_OLIVE_GREEN = "Metallic Olive Green",
   BLACK = "Black",
-  METALLIC_BLACK = "Metallic Black",
-  BLACK_EGGPLANT = "Black Eggplant",
-  METALLIC_OLIVE = "Metallic Olive",
-  METALLIC_REDDISH = "Metallic Reddish",
-  METALLIC_LIGHT_GRAY = "Metallic Light Gray",
-  STRONG_YELLOW = "Strong Yellow",
-  GLOWING_RED = "Glowing Red",
-  GRAY_MELANGE = "Gray Melange",
-  MATTE_MANDARIN = "Matte Mandarin",
-  GRAY = "Gray",
-  STEEL_GRAY = "Steel Gray",
-  DARK_GRAY = "Dark Gray",
-  LIGHT_GRAY = "Light Gray",
-  BRONZE_GRAY = "Bronze Gray",
+  WHITE = "White",
   SILVER = "Silver",
-  PLATINUM = "Platinum",
-  METALLIC_GRAY = "Metallic Gray",
-  METALLIC_GREENISH = "Metallic Greenish",
-  METALLIC_SILVER = "Metallic Silver",
-  BLUE = "Blue",
-  DARK_BLUE = "Dark Blue",
-  LIGHT_BLUE = "Light Blue",
-  AZURE = "Azure",
-  TURQUOISE = "Turquoise",
-  DARK_TURQUOISE = "Dark Turquoise",
-  METALLIC_BLUE = "Metallic Blue",
-  METALLIC_BLUE_GRAY = "Metallic Blue Gray",
-  METALLIC_CHARCOAL_BLUE = "Metallic Charcoal Blue",
-  METALLIC_LIGHT_BLUE = "Metallic Light Blue",
-  GREEN = "Green",
-  BRIGHT_GREEN = "Bright Green",
-  DARK_GREEN = "Dark Green",
-  GREENISH = "Greenish",
-  LIGHT_GREEN = "Light Green",
-  OLIVE_GREEN = "Olive Green",
-  METALLIC_GREEN = "Metallic Green",
-  METALLIC_BORDEAUX = "Metallic Bordeaux",
-  SILVER_GREEN = "Silver Green",
-  METALLIC_GOLD_GREEN = "Metallic Gold Green",
+  GRAY = "Gray",
   RED = "Red",
-  DARK_RED = "Dark Red",
-  WINE = "Wine",
-  PURPLE = "Purple",
-  BORDEAUX = "Bordeaux",
-  PINK = "Pink",
-  METALLIC_RED = "Metallic Red",
-  EGGPLANT = "Eggplant",
-  COPPER = "Copper",
-  ROSE_METALLIC = "Rose Metallic",
+  BLUE = "Blue",
+  GREEN = "Green",
   YELLOW = "Yellow",
-  LEMON_YELLOW = "Lemon Yellow",
-  SAHARA = "Sahara",
-  MUSTARD = "Mustard",
   ORANGE = "Orange",
+  BROWN = "Brown",
+  PURPLE = "Purple",
   GOLD = "Gold",
   BEIGE = "Beige",
-  DARK_BEIGE = "Dark Beige",
-  CREAM = "Cream",
-  METALLIC_GOLD = "Metallic Gold",
-  BROWN = "Brown",
-  LIGHT_BROWN = "Light Brown",
-  DARK_BROWN = "Dark Brown",
-  GOLDEN = "Golden",
-  AQUA_GREEN = "Aqua Green",
-  DARK_PURPLE = "Dark Purple",
-  GREENISH_SILVER = "Greenish Silver",
-  CLASSIC_RED = "Classic Red",
-  METALLIC_TURQUOISE = "Metallic Turquoise",
-  SEA_MONEY = "Sea Money",
-  WHITE_IVORY = "White Ivory",
-  IVORY = "Ivory",
-  OTHER = "Other",
-  MULTI_COLORED = "Multi-colored",
-  METALLIC_LIGHT_TURQUOISE = "Metallic Light Turquoise",
-  LIGHT_PURPLE = "Light Purple",
-  MILLENNIUM_SILVER = "Millennium Silver",
-  BEIGE_METALLIC = "Beige Metallic",
-  METALLIC_COFFEE = "Metallic Coffee",
-  INDIGO_MATTE = "Indigo Matte",
-  TONIC = "Tonic",
-  BLUE_CRYSTAL = "Blue Crystal",
   BRONZE = "Bronze",
-  DARK_SILVER = "Dark Silver",
-  LIGHT_SILVER = "Light Silver",
-  TURQUOISE_GREEN = "Turquoise Green",
-  SEA_GREEN = "Sea Green",
-  METALLIC_BLUISH_SILVER = "Metallic Bluish Silver",
-  RED_BLACK = "Red Black",
-  DARK_SILVER_METALLIC = "Dark Silver Metallic",
-  WHITE = "White",
+  BURGUNDY = "Burgundy",
+  COPPER = "Copper",
+  CREAM = "Cream",
+  INDIGO = "Indigo",
+  MAGENTA = "Magenta",
+  MAROON = "Maroon",
+  NAVY = "Navy",
+  OLIVE = "Olive",
+  PINK = "Pink",
+  PLUM = "Plum",
+  TAN = "Tan",
+  TEAL = "Teal",
+  TURQUOISE = "Turquoise",
+  VIOLET = "Violet",
+  WINE = "Wine",
+  UNKNOWN = "Unknown"
 }
+
+// Enum for screen names
+enum ScreenNames {
+  ADD_CAR = "AddCar",
+  MAIN = "Main",
+  USER_CARS = "UserCars",
+  PLATE_RECOGNITION = "PlateRecognition",
+  SETUP = "Setup"
+}
+
+// Export all enums for use throughout the app
+export { UserDTO, CarDTO, UsersCarsDTO, CarStatus, UserStatus, Brands, Colors, Countries, ScreenNames };

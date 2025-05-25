@@ -7,7 +7,7 @@ import Main from "./screens/Main";
 import NeedToGo from "./screens/NeedToGo";
 import Settings from "./screens/Settings";
 import SplashScreen from "./screens/SplashScreen";
-import Welcome from "./screens/Welcome";
+import AddCarScreen from "./screens/AddCarScreen";
 import PlateRecognitionScreen from "./screens/PlateRecognitionScreen";
 import UserCarsScreen from "./screens/UserCarsScreen";
 import { Provider } from "react-redux";
@@ -60,8 +60,8 @@ export default function App() {
               options={{ gestureEnabled: false }}
             />
             <Stack.Screen
-              name="Welcome"
-              component={Welcome}
+              name="AddCarScreen"
+              component={AddCarScreen}
               options={{ gestureEnabled: false }}
             />
             <Stack.Screen

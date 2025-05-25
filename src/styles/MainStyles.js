@@ -9,10 +9,14 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     alignContent: "center",
+    borderWidth: 1,
+    borderColor: "#FF0000", // Red
   },
   containerCars: {
     width: "100%",
     height: "80%",
+    borderWidth: 1,
+    borderColor: "#00FF00", // Green
   },
   containerCar: {
     width: "100%",
@@ -21,6 +25,8 @@ export default StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     alignContent: "center",
+    borderWidth: 1,
+    borderColor: "#0000FF", // Blue
   },
   containerCarPicture: {
     flex: 1,
@@ -28,10 +34,14 @@ export default StyleSheet.create({
     justifyContent: "space-evenly",
     alignContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FFFF00", // Yellow
   },
   car: {
     width: 50,
     height: 110,
+    borderWidth: 1,
+    borderColor: "#FF00FF", // Magenta
   },
   containerActionMain: {
     flex: 5,
@@ -39,12 +49,16 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#00FFFF", // Cyan
   },
   plate: {
     position: "absolute",
     zIndex: -1,
     width: 300,
     height: 50,
+    borderWidth: 1,
+    borderColor: "#FFA500", // Orange
   },
   littlePlate: {
     position: "absolute",
@@ -52,6 +66,8 @@ export default StyleSheet.create({
     width: 50,
     height: 10,
     right: 2,
+    borderWidth: 1,
+    borderColor: "#800080", // Purple
   },
   blockingButton: {
     backgroundColor: "#fff",
@@ -61,6 +77,8 @@ export default StyleSheet.create({
     marginTop: 20,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#008000", // Dark Green
   },
   settings: {
     zIndex: 2,
@@ -68,9 +86,13 @@ export default StyleSheet.create({
     left: "88%",
     top: "5%",
     width: 50,
+    borderWidth: 1,
+    borderColor: "#FF4500", // OrangeRed
   },
   settingButton: {
     width: 40,
     height: 40,
+    borderWidth: 1,
+    borderColor: "#4B0082", // Indigo
   },
 }); 

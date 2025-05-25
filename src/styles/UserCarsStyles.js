@@ -5,28 +5,51 @@ const { width } = Dimensions.get("window");
 
 export default StyleSheet.create({
   container: {
+    display: "flex",
+    alignItems: "center",
     flex: 1,
-    backgroundColor: Colors.background,
     padding: 24,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 20,
+    fontFamily: Fonts.medium,
+    fontSize: 16,
+    color: Colors.darkGray,
+  },
+  errorContainer: {
+    flex: 1,
+    padding: 24,
+  },
+  errorText: {
+    fontFamily: Fonts.medium,
+    fontSize: 16,
+    color: Colors.darkGray,
+    textAlign: "center",
+  },
   headerContainer: {
-    marginTop: 60,
-    marginBottom: 24,
+    width: "90%",
   },
   headerText: {
-    fontSize: 32,
+    fontSize: 28,
     fontFamily: Fonts.bold,
     color: "#000",
     marginBottom: 8,
   },
   subHeaderText: {
-    fontSize: 28,
+    fontSize: 21,
     fontFamily: Fonts.semiBold,
     color: "#000",
     marginBottom: 24,
   },
   cardContainer: {
-    width: "100%",
+    position: "absolute",
+    top: "25%",
+    width: "80%",
     borderRadius: 16,
     backgroundColor: Colors.white,
     shadowColor: "#000",
@@ -37,27 +60,17 @@ export default StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    padding: 16,
+    padding: 10,
     marginBottom: 32,
-  },
-  carImageContainer: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
-    overflow: "hidden",
-    marginBottom: 16,
-  },
-  carImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
   },
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: 2,
     borderBottomColor: "#F1F3F5",
   },
   lastDetailRow: {
@@ -66,39 +79,84 @@ export default StyleSheet.create({
   detailLabel: {
     fontSize: 16,
     fontFamily: Fonts.semiBold,
-    color: "#000",
+    color: Colors.textBlack,
   },
   detailValue: {
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: "#000",
+    color: Colors.textBlack,
     textAlign: "right",
   },
   buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 20,
+    width: "100%",
+    marginTop: "auto",
   },
-  addCarButton: {
-    padding: 10,
-  },
-  addCarText: {
-    fontSize: 16,
-    fontFamily: Fonts.medium,
-    color: Colors.mainOrange,
-  },
-  okButton: {
-    backgroundColor: Colors.mainOrange,
-    borderRadius: 8,
-    padding: 16,
-    alignItems: "center",
+  blockingButtonsContainer: {
+    display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
-    width: 120,
+    alignItems: "center",
+    width: "100%",
+    gap:15,
   },
-  okButtonText: {
-    fontSize: 16,
+  actionButton: {
+    width: "80%",
+    height: 56,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  blockedByButton: {
+    backgroundColor: Colors.mainOrange,
+  },
+  blockingButton: {
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
+  },
+  actionButtonText: {
+    fontSize: 18,
     fontFamily: Fonts.semiBold,
     color: Colors.white,
   },
-}); 
+  blockingButtonText: {
+    color: Colors.mainOrange,
+  },
+  saveButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    gap: 50,
+  },
+  cancelButton: {
+    padding: 15,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
+  },
+  cancelButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.semiBold,
+    color: Colors.mainOrange,
+  },
+  confirmButton: {
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: Colors.mainOrange,
+    minWidth: 120,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
+  },
+  confirmButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.semiBold,
+    color: Colors.white,
+  },
+  carSelector: {
+    marginBottom: 16,
+  },
+});

@@ -8,6 +8,7 @@ export const Colors = {
   blue: "#2169B6",
   mainOrange: "#F5855F", // Main app color
   textDark: "#4f4f4f",
+  textBlack: "#000000",
   background: "#FFFFFF", // Background color for the entire app
   inputBackground:"#F1F3F5",
 };
@@ -84,7 +85,6 @@ export default StyleSheet.create({
   
   // Global container style - use this for root containers
   container: {
-    display: "flex",
     flex: 1,
     backgroundColor: Colors.background,
   },

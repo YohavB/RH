@@ -1,5 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Countries } from "../classes/RHClasses";
 
 // Use environment variables to manage the base URL for different environments
 const BASE_URL = process.env.API_BASE_URL || "http://localhost:8008";
@@ -55,12 +56,16 @@ export const findAllCars = async (): Promise<any[]> => {
   return apiCall(`${CARS_URL}/`, 'get');
 };
 
-export const findCarByPlateNumber = async (plateNumber: string): Promise<any> => {
-  return apiCall(`${CARS_URL}/by-plate?plateNumber=${plateNumber}`, 'get');
+export const findCarByPlateNumber = async (plateNumber: string, country: Countries): Promise<any> => {
+  return apiCall(`${CARS_URL}/by-plate?plateNumber=${plateNumber}&country=${country}`, 'get');
 };
 
-export const createOrUpdateCar = async (plateNumber: string, userId: number | null): Promise<any> => {
-  return apiCall(`${CARS_URL}/car`, 'post', { plateNumber, userId });
+export const createOrUpdateCar = async (
+  plateNumber: string, 
+  country: Countries,
+  userId: number | null,
+): Promise<any> => {
+  return apiCall(`${CARS_URL}/car`, 'post', { plateNumber, userId, country });
 };
 
 /* USERS CARS API */

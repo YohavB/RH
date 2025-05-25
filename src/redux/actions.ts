@@ -18,6 +18,7 @@ export const SET_USER_ID = "SET_USER_ID";
 export const SET_EXPO_TOKEN = "SET_EXPO_TOKEN";
 export const SET_USER_CARS = "SET_USER_CARS";
 export const SET_CAR_PLATE = "SET_CAR_PLATE";
+export const SET_CAR_COUNTRY = "SET_CAR_COUNTRY";
 export const LOGOUT = "LOGOUT";
 
 // Action Creators with proper typing
@@ -46,6 +47,11 @@ export interface SetCarPlateAction {
   payload: string;
 }
 
+export interface SetCarCountryAction {
+  type: typeof SET_CAR_COUNTRY;
+  payload: string;
+}
+
 export interface LogoutAction {
   type: typeof LOGOUT;
 }
@@ -56,6 +62,7 @@ export type UserActionTypes =
     | SetExpoTokenAction
     | SetUserCarsAction
     | SetCarPlateAction
+    | SetCarCountryAction
     | LogoutAction;
 
 export const setUserInfo = (userInfo: UserDTO) => (dispatch: Dispatch<UserActionTypes>) => {
@@ -86,10 +93,14 @@ export const setUserCars = (cars: any[]) => (dispatch: Dispatch<UserActionTypes>
   });
 };
 
-export const setCarPlate = (plateNumber: string) => (dispatch: Dispatch<UserActionTypes>) => {
+export const setCarPlate = (plateNumber: string, country: string) => (dispatch: Dispatch<UserActionTypes>) => {
   dispatch({
     type: SET_CAR_PLATE,
     payload: plateNumber,
+  });
+  dispatch({
+    type: SET_CAR_COUNTRY,
+    payload: country,
   });
 };
 

@@ -7,44 +7,64 @@ import {
   Animated,
   ActivityIndicator,
   Dimensions,
-  Platform
+  Platform,
+  Alert,
 } from "react-native";
 import { Camera } from "expo-camera";
 import { Colors, Fonts } from "../styles/GlobalStyle";
 import styles from "../styles/PlateRecognitionStyles";
-import { useDispatch } from "react-redux";
-import { setCarPlate } from "../redux/actions";
+import {
+  Countries,
+  Brands,
+  Colors as CarColors,
+  CarDTO,
+  ScreenNames,
+} from "../classes/RHClasses";
 
-// Real camera implementation with fallback to simulation
+
+
 const PlateRecognitionScreen = ({ navigation, route }) => {
+  // Screen load logging
+  useEffect(() => {
+    console.log("Plate Recognition Screen Loaded");
+    if (route?.params) {
+      console.log("Route params:", route.params);
+    }
+  }, []);
+  
+  // Check if we're in demo environment
+  const IS_DEMO = true; // Toggle this for demo/production mode
+  // Get the source screen from route params
+  const source = route?.params?.source || ScreenNames.PLATE_RECOGNITION;
+  
+  // Camera and permission states
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraReady, setCameraReady] = useState(false);
+
+  // Recognition states
   const [detectedPlate, setDetectedPlate] = useState("");
+  const [detectedCountry, setDetectedCountry] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isScanning, setIsScanning] = useState(true);
-  const [useSimulation, setUseSimulation] = useState(true); // Start with simulation by default
+
+  // Animation and refs
   const scanAnimation = useRef(new Animated.Value(0)).current;
   const cameraRef = useRef(null);
-  const dispatch = useDispatch();
-  
-  // Request camera permissions
+
+  // Request camera permissions on mount
   useEffect(() => {
     (async () => {
       try {
         const { status } = await Camera.requestCameraPermissionsAsync();
         setHasPermission(status === "granted");
-        // Even if we have permission, start with simulation for now
-        // since we're having camera type issues
-        setUseSimulation(true);
       } catch (error) {
         console.error("Error requesting camera permissions:", error);
         setHasPermission(false);
-        setUseSimulation(true);
       }
     })();
   }, []);
 
-  // Animate scanner line
+  // Animate scanner line when scanning
   useEffect(() => {
     if (isScanning) {
       Animated.loop(
@@ -64,104 +84,146 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     } else {
       scanAnimation.stopAnimation();
     }
-    
+
     return () => scanAnimation.stopAnimation();
   }, [isScanning]);
-  
-  // Simulate periodic scanning
+
+  // Periodic scanning
   useEffect(() => {
+    if (IS_DEMO) return;
+
     if (isScanning && !isProcessing && !detectedPlate) {
       const interval = setInterval(() => {
-        // Only use simulation for now until camera issues are fixed
-        simulateCapture();
+        captureHandler();
       }, 3000); // Try to detect every 3 seconds
-      
+
       return () => clearInterval(interval);
     }
   }, [isScanning, isProcessing, detectedPlate]);
 
-  // Take a picture with real camera
-  const capturePicture = async () => {
-    if (cameraRef.current && !isProcessing && cameraReady) {
-      try {
-        setIsProcessing(true);
-        
-        // Take picture
-        const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.8,
-        });
-        
-        console.log("Photo taken:", photo.uri);
-        
-        // For now, just simulate processing the image
-        processImage(photo.uri);
-      } catch (error) {
-        console.error("Error capturing picture:", error);
-        setIsProcessing(false);
-        // Fall back to simulation if camera fails
-        simulateCapture();
-      }
-    } else {
-      simulateCapture();
+  // Main capture handler
+  const captureHandler = async () => {
+    if (isProcessing || detectedPlate) return;
+
+    setIsProcessing(true);
+
+    // Take picture (or skip in demo mode)
+    const photo = IS_DEMO ? null : await takePicture();
+    const imageUri = photo?.uri || "";
+
+    // Process with OCR (real or mock)
+    const result = await processWithOCR(imageUri);
+
+    if (result) {
+      setDetectedPlate(result.plate);
+      setDetectedCountry(result.country);
+      setIsScanning(false);
+    }
+
+    setIsProcessing(false);
+  };
+
+  // Take a picture using camera
+  const takePicture = async () => {
+    if (!cameraRef.current || !cameraReady) {
+      console.log("Camera not ready, using simulated data");
+      return null;
+    }
+
+    try {
+      return await cameraRef.current.takePictureAsync({
+        quality: 0.8,
+      });
+    } catch (error) {
+      console.error("Error taking picture:", error);
+      return null;
     }
   };
-  
-  // Process the captured image (for now just simulated OCR)
-  const processImage = (imageUri) => {
-    // In a real app, this would send the image to an OCR service
-    // For now, we'll just simulate detection after a delay
-    
-    setTimeout(() => {
-      // 70% chance of detecting a plate
-      const success = Math.random() > 0.3;
-      
-      if (success) {
-        setDetectedPlate("552-16-503");
-        setIsScanning(false);
+
+  // Process image with OCR
+  const processWithOCR = async (imageUri) => {
+    setIsProcessing(true);
+
+    try {
+      if (IS_DEMO) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        return {
+          plate: "32-544-33",
+          country: Countries.IL,
+        };
       } else {
-        setIsProcessing(false);
+        // Production mode: Call real OCR API
+        // TODO: Implement real OCR API call here
+        console.log("Processing image:", imageUri);
       }
-    }, 1500);
-  };
-
-  // Simulate taking a picture and processing it (fallback)
-  const simulateCapture = () => {
-    if (!isProcessing) {
-      setIsProcessing(true);
-      
-      // Simulate processing delay
-      setTimeout(() => {
-        // 70% chance of detecting a plate after processing
-        const success = Math.random() > 0.3;
-        
-        if (success) {
-          setDetectedPlate("552-16-503");
-          setIsScanning(false);
-        } else {
-          setIsProcessing(false);
-        }
-      }, 1500);
+    } catch (error) {
+      console.error("OCR processing error:", error);
+      return null;
     }
   };
 
-  const handleUseDetectedPlate = () => {
-    if (detectedPlate) {
-      // Add the detected plate to Redux
-      dispatch(setCarPlate(detectedPlate));
-      
-      // Navigate to UserCars screen with the detected plate
-      navigation.navigate("UserCars", { detectedPlate });
-    }
-  };
-  
   const handleCancel = () => {
     navigation.goBack();
   };
-  
-  const handleManualCapture = () => {
-    setIsProcessing(true);
-    // Always use simulation for now
-    simulateCapture();
+
+  // Handle using the detected plate
+  const handleUseDetectedPlate = async () => {
+    if (detectedPlate && detectedCountry) {
+      // Show processing state
+      setIsProcessing(true);
+      try {
+        // Get the source screen from route params
+        const carInfo = await getCarInfo(detectedPlate, detectedCountry);
+
+        // Reset the recognition screen state
+        setDetectedCountry("");
+        setDetectedPlate("");
+
+        navigation.navigate(ScreenNames.USER_CARS, {
+          carInfo,
+          source,
+        });
+      } catch (error) {
+        console.error("Error handling plate recognition:", error);
+        Alert.alert(
+          "Error",
+          "Failed to process the plate information. Please try again.",
+          [{ text: "OK", onPress: () => navigation.goBack() }]
+        );
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+  };
+
+  // Mock API call to get car info
+  const getCarInfo = async (plateNumber, country) => {
+    // In demo mode, return mock data after a delay
+    if (IS_DEMO) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Mock car DTO with proper enum types and serializable date
+      let car = new CarDTO(
+        plateNumber,
+        country,
+        Brands.DACIA,
+        "Sandero",
+        CarColors.BLACK,
+        "2025-06-01", // Changed from new Date("2025-06-01") to string
+        false,
+        false
+      );
+
+      return car;
+    } else {
+      // TODO: Replace with actual API call
+      try {
+        throw new Error("Failed to fetch car information");
+      } catch (error) {
+        console.error("API error:", error);
+        throw error;
+      }
+    }
   };
 
   // Animation for scanner line movement
@@ -170,97 +232,119 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     outputRange: [0, 100], // Height of the bracket
   });
 
+  // Main render
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="black" translucent />
-      
-      {/* Camera view container */}
-      <View style={styles.cameraContainer}>
-        {/* Always use simulation for now due to camera issues */}
-        <View style={styles.camera}>
-          <CameraOverlay 
+
+      {hasPermission && !IS_DEMO ? (
+        // Real camera in production mode
+        <Camera
+          ref={cameraRef}
+          style={styles.camera}
+          onCameraReady={() => setCameraReady(true)}
+          ratio="16:9"
+        >
+          <CameraOverlay
             isScanning={isScanning}
             scanLineTranslateY={scanLineTranslateY}
             detectedPlate={detectedPlate}
+            detectedCountry={detectedCountry}
             isProcessing={isProcessing}
             handleCancel={handleCancel}
             handleUseDetectedPlate={handleUseDetectedPlate}
-            handleManualCapture={handleManualCapture}
+            handleManualCapture={captureHandler}
+          />
+        </Camera>
+      ) : (
+        // Simulated camera view in demo mode
+        <View style={styles.camera}>
+          <CameraOverlay
+            isScanning={isScanning}
+            scanLineTranslateY={scanLineTranslateY}
+            detectedPlate={detectedPlate}
+            detectedCountry={detectedCountry}
+            isProcessing={isProcessing}
+            handleCancel={handleCancel}
+            handleUseDetectedPlate={handleUseDetectedPlate}
+            handleManualCapture={captureHandler}
           />
         </View>
-      </View>
+      )}
     </View>
   );
 };
 
-// Extract overlay UI to a separate component to avoid duplication
-const CameraOverlay = ({ 
-  isScanning, 
-  scanLineTranslateY, 
-  detectedPlate, 
-  isProcessing, 
-  handleCancel, 
+// Camera overlay component (UI elements over camera)
+const CameraOverlay = ({
+  isScanning,
+  scanLineTranslateY,
+  detectedPlate,
+  detectedCountry,
+  isProcessing,
+  handleCancel,
   handleUseDetectedPlate,
-  handleManualCapture
+  handleManualCapture,
 }) => (
   <View style={styles.overlay}>
-    <Text style={styles.headerText}>
-      Position license plate{"\n"}within bracket
-    </Text>
-    
     <View style={styles.bracketContainer}>
+      <Text style={styles.bracketText}>
+        Position license plate{"\n"}within bracket
+      </Text>
+
       <View style={styles.bracket}>
-        {/* Animated scan line */}
         {isScanning && (
-          <Animated.View 
+          <Animated.View
             style={[
               styles.scanLine,
-              {
-                transform: [{ translateY: scanLineTranslateY }],
-              }
+              { transform: [{ translateY: scanLineTranslateY }] },
             ]}
           />
         )}
       </View>
-    </View>
-    
-    {detectedPlate ? (
-      <View style={styles.detectedContainer}>
-        <Text style={styles.detectedText}>{detectedPlate}</Text>
-      </View>
-    ) : (
-      <View style={styles.loadingContainer}>
-        {isProcessing ? (
-          <View style={styles.processingContainer}>
-            <ActivityIndicator size="small" color={Colors.white} />
-            <Text style={styles.processingText}>Processing...</Text>
+
+      {/* Detection result or status */}
+      {detectedPlate ? (
+        <View style={styles.detectedContainer}>
+          <View style={styles.countryRow}>
+            <Text style={styles.detectedText}>{detectedPlate}</Text>
           </View>
-        ) : (
-          <Text style={styles.loadingText}>
-            Detecting plate...
+          <Text style={styles.countryText}>
+            Country : {detectedCountry || "Unknown"}
           </Text>
-        )}
-      </View>
-    )}
-    
+        </View>
+      ) : (
+        <View style={styles.loadingContainer}>
+          {isProcessing ? (
+            <View style={styles.processingContainer}>
+              <ActivityIndicator size="small" color={Colors.white} />
+              <Text style={styles.loadingText}>Processing...</Text>
+            </View>
+          ) : (
+            <View style={styles.processingContainer}>
+              <Text style={styles.loadingText}>Detecting plate...</Text>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+
+    {/* Action buttons */}
     <View style={styles.buttonContainer}>
-      <TouchableOpacity 
-        style={styles.cancelButton} 
-        onPress={handleCancel}
-      >
+      <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
       </TouchableOpacity>
-      
+
       {detectedPlate ? (
-        <TouchableOpacity 
-          style={styles.useButton} 
+        <TouchableOpacity
+          style={styles.useButton}
           onPress={handleUseDetectedPlate}
         >
-          <Text style={styles.useButtonText}>Check</Text>
+          <Text style={styles.useButtonText}>Confirm</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity 
-          style={[styles.useButton, isProcessing && styles.disabledButton]} 
+        <TouchableOpacity
+          style={[styles.useButton, isProcessing && styles.disabledButton]}
           onPress={handleManualCapture}
           disabled={isProcessing}
         >
@@ -271,4 +355,4 @@ const CameraOverlay = ({
   </View>
 );
 
-export default PlateRecognitionScreen; 
+export default PlateRecognitionScreen;

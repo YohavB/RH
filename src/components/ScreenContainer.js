@@ -7,16 +7,23 @@ import GlobalStyle, { Colors } from '../styles/GlobalStyle';
  * Use this component as the root container for all screens to ensure consistent styling
  */
 const ScreenContainer = ({ children, style, safeArea = true }) => {
+  const containerStyle = StyleSheet.create({
+    container: {
+      ...GlobalStyle.container,
+      ...(style || {}),
+    }
+  });
+
   if (safeArea) {
     return (
-      <SafeAreaView style={[GlobalStyle.container, style]}>
+      <SafeAreaView style={containerStyle.container}>
         {children}
       </SafeAreaView>
     );
   }
 
   return (
-    <View style={[GlobalStyle.container, style]}>
+    <View style={containerStyle.container}>
       {children}
     </View>
   );

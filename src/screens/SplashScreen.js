@@ -40,6 +40,11 @@ const SplashScreen = ({ navigation }) => {
     startAnimation();
   }, []);
 
+  // Screen load logging
+  useEffect(() => {
+    console.log("Splash Screen Loaded");
+  }, []);
+
   const startAnimation = () => {
     // Reset animation values
     topLeftRectAnim.setValue(0);

@@ -54,6 +54,8 @@ export default StyleSheet.create({
   },
   googleIcon: {
     marginRight: 20,
+    height: 24,
+    width: 24,
   },
   googleButtonText: {
     fontSize: 16,

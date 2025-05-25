@@ -31,6 +31,11 @@ const Settings = ({ navigation }) => {
     phone: userInfo?.user?.phone || '058-089-2242',
   };
   
+  // Screen load logging
+  useEffect(() => {
+    console.log("Settings Screen Loaded");
+  }, []);
+  
   // Handle deleting a car
   const handleDeleteCar = (car) => {
     // Store the deleted car info for notification

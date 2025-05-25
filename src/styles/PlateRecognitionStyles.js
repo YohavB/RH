@@ -5,55 +5,44 @@ const { width, height } = Dimensions.get("window");
 
 export default StyleSheet.create({
   container: {
+    display: "flex",
     flex: 1,
     backgroundColor: "black", // Camera background is black
-  },
-  permissionContainer: {
-    flex: 1,
-    backgroundColor: "#000",
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-  },
-  permissionText: {
-    color: Colors.white,
-    fontSize: 18,
-    fontFamily: Fonts.medium,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  cameraContainer: {
-    flex: 1,
   },
   camera: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   overlay: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
+    display: "flex",
     // Semi-transparent dark overlay to make text readable
     backgroundColor: "rgba(0, 0, 0, 0.3)", 
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 60,
-    paddingTop: 80, // Account for status bar
-  },
-  headerText: {
-    color: Colors.white,
-    fontSize: 18,
-    fontFamily: Fonts.bold,
-    textAlign: "center",
-    marginTop: 50,
   },
   bracketContainer: {
+    marginTop: "50%",
     width: width * 0.8,
-    height: 100,
     justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
+    alignItems: "center", 
+  },
+  bracketText: {
+    color: Colors.white,
+    fontSize: 18,
+    fontFamily: Fonts.medium,
+    textAlign: "center",
+    marginBottom: 20,
   },
   bracket: {
     width: "100%",
-    height: "100%",
+    height: 92,
     borderRadius: 20,
     // Semi-transparent white to show what's underneath
     borderWidth: 2,
@@ -76,20 +65,41 @@ export default StyleSheet.create({
     padding: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 8,
+    minWidth: width * 0.7,
+  },
+  detectedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
   },
   detectedText: {
     color: Colors.white,
-    fontSize: 30,
+    fontSize: 28,
     fontFamily: Fonts.bold,
     letterSpacing: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
     textAlign: 'center',
+    flex: 1,
+    marginLeft: 5,
+  },
+  countryPicker: {
+    height: 45,
+    width: 55,
+    marginRight: 10,
   },
   loadingContainer: {
     marginTop: 40,
     alignItems: 'center',
+  },
+  countryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+    borderRadius: 8,
   },
   loadingText: {
     color: Colors.white,
@@ -98,6 +108,7 @@ export default StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
+    marginLeft: 10, 
   },
   processingContainer: {
     flexDirection: 'row',
@@ -113,13 +124,13 @@ export default StyleSheet.create({
     marginLeft: 10,
   },
   buttonContainer: {
+    marginTop: "auto",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    paddingHorizontal: 20,
-    gap: 20,
-    marginBottom: 40,
+    gap: 50,
+    marginBottom: 80,
   },
   cancelButton: {
     padding: 15,
@@ -147,5 +158,12 @@ export default StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
+  },
+  countryText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    textAlign: 'center',
+    marginTop: 10,
   },
 }); 

@@ -1,272 +1,295 @@
 import React, { useState, useEffect } from "react";
-import { Text, TextInput, View, Pressable, Image, Alert } from "react-native";
-
+import { 
+  Text, 
+  TextInput, 
+  View, 
+  TouchableOpacity, 
+  Image, 
+  Alert,
+  StyleSheet,
+  StatusBar,
+  SafeAreaView
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors } from "../styles/GlobalStyle";
-import styles from "../styles/MainStyles";
+import { Colors, Fonts } from "../styles/GlobalStyle";
 import KeyboardAvoidingWrapper from "../../utils/KeyboardAvoidingWrapper";
+import CameraButton from "../components/CameraButton";
+import { ScreenNames } from "../classes/RHClasses";
 
-export default function Main({ navigation }) {
-  const [blocked, setBlocked] = useState(false);
-  const [blockingSaved, setBlockingSaved] = useState(false);
-  const [needToGo, setNeedToGo] = useState(false);
-  const [blockedPlateNumber, setBlockedPlateNumber] = useState("");
-  const [driverBlockingYou, setDriverBlockingYou] = useState("Dor");
-  const [carBlockingYou, setCarBlockingYou] = useState("12345678");
-
-  // Fix Redux selector and provide default values
-  const userState = useSelector((state) => state.user) || {};
-  const userName = userState.userInfo?.user?.name || "User";
-  const carNumber = userState.userInfo?.carNumber || "12345678";
-
+export default function Main({ navigation, route }) {
+  // Screen load logging
   useEffect(() => {
-    console.log("useEffect in Main");
+    console.log("Main Screen Loaded");
+    if (route?.params) {
+      console.log("Route params:", route.params);
+    }
   }, []);
 
-  const validateBolckingCar = () => {
-    setBlockingSaved(!blockingSaved);
-  };
+  // State for the license plate input
+  const [plateNumber, setPlateNumber] = useState("");
+  
+  // Get user data from Redux store
+  const userState = useSelector((state) => state.user) || {};
+  const userName = userState.userInfo?.user?.name || "User";
+  const userCar = userState.userInfo?.carNumber || "";
+  
+  const dispatch = useDispatch();
+  
+  // Check if we received a car plate from another screen
+  useEffect(() => {
+    if (route?.params?.plateNumber) {
+      setPlateNumber(route.params.plateNumber);
+    }
+  }, [route?.params]);
 
-  const navToSettings = () => {
-    console.log("SETINNG");
+  // Navigate to settings
+  const handleSettings = () => {
     navigation.navigate("Settings");
   };
-
-  const validatePlate = (value) => {
-    value = value.replace(/[^0-9]/g, "");
-    setBlockedPlateNumber(value);
+  
+  // Handle camera button press to scan license plate
+  const handleCameraScan = () => {
+    navigation.navigate("PlateRecognition", { 
+      source: ScreenNames.MAIN 
+    });
   };
-
-  const blockingCar = () => {
-    console.log("enter the plate");
+  
+  // Navigate to recognition result screen with appropriate action
+  const handlePlateCheck = () => {
+    if (!plateNumber.trim()) {
+      Alert.alert("Error", "Please enter a license plate number");
+      return;
+    }
+    
+    // Navigate to the car details screen with the plate number
+    navigation.navigate("UserCars", { 
+      detectedPlate: plateNumber
+    });
   };
-  const testblocked = () => {
-    setBlocked(!blocked);
-  };
-  const INeedToGo = () => {
+  
+  // Handle when user is blocked
+  const handleBlockedByCar = () => {
+    // In a real app, this would send a notification to the car owner
     Alert.alert(
-      "Ok, You need to go !",
-      " We just notify the blocking car's driver !"
+      "Notification Sent",
+      "We've notified the driver that you need to leave"
     );
-    console.log("push notification to blocking car");
-    setNeedToGo(true);
+    
+    // Additional logic for notification sending would go here
   };
-
+  
+  // Handle when user is blocking
+  const handleBlockingCar = () => {
+    // In a real app, this would register that the user is blocking this car
+    Alert.alert(
+      "Registered",
+      "You've registered that you're blocking this car. The driver can now contact you if needed."
+    );
+    
+    // Additional logic for registering the blocking action would go here
+  };
 
   return (
     <KeyboardAvoidingWrapper>
       <SafeAreaView style={styles.mainContainer}>
-        <Pressable style={styles.settings} onPress={navToSettings}>
-          <Image
-            style={styles.settingButton}
-            source={require("../../assets/images/settings.png")}
+        <StatusBar barStyle="dark-content" backgroundColor="white" />
+        
+        {/* Settings button */}
+        <TouchableOpacity 
+          style={styles.settingsButton} 
+          onPress={handleSettings}
+        >
+          <Image 
+            source={require("../../assets/images/settings.png")} 
+            style={styles.settingsIcon} 
           />
-        </Pressable>
-        <View>
-          <Text style={{ fontSize: 60, textAlign: "center" }}>Hi {userName} !</Text>
-          <Text style={{ fontSize: 20, margin: 20, textAlign: "center" }}>
-            Enter the Car's Plate Number that you're blocking. Plate :{" "}
-            {blockedPlateNumber}, redux text {userName}, {carNumber}
+        </TouchableOpacity>
+        
+        {/* Welcome screen content (Home) */}
+        <View style={styles.homeContent}>
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>
+              Let's <Text style={styles.orangeText}>unBlock</Text>.
+            </Text>
+          </View>
+          
+          {/* Subtitle */}
+          <Text style={styles.subtitle}>
+            Scan or enter the license plate 
+            of the car you're blocked by, or 
+            are blocking.
           </Text>
+          
+          {/* Camera Button */}
+          <View style={{marginVertical: 40}}>
+            <CameraButton onPress={handleCameraScan} />
+          </View>
+          
+          {/* Plate Input */}
+          <TextInput
+            style={styles.plateInput}
+            placeholder="Plate number"
+            placeholderTextColor="#888"
+            value={plateNumber}
+            onChangeText={setPlateNumber}
+            onSubmitEditing={handlePlateCheck}
+            autoCapitalize="characters"
+          />
         </View>
-        <View style={styles.containerCars}>
-          {/* FIRST PART */}
-          <View style={styles.containerCar}>
-            <View style={styles.containerCarPicture}>
-              <Pressable>
-                <Image
-                  style={styles.car}
-                  source={require("../../assets/images/grey-car.png")}
-                />
-              </Pressable>
-              {blockingSaved ? (
-                <View>
-                  <TextInput
-                    showSoftInputOnFocus={false}
-                    editable={false}
-                    style={{
-                      borderWidth: 1,
-                      width: 50,
-                      height: 10,
-                      textAlign: "center",
-                      fontSize: 8,
-                      fontWeight: "bold",
-                      borderColor: "transparent",
-                    }}
-                    backgroundColor="transparent"
-                    value={blockedPlateNumber}
-                  ></TextInput>
-                  <Image
-                    source={require("../../assets/images/plate.png")}
-                    style={styles.littlePlate}
-                  ></Image>
-                </View>
-              ) : (
-                <View></View>
-              )}
+        
+        {/* Car Details Screen Content (shown after plate recognition) */}
+        {route.params?.carDetails && (
+          <View style={styles.carDetailsContent}>
+            <View style={styles.carInfoContainer}>
+              {/* This would be populated with car owner details */}
             </View>
-            {!blockingSaved ? (
-              <View style={styles.containerActionMain}>
-                <View>
-                  <TextInput
-                    contextMenuHidden={true}
-                    style={[
-                      {
-                        borderWidth: 1,
-                        padding: 10,
-                        width: 300,
-                        height: 50,
-                        borderColor: "#555",
-                        backgroundColor: "#fff",
-                        borderRadius: 10,
-                        textAlign: "center",
-                        fontSize: 20,
-                      },
-                    ]}
-                    placeholder="Plate Number"
-                    value={blockedPlateNumber}
-                    onChangeText={(value) => validatePlate(value)}
-                    keyboardType="number-pad"
-                    maxLength={8}
-                    backgroundColor="transparent"
-                  ></TextInput>
-                  <Image
-                    source={require("../../assets/images/plate.png")}
-                    style={styles.plate}
-                  ></Image>
-                </View>
-
-                <Pressable
-                  style={styles.blockingButton}
-                  onPress={validateBolckingCar}
-                >
-                  <Text>I'm blocking that Car</Text>
-                </Pressable>
-              </View>
-            ) : (
-              <View style={styles.containerActionMain}>
-                <Pressable
-                  style={styles.blockingButton}
-                  onPress={validateBolckingCar}
-                >
-                  <Text style={{ textAlign: "center" }}>
-                    Inform the driver that you are going
-                  </Text>
-                </Pressable>
-              </View>
-            )}
-          </View>
-          {/* SECOND PART */}
-          <View style={styles.containerCar}>
-            <View style={styles.containerCarPicture}>
-              <Pressable>
-                <Image
-                  style={styles.car}
-                  source={require("../../assets/images/red-car.png")}
-                />
-              </Pressable>
-              <View>
-                <TextInput
-                  showSoftInputOnFocus={false}
-                  editable={false}
-                  style={styles.inputLittlePlate}
-                  backgroundColor="transparent"
-                  value={carNumber}
-                ></TextInput>
-                <Image
-                  source={require("../../assets/images/plate.png")}
-                  style={styles.littlePlate}
-                ></Image>
-              </View>
-            </View>
-
-            <View style={styles.containerActionMain}>
-              <TextInput
-                showSoftInputOnFocus={false}
-                editable={false}
-                style={styles.input}
-                backgroundColor="transparent"
-                value={carNumber}
-              ></TextInput>
-              <Image
-                source={require("../../assets/images/plate.png")}
-                style={styles.plate}
-              ></Image>
-            </View>
-          </View>
-          {/* THIRD PART */}
-          <View style={styles.containerCar}>
-            <View
-              style={[
-                styles.containerCarPicture,
-                { paddingBottom: "20%" },
-              ]}
-            >
-              {blocked ? (
-                <Pressable onPress={INeedToGo}>
-                  <Image
-                    style={styles.car}
-                    source={require("../../assets/images/grey-car.png")}
-                  />
-                </Pressable>
-              ) : (
-                <View></View>
-              )}
-            </View>
-            {blocked ? (
-              <View
-                style={[
-                  styles.containerActionMain,
-                  { paddingBottom: "30%" },
-                ]}
+            
+            <Text style={styles.detectedPlateText}>
+              {route.params.plateNumber || "552-16-503"}
+            </Text>
+            
+            {/* Action Buttons */}
+            <View style={styles.actionButtonsContainer}>
+              <TouchableOpacity 
+                style={styles.blockedByButton}
+                onPress={handleBlockedByCar}
               >
-                <Text style={styles.text}>
-                  Seems Like {driverBlockingYou} ({carBlockingYou}) is blocking
-                  you !
+                <Text style={styles.buttonText}>
+                  I'm blocked by this car
                 </Text>
-                <Pressable
-                  style={[
-                    styles.input,
-                    { alignItems: "center", justifyContent: "center" },
-                  ]}
-                  onPress={INeedToGo}
-                >
-                  <Text style={{ fontSize: 20 }}>
-                    Notify the Driver, I Need To Go!
-                  </Text>
-                </Pressable>
-              </View>
-            ) : (
-              <View
-                style={[
-                  styles.containerActionMain,
-                  { paddingBottom: "30%" },
-                ]}
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.blockingButton}
+                onPress={handleBlockingCar}
               >
-                <Text style={styles.text}>
-                  Seems like anyone is blocking you !
+                <Text style={styles.buttonText}>
+                  I'm blocking this car
                 </Text>
-                <Text style={styles.text}>You're free to go !</Text>
-              </View>
-            )}
+              </TouchableOpacity>
+            </View>
           </View>
-          <Pressable
-            style={{
-              position: "absolute",
-              left: "85%",
-              bottom: "0%",
-              width: 40,
-              height: 40,
-              backgroundColor: "white",
-            }}
-            onPress={testblocked}
-          >
-            <Text>TEST</Text>
-          </Pressable>
-        </View>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingWrapper>
   );
 }
+
+// Styles
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  settingsButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 10,
+  },
+  settingsIcon: {
+    width: 35,
+    height: 35,
+    tintColor: "#8e8e93",
+  },
+  homeContent: {
+    flex: 1,
+    paddingHorizontal: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerContainer: {
+    marginBottom: 20,
+    alignSelf: "flex-start",
+  },
+  headerText: {
+    fontSize: 40,
+    fontWeight: "800",
+    color: "#000",
+  },
+  orangeText: {
+    color: Colors.mainOrange,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#4a4a4a",
+    textAlign: "left",
+    alignSelf: "flex-start",
+    marginBottom: 60,
+  },
+  cameraButton: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: Colors.mainOrange,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 40,
+    // Gradient background would be implemented with a library like linear-gradient
+  },
+  cameraIcon: {
+    width: 50,
+    height: 50,
+    tintColor: "white",
+  },
+  plateInput: {
+    width: "100%",
+    height: 60,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    fontSize: 18,
+    marginTop: 20,
+    textAlign: "center",
+  },
+  
+  // Car Details Screen (after plate recognition)
+  carDetailsContent: {
+    flex: 1,
+    backgroundColor: "#7c85a8", // Dark blue-gray background
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 60,
+  },
+  carInfoContainer: {
+    width: "80%",
+    height: 180,
+    backgroundColor: "white",
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  detectedPlateText: {
+    fontSize: 48,
+    fontWeight: "bold",
+    color: "white",
+    marginVertical: 40,
+  },
+  actionButtonsContainer: {
+    width: "100%",
+    paddingHorizontal: 24,
+  },
+  blockedByButton: {
+    width: "100%",
+    height: 60,
+    backgroundColor: Colors.mainOrange,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  blockingButton: {
+    width: "100%",
+    height: 60,
+    backgroundColor: "white",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "white",
+  },
+});

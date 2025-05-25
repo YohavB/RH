@@ -34,10 +34,15 @@ export default StyleSheet.create({
   inputContainer: {
     width: "100%",
     marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  countryPicker: {
+    marginRight: 8,
   },
   input: {
-    width: "100%",
-    height: 40,
+    flex: 1,
+    height: 50,
     backgroundColor: Colors.inputBackground,
     paddingHorizontal: 16,
     fontSize: 18,
@@ -74,6 +79,23 @@ export default StyleSheet.create({
     color: Colors.white,
   },
   submitButtonTextDisabled: {
-    // You can add specific text styling for disabled state if needed
+    color: Colors.white,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    color: Colors.textDark,
   },
 });
