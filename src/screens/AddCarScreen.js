@@ -24,6 +24,8 @@ import {
 import ScreenContainer from "../components/ScreenContainer";
 import CameraButton from "../components/CameraButton";
 import CountryPicker from "../components/CountryPicker";
+import { isDemoMode } from "../config/env";
+import PlateNumberInput from '../components/PlateNumberInput';
 
 const AddCarScreen = ({ navigation, route }) => {
   // Screen load logging
@@ -35,7 +37,7 @@ const AddCarScreen = ({ navigation, route }) => {
   }, []);
 
   const [plateNumber, setPlateNumber] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState(Countries.UNKNOWN);
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -55,7 +57,6 @@ const AddCarScreen = ({ navigation, route }) => {
   const isButtonDisabled =
     isLoading ||
     plateNumber.replace(/[^a-zA-Z0-9]/g, "").trim().length < 6 ||
-    selectedCountry === Countries.UNKNOWN ||
     selectedCountry === "";
 
   const inputRef = useRef(null);
@@ -84,7 +85,7 @@ const AddCarScreen = ({ navigation, route }) => {
     });
   };
 
-  const handlePlateSubmit = async () => {
+  const handleSubmit = async () => {
     if (!plateNumber.trim()) {
       Alert.alert("Error", "Please enter a valid plate number");
       return;
@@ -100,7 +101,7 @@ const AddCarScreen = ({ navigation, route }) => {
       const carInfo = await getCarInfo(plateNumber, selectedCountry);
 
       //reset the plate recognition screen
-      setSelectedCountry(Countries.UNKNOWN);
+      setSelectedCountry("");
       setPlateNumber("");
 
       navigation.navigate("CarConfirmation", {
@@ -119,14 +120,14 @@ const AddCarScreen = ({ navigation, route }) => {
   };
 
   const getCarInfo = async (plateNumber, country) => {
-    if (IS_DEMO) {
+    if (isDemoMode()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       let car = new CarDTO(
         plateNumber,
         country,
-        Brands.DACIA,
+        "DACIA",
         "Sandero",
-        CarColors.BLACK,
+        "Black",
         "2025-06-01",
         false,
         false
@@ -174,37 +175,23 @@ const AddCarScreen = ({ navigation, route }) => {
             <CameraButton onPress={handleCameraPress} disabled={isLoading} />
           </View>
 
-          <View style={styles.inputContainer}>
-            <CountryPicker
-              value={selectedCountry}
-              onValueChange={setSelectedCountry}
-              style={styles.countryPicker}
-            />
-
-            <TextInput
-              style={[styles.input, isFocused && styles.inputFocused]}
-              placeholder="Plate number"
-              placeholderTextColor="#888"
-              value={plateNumber}
-              onChangeText={setPlateNumber}
-              onSubmitEditing={handlePlateSubmit}
-              keyboardType="default"
-              autoCapitalize="characters"
-              editable={!isLoading}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => {
-                setIsFocused(false);
-              }}
-              ref={inputRef}
-            />
-          </View>
+          <PlateNumberInput
+            plateNumber={plateNumber}
+            setPlateNumber={setPlateNumber}
+            selectedCountry={selectedCountry}
+            setSelectedCountry={setSelectedCountry}
+            onSubmit={isButtonDisabled ? null : handleSubmit}
+            isLoading={isLoading}
+            style={styles.inputContainer}
+            inputRef={inputRef}
+          />
 
           <TouchableOpacity
             style={[
               styles.submitButton,
               isButtonDisabled && styles.submitButtonDisabled,
             ]}
-            onPress={handlePlateSubmit}
+            onPress={handleSubmit}
             disabled={isButtonDisabled}
           >
             <Text

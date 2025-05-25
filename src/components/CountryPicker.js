@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
-import { Countries } from '../classes/RHClasses';
-import { Colors, Fonts } from '../styles/GlobalStyle';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { Countries } from "../classes/RHClasses";
+import { Colors, Fonts } from "../styles/GlobalStyle";
+import PickerIcon from "../../assets/earth_picker.svg";
 
 /**
  * Country picker component for selecting a country
@@ -11,43 +19,53 @@ import { Colors, Fonts } from '../styles/GlobalStyle';
  */
 const CountryPicker = ({ value, onValueChange, style }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   // Build countries list from enum
-  const countryList = Object.keys(Countries).map(key => ({
+  const countryList = Object.keys(Countries).map((key) => ({
     code: key,
     name: getCountryName(key),
-    flag: getCountryFlag(key)
+    flag: getCountryFlag(key),
   }));
-  
+
   // Helper function to get human-readable country name
   function getCountryName(countryCode) {
-    switch(countryCode) {
-      case 'IL': return 'Israel';
-      default: return countryCode;
+    switch (countryCode) {
+      case "IL":
+        return "Israel";
+      default:
+        return "None";
     }
   }
-  
+
   // Helper function to get country flag emoji
   function getCountryFlag(countryCode) {
-    switch(countryCode) {
-      case 'IL': return '🇮🇱';
-      default: return '🏳️';
+    switch (countryCode) {
+      case "IL":
+        return "🇮🇱";
+      default:
+        return "";
     }
   }
-  
+
   // Get current country display info
-  const selectedCountry = countryList.find(c => c.code === value) || countryList[0];
-  
+  const selectedCountry = countryList.find((c) => c.code === value);
+
   return (
     <View style={[styles.container, style]}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.pickerButton}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.flagText}>{selectedCountry.flag}</Text>
-        <Text style={styles.codeText}>{selectedCountry.code}</Text>
+        {selectedCountry ? (
+          <>
+            <Text style={styles.flagText}>{selectedCountry.flag}</Text>
+            <Text style={styles.codeText}>{selectedCountry.code}</Text>
+          </>
+        ) : (
+          <PickerIcon width={40} height={40} fill={Colors.mainOrange} />
+        )}
       </TouchableOpacity>
-      
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -57,10 +75,10 @@ const CountryPicker = ({ value, onValueChange, style }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Select Country</Text>
-            
+
             <FlatList
               data={countryList}
-              keyExtractor={item => item.code}
+              keyExtractor={(item) => item.code}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.countryItem}
@@ -80,7 +98,7 @@ const CountryPicker = ({ value, onValueChange, style }) => {
                 </TouchableOpacity>
               )}
             />
-            
+
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
@@ -101,17 +119,17 @@ const styles = StyleSheet.create({
   },
   pickerButton: {
     borderWidth: 1,
-    borderColor: '#DDD',
+    borderColor: "#DDD",
     borderRadius: 8,
     padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF',
-    height: '100%',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF",
+    height: "100%",
   },
   flagText: {
-    fontSize: 18,
-    marginBottom: 2,
+    fontSize: 22,
+    textAlign: "center",
   },
   codeText: {
     fontSize: 12,
@@ -119,30 +137,30 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
-    width: '80%',
-    backgroundColor: '#FFF',
+    width: "80%",
+    backgroundColor: "#FFF",
     borderRadius: 12,
     padding: 16,
-    maxHeight: '70%',
+    maxHeight: "70%",
   },
   modalTitle: {
     fontSize: 20,
     fontFamily: Fonts.semiBold,
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   countryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    borderBottomColor: "#EEE",
   },
   countryFlag: {
     fontSize: 24,
@@ -158,7 +176,7 @@ const styles = StyleSheet.create({
   countryName: {
     fontSize: 14,
     fontFamily: Fonts.regular,
-    color: '#666',
+    color: "#666",
   },
   selectedIndicator: {
     width: 10,
@@ -171,13 +189,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mainOrange,
     padding: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   closeButtonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontFamily: Fonts.medium,
     fontSize: 16,
   },
 });
 
-export default CountryPicker; 
+export default CountryPicker;

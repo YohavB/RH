@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View, StatusBar } from "react-native";
 import Login from "./screens/Login";
-import Main from "./screens/Main";
+import MainScreen from "./screens/MainScreen";
 import NeedToGo from "./screens/NeedToGo";
 import Settings from "./screens/Settings";
 import SplashScreen from "./screens/SplashScreen";
@@ -74,13 +74,8 @@ export default function App() {
               options={{ gestureEnabled: false }}
             />
             <Stack.Screen
-              name="UserCars"
-              component={UserCarsScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
               name="Main"
-              component={Main}
+              component={MainScreen}
               options={{ gestureEnabled: false }}
             />
             <Stack.Screen

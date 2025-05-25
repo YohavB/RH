@@ -1,4 +1,5 @@
 import { Dispatch } from "redux";
+import { CarDTO } from "../classes/RHClasses";
 
 // Define UserDTO interface
 interface UserDTO {
@@ -39,7 +40,7 @@ export interface SetExpoTokenAction {
 
 export interface SetUserCarsAction {
   type: typeof SET_USER_CARS;
-  payload: any[];
+  payload: CarDTO[];
 }
 
 export interface SetCarPlateAction {
@@ -86,7 +87,7 @@ export const setExpoToken = (expoToken: string) => (dispatch: Dispatch<UserActio
   });
 };
 
-export const setUserCars = (cars: any[]) => (dispatch: Dispatch<UserActionTypes>) => {
+export const setUserCars = (cars: CarDTO[]) => (dispatch: Dispatch<UserActionTypes>) => {
   dispatch({
     type: SET_USER_CARS,
     payload: cars,

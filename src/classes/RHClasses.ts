@@ -29,9 +29,9 @@ class UserDTO {
 class CarDTO {
   plateNumber: string;
   country: Countries;
-  brand: Brands;
+  brand: string;
   model: string;
-  color: Colors;
+  color: string;
   carLicenseExpireDate: string | null;
   isBlocking: boolean = false;
   isBlocked: boolean = false;
@@ -39,9 +39,9 @@ class CarDTO {
   constructor(
       plateNumber: string,
       country: Countries,
-      brand: Brands,
+      brand: string,
       model: string,
-      color: Colors,
+      color: string,
       carLicenseExpireDate: string | null = null,
       isBlocking: boolean = false,
       isBlocked: boolean = false
@@ -92,123 +92,6 @@ enum CarStatus {
 // Enum for countries
 enum Countries {
   IL = "IL",  // Israel
-  UNKNOWN = "UNKNOWN"
-}
-
-// Enum for brands
-enum Brands {
-  AIWAYS = "Aiways",
-  ALPHA_ROMEO = "Alpha Romeo",
-  ASTON_MARTIN = "Aston Martin",
-  AUDI = "Audi",
-  AVTOVAZ = "AvtoVAZ",
-  BENTLEY = "Bentley",
-  BMW = "BMW",
-  BUICK = "Buick",
-  CADILLAC = "Cadillac",
-  CENNTRO = "Cenntro",
-  CHEVROLET = "Chevrolet",
-  CHRYSLER = "Chrysler",
-  CITROEN = "Citroen",
-  DACIA = "Dacia",
-  DAEWOO = "Daewoo",
-  DAIHATSU = "Daihatsu",
-  DE_TOMASO = "De Tomaso",
-  DFSK = "DFSK",
-  DODGE = "Dodge",
-  DONGFENG = "Dongfeng",
-  DS = "DS",
-  FERRARI = "Ferrari",
-  FIAT = "Fiat",
-  FORD = "Ford",
-  GAC = "GAC",
-  GEELY = "Geely",
-  GMC = "GMC",
-  GOUPIL = "Goupil",
-  GREAT_WALL = "Great Wall",
-  HONDA = "Honda",
-  HONGQI = "Hongqi",
-  HUMMER = "Hummer",
-  HYUNDAI = "Hyundai",
-  ISUZU = "Isuzu",
-  IVECO = "Iveco",
-  JAGUAR = "Jaguar",
-  JEEP = "Jeep",
-  KARMA = "Karma",
-  KIA = "Kia",
-  LAMBORGHINI = "Lamborghini",
-  LANCIA = "Lancia",
-  LAND_ROVER = "Land Rover",
-  LEVC = "LEVC",
-  LEXUS = "Lexus",
-  LINCOLN = "Lincoln",
-  LTI = "LTI",
-  LYNK_AND_CO = "Lynk & Co",
-  MAN = "Man",
-  MASERATI = "Maserati",
-  MAXUS = "Maxus",
-  MAZDA = "Mazda",
-  MCC = "MCC",
-  MERCEDES = "Mercedes",
-  MG = "MG",
-  MITSUBISHI = "Mitsubishi",
-  NISSAN = "Nissan",
-  OPEL = "Opel",
-  PEUGEOT = "Peugeot",
-  PIAGGIO = "Piaggio",
-  POLESTAR = "Polestar",
-  PONTIAC = "Pontiac",
-  PORSCHE = "Porsche",
-  RENAULT = "Renault",
-  ROVER = "Rover",
-  SAAB = "Saab",
-  SEAT = "Seat",
-  SERES = "Seres",
-  SKODA = "Skoda",
-  SKYWELL = "Skywell",
-  SMART = "Smart",
-  SSANGYONG = "Ssangyong",
-  SUBARU = "Subaru",
-  SUZUKI = "Suzuki",
-  TELCO = "TELCO",
-  TESLA = "Tesla",
-  TOYOTA = "Toyota",
-  VOLKSWAGEN = "Volkswagen",
-  UNKNOWN = "Unknown"
-}
-
-// Enum for colors
-enum Colors {
-  BLACK = "Black",
-  WHITE = "White",
-  SILVER = "Silver",
-  GRAY = "Gray",
-  RED = "Red",
-  BLUE = "Blue",
-  GREEN = "Green",
-  YELLOW = "Yellow",
-  ORANGE = "Orange",
-  BROWN = "Brown",
-  PURPLE = "Purple",
-  GOLD = "Gold",
-  BEIGE = "Beige",
-  BRONZE = "Bronze",
-  BURGUNDY = "Burgundy",
-  COPPER = "Copper",
-  CREAM = "Cream",
-  INDIGO = "Indigo",
-  MAGENTA = "Magenta",
-  MAROON = "Maroon",
-  NAVY = "Navy",
-  OLIVE = "Olive",
-  PINK = "Pink",
-  PLUM = "Plum",
-  TAN = "Tan",
-  TEAL = "Teal",
-  TURQUOISE = "Turquoise",
-  VIOLET = "Violet",
-  WINE = "Wine",
-  UNKNOWN = "Unknown"
 }
 
 // Enum for screen names
@@ -221,4 +104,4 @@ enum ScreenNames {
 }
 
 // Export all enums for use throughout the app
-export { UserDTO, CarDTO, UsersCarsDTO, CarStatus, UserStatus, Brands, Colors, Countries, ScreenNames };
+export { UserDTO, CarDTO, UsersCarsDTO, CarStatus, UserStatus, Countries, ScreenNames };

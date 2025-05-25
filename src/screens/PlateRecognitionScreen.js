@@ -15,13 +15,10 @@ import { Colors, Fonts } from "../styles/GlobalStyle";
 import styles from "../styles/PlateRecognitionStyles";
 import {
   Countries,
-  Brands,
-  Colors as CarColors,
   CarDTO,
   ScreenNames,
 } from "../classes/RHClasses";
-
-
+import {ENV, isDemoMode } from "../config/env";
 
 const PlateRecognitionScreen = ({ navigation, route }) => {
   // Screen load logging
@@ -32,8 +29,6 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     }
   }, []);
   
-  // Check if we're in demo environment
-  const IS_DEMO = true; // Toggle this for demo/production mode
   // Get the source screen from route params
   const source = route?.params?.source || ScreenNames.PLATE_RECOGNITION;
   
@@ -90,7 +85,7 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
 
   // Periodic scanning
   useEffect(() => {
-    if (IS_DEMO) return;
+    if (isDemoMode()) return;
 
     if (isScanning && !isProcessing && !detectedPlate) {
       const interval = setInterval(() => {
@@ -108,7 +103,7 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     setIsProcessing(true);
 
     // Take picture (or skip in demo mode)
-    const photo = IS_DEMO ? null : await takePicture();
+    const photo = isDemoMode() ? null : await takePicture();
     const imageUri = photo?.uri || "";
 
     // Process with OCR (real or mock)
@@ -145,8 +140,8 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     setIsProcessing(true);
 
     try {
-      if (IS_DEMO) {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (isDemoMode()) {
+        await new Promise((resolve) => setTimeout(resolve, ENV.DEMO_DELAY));
         return {
           plate: "32-544-33",
           country: Countries.IL,
@@ -198,16 +193,16 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
   // Mock API call to get car info
   const getCarInfo = async (plateNumber, country) => {
     // In demo mode, return mock data after a delay
-    if (IS_DEMO) {
+    if (isDemoMode()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Mock car DTO with proper enum types and serializable date
       let car = new CarDTO(
         plateNumber,
         country,
-        Brands.DACIA,
+        "DACIA",
         "Sandero",
-        CarColors.BLACK,
+        "Black",
         "2025-06-01", // Changed from new Date("2025-06-01") to string
         false,
         false
@@ -236,7 +231,7 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="black" translucent />
 
-      {hasPermission && !IS_DEMO ? (
+      {hasPermission && !isDemoMode() ? (
         // Real camera in production mode
         <Camera
           ref={cameraRef}

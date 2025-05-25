@@ -13,7 +13,8 @@ import { setUserCars } from "../redux/actions";
 import ScreenContainer from "../components/ScreenContainer";
 import styles from "../styles/CarConfirmationStyles";
 import { Colors } from "../styles/GlobalStyle";
-import { ScreenNames, UserStatus } from "../classes/RHClasses";
+import { ScreenNames, UserStatus, CarDTO } from "../classes/RHClasses";
+import { ENV, isDemoMode } from "../config/env";
 import {
   createOrUpdateCar,
   updateBlockedCarByPlateNumber,
@@ -41,7 +42,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
   // Log the source for debugging
   useEffect(() => {
-    console.log("UserCarsScreen source:", source);
+    console.log("CarConfirmationScreen source:", source);
   }, [source]);
 
   const [selectedUserCar, setSelectedUserCar] = useState(null);
@@ -50,66 +51,58 @@ const CarConfirmationScreen = ({ navigation, route }) => {
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      // Create or update car in backend
-      const response = await createOrUpdateCar(
-        carInfo.plateNumber,
-        carInfo.country,
-        userId
-      );
-
-      if (response && response.data) {
-        // Create car object to save to Redux
-        const car = {
-          plateNumber: carInfo.plateNumber,
-          make: carInfo.brand,
-          model: carInfo.model,
-          color: carInfo.color,
-          country: carInfo.country,
+      let response;
+      
+      if (isDemoMode()) {
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, ENV.DEMO_DELAY));
+        
+        // Mock successful response
+        response = {
+          success: true,
+          car: new CarDTO(
+            carInfo.plateNumber,
+            carInfo.country,
+            carInfo.brand,
+            carInfo.model,
+            carInfo.color,
+            carInfo.expiryDate,
+          false,
+          false
+          )
         };
-
-        // Update Redux with the registered car
-        dispatch(setUserCars([...userCars, car]));
-
-        // Navigate to the action screen with car details
-        returnToMain("Save");
       } else {
-        throw new Error("Failed to save car");
+        // TODO: Implement real API call
+        response = await fetch(`${ENV.API_URL}/cars/confirm`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userInfo?.token}`,
+          },
+          body: JSON.stringify(carInfo),
+        }).then(res => res.json());
+      }
+
+      if (response.success) {
+        // Navigate based on source screen
+        if (source === ScreenNames.ADD_CAR) {
+          navigation.navigate(ScreenNames.MAIN);
+        } else {
+          navigation.navigate(ScreenNames.NEED_TO_GO);
+        }
+      } else {
+        throw new Error('Failed to confirm car');
       }
     } catch (error) {
-      console.error("Error saving car:", error);
-      Alert.alert("Error", "Failed to save car details. Please try again.");
+      console.error('Error confirming car:', error);
+      Alert.alert(
+        'Error',
+        'Failed to confirm car. Please try again.',
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Return to main screen with appropriate action
-  const returnToMain = (action) => {
-    navigation.navigate(ScreenNames.MAIN, {
-      carDetails: carInfo,
-      plateNumber: carInfo.plateNumber,
-      action: action,
-    });
-  };
-
-  // Validate car selection when needed
-  const validateCarSelection = () => {
-    if (userCars.length > 1 && !selectedUserCar) {
-      Alert.alert("Error", "Please select which of your cars is involved.");
-      return false;
-    }
-    return true;
-  };
-
-  // Get the appropriate car plate number based on user's cars
-  const getUserCarPlate = () => {
-    if (userCars.length === 0) {
-      return null;
-    }
-    if (userCars.length === 1) {
-      return userCars[0].plateNumber;
-    }
-    return selectedUserCar?.plateNumber;
   };
 
   // Handle "I'm blocked by this car" action
@@ -187,6 +180,35 @@ const CarConfirmationScreen = ({ navigation, route }) => {
   // Handle adding another car - just go back
   const handleCancel = () => {
     navigation.goBack();
+  };
+
+  // Validate car selection when needed
+  const validateCarSelection = () => {
+    if (userCars.length > 1 && !selectedUserCar) {
+      Alert.alert("Error", "Please select which of your cars is involved.");
+      return false;
+    }
+    return true;
+  };
+
+  // Get the appropriate car plate number based on user's cars
+  const getUserCarPlate = () => {
+    if (userCars.length === 0) {
+      return null;
+    }
+    if (userCars.length === 1) {
+      return userCars[0].plateNumber;
+    }
+    return selectedUserCar?.plateNumber;
+  };
+
+  // Return to main screen with appropriate action
+  const returnToMain = (action) => {
+    navigation.navigate(ScreenNames.MAIN, {
+      carDetails: carInfo,
+      plateNumber: carInfo.plateNumber,
+      action: action,
+    });
   };
 
   // Render loading state
