@@ -11,7 +11,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { setUserCars } from "../redux/actions";
 import ScreenContainer from "../components/ScreenContainer";
-import styles from "../styles/UserCarsStyles";
+import styles from "../styles/CarConfirmationStyles";
 import { Colors } from "../styles/GlobalStyle";
 import { ScreenNames, UserStatus } from "../classes/RHClasses";
 import {
@@ -20,10 +20,10 @@ import {
 } from "../BE_Api/ApiCalls";
 import CarSelector from "../components/CarSelector";
 
-const UserCarsScreen = ({ navigation, route }) => {
+const CarConfirmationScreen = ({ navigation, route }) => {
   // Screen load logging
   useEffect(() => {
-    console.log("User Cars Screen Loaded");
+    console.log("Car Confirmation Screen Loaded");
     if (route?.params) {
       console.log("Route params:", route.params);
     }
@@ -312,4 +312,4 @@ const UserCarsScreen = ({ navigation, route }) => {
   );
 };
 
-export default UserCarsScreen;
+export default CarConfirmationScreen;

@@ -9,12 +9,11 @@ import Settings from "./screens/Settings";
 import SplashScreen from "./screens/SplashScreen";
 import AddCarScreen from "./screens/AddCarScreen";
 import PlateRecognitionScreen from "./screens/PlateRecognitionScreen";
-import UserCarsScreen from "./screens/UserCarsScreen";
+import CarConfirmationScreen from "./screens/CarConfirmationScreen";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import GlobalStyle, { Colors } from "./styles/GlobalStyle";
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import AppLoading from 'expo-app-loading';
 
 const Stack = createStackNavigator();
 
@@ -67,6 +66,11 @@ export default function App() {
             <Stack.Screen
               name="PlateRecognition"
               component={PlateRecognitionScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="CarConfirmation"
+              component={CarConfirmationScreen}
               options={{ gestureEnabled: false }}
             />
             <Stack.Screen

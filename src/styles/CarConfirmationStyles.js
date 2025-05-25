@@ -3,6 +3,7 @@ import { Colors, Fonts } from "./GlobalStyle";
 
 const { width } = Dimensions.get("window");
 
+// Styles for the Car Confirmation Screen
 export default StyleSheet.create({
   container: {
     display: "flex",

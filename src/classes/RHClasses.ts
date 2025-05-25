@@ -215,7 +215,7 @@ enum Colors {
 enum ScreenNames {
   ADD_CAR = "AddCar",
   MAIN = "Main",
-  USER_CARS = "UserCars",
+  CAR_CONFIRMATION = "CarConfirmation",
   PLATE_RECOGNITION = "PlateRecognition",
   SETUP = "Setup"
 }

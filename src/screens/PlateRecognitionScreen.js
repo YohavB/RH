@@ -172,14 +172,13 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
       // Show processing state
       setIsProcessing(true);
       try {
-        // Get the source screen from route params
         const carInfo = await getCarInfo(detectedPlate, detectedCountry);
 
         // Reset the recognition screen state
         setDetectedCountry("");
         setDetectedPlate("");
 
-        navigation.navigate(ScreenNames.USER_CARS, {
+        navigation.navigate("CarConfirmation", {
           carInfo,
           source,
         });

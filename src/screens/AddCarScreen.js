@@ -103,7 +103,7 @@ const AddCarScreen = ({ navigation, route }) => {
       setSelectedCountry(Countries.UNKNOWN);
       setPlateNumber("");
 
-      navigation.navigate("UserCars", {
+      navigation.navigate("CarConfirmation", {
         carInfo,
         source,
       });
