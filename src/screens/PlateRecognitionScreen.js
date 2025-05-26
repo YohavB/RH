@@ -173,7 +173,7 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
         setDetectedCountry("");
         setDetectedPlate("");
 
-        navigation.navigate("CarConfirmation", {
+        navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
           carInfo,
           source,
         });

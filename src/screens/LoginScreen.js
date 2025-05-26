@@ -4,7 +4,7 @@ import { Text, View, Pressable } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo, setUserCars } from "../redux/actions";
 
-import styles from "../styles/LoginStyles";
+import styles from "../styles/LoginScreenStyles";
 import { getUsersCarsByUserId } from "../BE_Api/ApiCalls";
 import ScreenContainer from '../components/ScreenContainer';
 

@@ -9,7 +9,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { setUserCars } from '../redux/actions';
 import ScreenContainer from '../components/ScreenContainer';
-import styles from '../styles/SettingsStyles';
+import styles from '../styles/SettingsScreenStyles';
 import { PersonIcon, CarIcon, BackIcon } from '../components/Icons';
 import SectionHeader from '../components/SectionHeader';
 import InfoField from '../components/InfoField';
@@ -61,7 +61,7 @@ const Settings = ({ navigation }) => {
   
   // Navigate to add car screen
   const handleAddCar = () => {
-    navigation.navigate('AddCarScreen', {
+    navigation.navigate(ScreenNames.ADD_CAR, {
       source: ScreenNames.SETTINGS
     });
   };

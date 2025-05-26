@@ -4,6 +4,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Gradients } from "../styles/GlobalStyle";
 import styles from "../styles/SplashScreenStyles";
 import ScreenContainer from '../components/ScreenContainer';
+import { ScreenNames } from "../classes/RHClasses";
+
 
 const { height } = Dimensions.get("window");
 
@@ -28,7 +30,7 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     if (animationComplete) {
       const timer = setTimeout(() => {
-        navigation.replace("Login");
+        navigation.replace(ScreenNames.LOGIN)
       }, 500);
       
       return () => clearTimeout(timer);

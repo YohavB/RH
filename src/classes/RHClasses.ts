@@ -9,12 +9,12 @@ class UserDTO {
   userCars: CarDTO[] | null;
 
   constructor(
-      email: string,
-      givenName: string,
-      familyName: string,
-      photo: string,
-      pushNotificationToken: string,
-      userCars: CarDTO[] | null = null
+    email: string,
+    givenName: string,
+    familyName: string,
+    photo: string,
+    pushNotificationToken: string,
+    userCars: CarDTO[] | null = null
   ) {
     this.email = email;
     this.firstName = givenName;
@@ -37,14 +37,14 @@ class CarDTO {
   isBlocked: boolean = false;
 
   constructor(
-      plateNumber: string,
-      country: Countries,
-      brand: string,
-      model: string,
-      color: string,
-      carLicenseExpireDate: string | null = null,
-      isBlocking: boolean = false,
-      isBlocked: boolean = false
+    plateNumber: string,
+    country: Countries,
+    brand: string,
+    model: string,
+    color: string,
+    carLicenseExpireDate: string | null = null,
+    isBlocking: boolean = false,
+    isBlocked: boolean = false
   ) {
     this.plateNumber = plateNumber;
     this.country = country;
@@ -65,10 +65,10 @@ class UsersCarsDTO {
   blockedCar: string | null;
 
   constructor(
-      userId: number,
-      userCar: string,
-      blockingCar: string | null = null,
-      blockedCar: string | null = null
+    userId: number,
+    userCar: string,
+    blockingCar: string | null = null,
+    blockedCar: string | null = null
   ) {
     this.userId = userId;
     this.userCar = userCar;
@@ -91,17 +91,27 @@ enum CarStatus {
 
 // Enum for countries
 enum Countries {
-  IL = "IL",  // Israel
+  IL = "IL", // Israel
 }
 
 // Enum for screen names
 enum ScreenNames {
-  ADD_CAR = "AddCar",
-  MAIN = "Main",
-  CAR_CONFIRMATION = "CarConfirmation",
-  PLATE_RECOGNITION = "PlateRecognition",
-  SETTINGS = "Settings"
+  SPLASH = "SplashScreen",
+  LOGIN = "LoginScreen",
+  ADD_CAR = "AddCarScreen",
+  MAIN = "MainScreen",
+  CAR_CONFIRMATION = "CarConfirmationScreen",
+  PLATE_RECOGNITION = "PlateRecognitionScreen",
+  SETTINGS = "SettingsScreen",
 }
 
 // Export all enums for use throughout the app
-export { UserDTO, CarDTO, UsersCarsDTO, CarStatus, UserStatus, Countries, ScreenNames };
+export {
+  UserDTO,
+  CarDTO,
+  UsersCarsDTO,
+  CarStatus,
+  UserStatus,
+  Countries,
+  ScreenNames,
+};

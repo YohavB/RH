@@ -80,7 +80,7 @@ const AddCarScreen = ({ navigation, route }) => {
 
   const handleCameraPress = () => {
     dismissKeyboard();
-    navigation.navigate("PlateRecognition", { 
+    navigation.navigate(ScreenNames.PLATE_RECOGNITION, { 
       source: ScreenNames.ADD_CAR 
     });
   };
@@ -104,7 +104,7 @@ const AddCarScreen = ({ navigation, route }) => {
       setSelectedCountry("");
       setPlateNumber("");
 
-      navigation.navigate("CarConfirmation", {
+      navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
         carInfo,
         source,
       });

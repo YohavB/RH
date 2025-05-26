@@ -111,7 +111,7 @@ const MainScreen = ({ navigation, route }) => {
     selectedCountry === '';
 
   const handleProfilePress = () => {
-    navigation.navigate('Settings');
+    navigation.navigate(ScreenNames.SETTINGS);
   };
 
   return (
