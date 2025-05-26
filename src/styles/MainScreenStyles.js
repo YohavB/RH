@@ -64,4 +64,31 @@ export default StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.mainOrange,
   },
+  submitButton: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
+    backgroundColor: Colors.mainOrange,
+    display: "flex",
+    width: 235,
+    padding: 10,
+    paddingHorizontal: 16,
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 8,
+    alignSelf: "center",
+    marginTop: 16,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+    borderColor: Colors.mainOrange,
+  },
+  submitButtonText: {
+    fontFamily: Fonts.semiBold,
+    fontSize: 16,
+    color: Colors.white,
+  },
+  submitButtonTextDisabled: {
+    color: Colors.white,
+  },
 }); 

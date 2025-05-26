@@ -118,19 +118,18 @@ const MainScreen = ({ navigation, route }) => {
     <ScreenContainer>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          {/* Profile Button */}
           <TouchableOpacity 
             style={styles.profileButton}
             onPress={handleProfilePress}
           >
-            <LinearGradient
+            {/* <LinearGradient
               colors={Gradients.orangeToPink.colors}
               style={styles.profileIconContainer}
               start={Gradients.orangeToPink.start}
               end={Gradients.orangeToPink.end}
-            >
-              <ProfileIcon width={24} height={24} fill="#FFFFFF" />
-            </LinearGradient>
+            > */}
+              <ProfileIcon width={24} height={24} fill="red" />
+            {/* </LinearGradient> */}
           </TouchableOpacity>
 
           <View style={styles.welcomeContainer}>
@@ -140,7 +139,7 @@ const MainScreen = ({ navigation, route }) => {
 
           <View style={styles.contentContainer}>
             <Text style={styles.instructionText}>
-              Enter a plate number or scan it with your camera
+              Are you blocking a car ? Or being blocked ? Let's check it out !
             </Text>
 
             <View style={styles.cameraButtonContainer}>
@@ -156,6 +155,24 @@ const MainScreen = ({ navigation, route }) => {
               isLoading={isLoading}
               style={styles.inputContainer}
             />
+
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                isButtonDisabled && styles.submitButtonDisabled,
+              ]}
+              onPress={handleSubmit}
+              disabled={isButtonDisabled}
+            >
+              <Text
+                style={[
+                  styles.submitButtonText,
+                  isButtonDisabled && styles.submitButtonTextDisabled,
+                ]}
+              >
+                Check
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {isLoading && (

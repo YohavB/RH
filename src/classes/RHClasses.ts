@@ -100,7 +100,7 @@ enum ScreenNames {
   MAIN = "Main",
   CAR_CONFIRMATION = "CarConfirmation",
   PLATE_RECOGNITION = "PlateRecognition",
-  SETUP = "Setup"
+  SETTINGS = "Settings"
 }
 
 // Export all enums for use throughout the app

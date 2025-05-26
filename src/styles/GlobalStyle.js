@@ -27,7 +27,7 @@ export const Gradients = {
     start: { x: 0, y: 0 },
     end: { x: 0, y: 1.09 },
   },
-};
+}; 
 
 // Common styles shared across multiple components
 export default StyleSheet.create({

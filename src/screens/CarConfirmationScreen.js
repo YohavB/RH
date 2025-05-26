@@ -85,10 +85,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
       if (response.success) {
         // Navigate based on source screen
-        if (source === ScreenNames.ADD_CAR) {
-          navigation.navigate(ScreenNames.MAIN);
+        if (source === ScreenNames.SETTINGS) {
+          navigation.navigate(ScreenNames.SETTINGS);
         } else {
-          navigation.navigate(ScreenNames.NEED_TO_GO);
+          navigation.navigate(ScreenNames.MAIN);
         }
       } else {
         throw new Error('Failed to confirm car');

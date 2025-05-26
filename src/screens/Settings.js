@@ -15,6 +15,7 @@ import SectionHeader from '../components/SectionHeader';
 import InfoField from '../components/InfoField';
 import CarCard from '../components/CarCard';
 import DeleteNotification from '../components/DeleteNotification';
+import { ScreenNames } from '../classes/RHClasses';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -60,7 +61,9 @@ const Settings = ({ navigation }) => {
   
   // Navigate to add car screen
   const handleAddCar = () => {
-    navigation.navigate('Welcome');
+    navigation.navigate('AddCarScreen', {
+      source: ScreenNames.SETTINGS
+    });
   };
   
   // Handle back button press
