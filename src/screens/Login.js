@@ -9,7 +9,7 @@ import { getUsersCarsByUserId } from "../BE_Api/ApiCalls";
 import ScreenContainer from '../components/ScreenContainer';
 
 // Import the SVG file directly
-import GoogleLogo from "../../assets/google_logo.svg";
+import GoogleLogo from "../assets/icons/google_logo.svg";
 
 const Login = ({ navigation }) => {
   // Fix Redux selector to match store structure

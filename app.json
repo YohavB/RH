@@ -5,7 +5,7 @@
     "slug": "RushHour",
     "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/images/RHlogo.png",
+    "icon": "./assets/images/logo.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -29,7 +29,7 @@
       "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/images/RHlogo.png"
+      "favicon": "./assets/images/logo.png"
     },
     "plugins": [
       ["@react-native-google-signin/google-signin"],
@@ -39,8 +39,8 @@
           "icon": "./assets/images/logo.png",
           "iosDisplayInForeground": true,
           "sounds": [
-            "./assets/images/sounds/car-horn.wav",
-            "./assets/images/sounds/double-car-horn.wav"
+            "./assets/sounds/car-horn.wav",
+            "./assets/sounds/double-car-horn.wav"
           ]
         }
       ]

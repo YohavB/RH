@@ -4,8 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Gradients } from '../styles/GlobalStyle';
 
 // Import SVG assets
-import PhotoIcon from '../../assets/photo.svg';
-import Ellipse5 from '../../assets/Ellipse 5.svg';
+import PhotoIcon from '../assets/icons/photo.svg';
+import Ellipse5 from '../assets/icons/Ellipse 5.svg';
 
 /**
  * A reusable camera button component with gradient background

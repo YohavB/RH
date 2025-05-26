@@ -17,7 +17,7 @@ import styles from '../styles/MainScreenStyles';
 import { Colors, Gradients } from '../styles/GlobalStyle';
 import { ScreenNames } from '../classes/RHClasses';
 import { ENV, isDemoMode } from '../config/env';
-import ProfileIcon from '../../assets/profile_icon.svg';
+import ProfileIcon from '../assets/icons/profile_icon.svg';
 
 const MainScreen = ({ navigation, route }) => {
   // Screen load logging

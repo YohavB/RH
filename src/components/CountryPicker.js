@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Countries } from "../classes/RHClasses";
 import { Colors, Fonts } from "../styles/GlobalStyle";
-import PickerIcon from "../../assets/earth_picker.svg";
+import PickerIcon from "../assets/icons/earth_picker.svg";
 
 /**
  * Country picker component for selecting a country
