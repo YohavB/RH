@@ -20,13 +20,23 @@ import { ENV, isDemoMode } from '../config/env';
 import ProfileIcon from '../assets/icons/profile_icon.svg';
 
 const MainScreen = ({ navigation, route }) => {
-  // Screen load logging
+  // Screen load logging and reset navigation stack
   useEffect(() => {
     console.log("Main Screen Loaded");
     if (route?.params) {
       console.log("Route params:", route.params);
     }
-  }, []);
+    
+    // Reset navigation stack to make MainScreen the root screen
+    // Only reset if we have more than one screen in the stack
+    const currentState = navigation.getState();
+    if (currentState.routes.length > 1) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: ScreenNames.MAIN }],
+      });
+    }
+  }, [navigation]);
 
   const [plateNumber, setPlateNumber] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
