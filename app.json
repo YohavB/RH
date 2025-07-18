@@ -14,7 +14,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.rushhour",
       "googleServicesFile": "./GoogleService-Info.plist",
@@ -32,7 +34,9 @@
       "favicon": "./assets/images/logo.png"
     },
     "plugins": [
-      ["@react-native-google-signin/google-signin"],
+      [
+        "@react-native-google-signin/google-signin"
+      ],
       [
         "expo-notifications",
         {
@@ -44,6 +48,11 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "43444348-9663-4af8-aaa7-188ed46f6d8c"
+      }
+    }
   }
 }

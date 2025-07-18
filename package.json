@@ -23,7 +23,7 @@
     "expo-app-loading": "^1.1.2",
     "expo-auth-session": "~6.1.5",
     "expo-camera": "~16.1.6",
-    "expo-dev-client": "~5.1.8",
+    "expo-dev-client": "~5.2.4",
     "expo-device": "~7.1.4",
     "expo-file-system": "^18.1.10",
     "expo-font": "^13.3.1",
@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@react-native-community/cli": "^19.1.0",
     "metro": "^0.82.0",
     "react-native-svg-transformer": "^1.5.1"
   },
