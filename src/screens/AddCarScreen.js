@@ -43,7 +43,7 @@ const AddCarScreen = ({ navigation, route }) => {
 
   // Get user information from Redux store
   const { userInfo, userCars } = useSelector((state) => state.user) || {};
-  const userName = userInfo?.user?.name || "Ben";
+  const userName = userInfo?.user?.name;
   const userId = userInfo?.user?.id;
 
   // Check if we're in demo environment
@@ -154,7 +154,6 @@ const AddCarScreen = ({ navigation, route }) => {
           
           {hasRegisteredCars ? (
             <>
-              <Text style={styles.welcomeText}>Hey {userName},</Text>
               <Text style={styles.welcomeText}>
                 Adding another car?{" "}
                 <Text style={styles.brandText}>unBlock</Text> has got you
@@ -163,10 +162,9 @@ const AddCarScreen = ({ navigation, route }) => {
             </>
           ) : (
             <>
-              <Text style={styles.welcomeText}>Hi {userName},</Text>
               <Text style={styles.welcomeText}>
-                Welcome to
-                <Text style={styles.brandText}> unBlock</Text> .
+                Welcome to{" "}
+                <Text style={styles.brandText}>unBlock</Text>.
               </Text>
             </>
           )}

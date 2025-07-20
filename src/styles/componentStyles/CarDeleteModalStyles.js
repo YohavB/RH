@@ -20,6 +20,12 @@ export default StyleSheet.create({
     fontFamily: Fonts.bold,
     marginBottom: 24,
   },
+  modalTitleLastCar: {
+    fontSize: 20,
+    fontFamily: Fonts.bold,
+    color: Colors.mainOrange,
+    marginBottom: 10,
+  },
   carPreview: {
     borderRadius: 12,
     backgroundColor: Colors.white,

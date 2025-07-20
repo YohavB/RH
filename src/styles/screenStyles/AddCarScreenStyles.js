@@ -4,14 +4,14 @@ import { Colors, Fonts } from "../GlobalStyle";
 export default StyleSheet.create({
   contentContainer: {
     flex: 1,
+    paddingTop: 40,
     padding: 20,
   },
   welcomeText: {
-    marginTop: 20,
     fontSize: 24,
     fontFamily: Fonts.bold,
     color: "#000",
-    marginBottom: 4,
+    marginBottom: 2,
     flexDirection: "row",
   },
   brandText: {

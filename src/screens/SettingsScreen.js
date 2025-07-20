@@ -155,6 +155,7 @@ const Settings = ({ navigation }) => {
                     key={car.id}
                     car={car}
                     onDelete={isDeleting ? null : handleDeleteCar}
+                    isLastCar={userCars.length === 1}
                   />
                 ))
               ) : (

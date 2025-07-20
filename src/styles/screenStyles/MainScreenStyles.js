@@ -26,7 +26,7 @@ export default StyleSheet.create({
   },
   welcomeText: {
     fontSize: 24,
-    fontFamily: Fonts.regular,
+    fontFamily: Fonts.semiBold,
     color: Colors.text,
   },
   nameText: {

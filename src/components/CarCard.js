@@ -10,7 +10,7 @@ import CarDeleteModal from "./CarDeleteModal";
  * @param {object} car - Car details object
  * @param {function} onDelete - Function to call when delete is confirmed
  */
-const CarCard = ({ car, onDelete }) => {
+const CarCard = ({ car, onDelete, isLastCar }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
@@ -85,6 +85,7 @@ const CarCard = ({ car, onDelete }) => {
         car={car}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
+        isLastCar={isLastCar}
       />
     </>
   );

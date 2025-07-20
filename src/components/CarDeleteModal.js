@@ -1,8 +1,14 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
 import styles from "../styles/componentStyles/CarDeleteModalStyles";
 
-const CarDeleteModal = ({ isVisible, car, onConfirm, onCancel }) => {
+const CarDeleteModal = ({ isVisible, car, onConfirm, onCancel, isLastCar }) => {
   const handleOutsidePress = () => {
     onCancel();
   };
@@ -22,9 +28,20 @@ const CarDeleteModal = ({ isVisible, car, onConfirm, onCancel }) => {
         <View style={styles.modalOverlay}>
           <TouchableWithoutFeedback onPress={handleModalPress}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>
-                Are you sure you want to delete this car?
-              </Text>
+              {isLastCar ? (
+                <>
+                  <Text style={styles.modalTitleLastCar}>
+                    This is your last registered car.
+                  </Text>
+                  <Text style={styles.modalTitleLastCar}>
+                    Are you sure you want to delete it?
+                  </Text>
+                </>
+              ) : (
+                <Text style={styles.modalTitle}>
+                  Are you sure you want to delete this car?
+                </Text>
+              )}
 
               <View style={styles.carPreview}>
                 <View style={styles.previewDetails}>
@@ -44,10 +61,16 @@ const CarDeleteModal = ({ isVisible, car, onConfirm, onCancel }) => {
               </View>
 
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={onCancel}
+                >
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.deleteButton} onPress={onConfirm}>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={onConfirm}
+                >
                   <Text style={styles.deleteButtonText}>Yes, delete</Text>
                 </TouchableOpacity>
               </View>
@@ -59,4 +82,4 @@ const CarDeleteModal = ({ isVisible, car, onConfirm, onCancel }) => {
   );
 };
 
-export default CarDeleteModal; 
+export default CarDeleteModal;
