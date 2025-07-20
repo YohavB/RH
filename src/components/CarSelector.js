@@ -5,11 +5,20 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import styles from '../styles/componentStyles/CarSelectorStyles';
 
 const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
   const [modalVisible, setModalVisible] = React.useState(false);
+
+  const handleOutsidePress = () => {
+    setModalVisible(false);
+  };
+
+  const handleModalPress = () => {
+    // Prevent closing when clicking on the modal content
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -35,7 +44,7 @@ const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
         <Text style={styles.selectorText}>
           {selectedCar
             ? `${selectedCar.plateNumber} (${selectedCar.make} ${selectedCar.model})`
-            : 'Select your car'}
+            : 'Select your current car'}
         </Text>
       </TouchableOpacity>
 
@@ -45,23 +54,27 @@ const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Your Car</Text>
-            <FlatList
-              data={cars}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.plateNumber}
-              style={styles.carList}
-            />
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>Cancel</Text>
-            </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={handleOutsidePress}>
+          <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback onPress={handleModalPress}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Which car are you driving?</Text>
+                <FlatList
+                  data={cars}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.plateNumber}
+                  style={styles.carList}
+                />
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );

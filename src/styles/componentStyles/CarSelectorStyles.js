@@ -1,21 +1,19 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from '../GlobalStyle';
+import { Fonts } from '../GlobalStyle';
 
 export default StyleSheet.create({
-  container: {
-    width: '100%',
-  },
   selector: {
     backgroundColor: Colors.white,
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: Colors.mainOrange,
+    borderColor: Colors.pinkish,
   },
   selectorText: {
-    color: Colors.mainOrange,
+    color: Colors.darkGray,
     fontSize: 16,
-    fontFamily: 'Poppins_500Medium',
+    fontFamily: Fonts.medium,
   },
   modalContainer: {
     flex: 1,
@@ -24,6 +22,8 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.white,
     borderRadius: 12,
     padding: 20,
@@ -32,12 +32,13 @@ export default StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: Fonts.semiBold,
     color: Colors.mainOrange,
     marginBottom: 16,
     textAlign: 'center',
   },
   carList: {
+    width: '80%',
     maxHeight: '80%',
   },
   carItem: {
@@ -47,25 +48,27 @@ export default StyleSheet.create({
   },
   plateNumber: {
     fontSize: 16,
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: Fonts.semiBold,
     color: Colors.darkGray,
   },
   carDetails: {
     fontSize: 14,
-    fontFamily: 'Poppins_400Regular',
+    fontFamily: Fonts.regular,
     color: Colors.gray,
     marginTop: 4,
   },
-  closeButton: {
+  cancelButton: {
     marginTop: 16,
     padding: 12,
-    backgroundColor: Colors.lightGray,
     borderRadius: 8,
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
+    width: "45%",
+    alignItems: "center",
   },
-  closeButtonText: {
-    color: Colors.darkGray,
-    fontSize: 16,
-    fontFamily: 'Poppins_500Medium',
+  cancelButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.semiBold,
+    color: Colors.mainOrange,
   },
 }); 

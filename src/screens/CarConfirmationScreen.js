@@ -19,7 +19,7 @@ import {
   createOrUpdateCar,
   updateBlockedCarByPlateNumber,
   saveCar,
-} from "../BE_Api/ApiCalls";
+} from "../BE_Api/ApiManager";
 import CarSelector from "../components/CarSelector";
 
 const CarConfirmationScreen = ({ navigation, route }) => {
@@ -198,6 +198,17 @@ const CarConfirmationScreen = ({ navigation, route }) => {
     return selectedUserCar?.plateNumber;
   };
 
+  // Check if blocking buttons should be disabled
+  const isBlockingButtonsDisabled = () => {
+    if (userCars.length === 0) {
+      return true; // No cars registered
+    }
+    if (userCars.length === 1) {
+      return false; // Single car is always selected
+    }
+    return !selectedUserCar; // Multiple cars but none selected
+  };
+
   // Return to main screen with appropriate action
   const returnToMain = (action) => {
     navigation.navigate(ScreenNames.MAIN, {
@@ -234,12 +245,14 @@ const CarConfirmationScreen = ({ navigation, route }) => {
     <ScreenContainer>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Found it !</Text>
+                  <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>
+              Found <Text style={styles.brandText}>it</Text>!
+            </Text>
           <Text style={styles.subHeaderText}>
             {source === ScreenNames.MAIN
-              ? "How do you want to proceed?"
-              : "Is this your car?"}
+              ? "How do you want to proceed ?"
+              : "Is this your car ?"}
           </Text>
         </View>
 
@@ -283,20 +296,37 @@ const CarConfirmationScreen = ({ navigation, route }) => {
               )}
 
               <TouchableOpacity
-                style={[styles.actionButton, styles.blockedByButton]}
+                style={[
+                  styles.actionButton, 
+                  styles.blockedByButton,
+                  isBlockingButtonsDisabled() && styles.actionButtonDisabled
+                ]}
                 onPress={handleBlockedBy}
+                disabled={isBlockingButtonsDisabled()}
               >
-                <Text style={styles.actionButtonText}>
+                <Text style={[
+                  styles.actionButtonText,
+                  isBlockingButtonsDisabled() && styles.actionButtonTextDisabled
+                ]}>
                   I'm blocked by this car
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.actionButton, styles.blockingButton]}
+                style={[
+                  styles.actionButton, 
+                  styles.blockingButton,
+                  isBlockingButtonsDisabled() && styles.actionButtonDisabled
+                ]}
                 onPress={handleBlocking}
+                disabled={isBlockingButtonsDisabled()}
               >
                 <Text
-                  style={[styles.actionButtonText, styles.blockingButtonText]}
+                  style={[
+                    styles.actionButtonText, 
+                    styles.blockingButtonText,
+                    isBlockingButtonsDisabled() && styles.actionButtonTextDisabled
+                  ]}
                 >
                   I'm blocking this car
                 </Text>

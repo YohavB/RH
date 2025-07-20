@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserCars } from "../redux/actions";
-import { deleteCar } from "../BE_Api/ApiCalls";
+import { deleteCar } from "../BE_Api/ApiManager";
 import ScreenContainer from "../components/ScreenContainer";
 import styles from "../styles/screenStyles/SettingsScreenStyles";
 import { PersonIcon, CarIcon, BackIcon } from "../components/Icons";

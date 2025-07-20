@@ -69,113 +69,11 @@ export const createOrUpdateCar = async (
 };
 
 export const saveCar = async (carInfo: any, userId: string, existingCars: any[] = []): Promise<any> => {
-  console.log('🚗 API CALL - saveCar():');
-  console.log(`  Car: ${carInfo.plateNumber} - ${carInfo.brand} ${carInfo.model}`);
-  console.log(`  User ID: ${userId}`);
-  console.log(`  Existing cars: ${existingCars.length}`);
-  console.log(`  Mode: ${process.env.NODE_ENV === 'development' ? 'DEMO' : 'PRODUCTION'}`);
-  
-  // For demo mode, return a mock response with saved user cars
-  if (process.env.NODE_ENV === 'development') {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Generate a unique ID for the new car
-    const newCarId = Math.floor(Math.random() * 10000);
-    
-    // Create the new car object
-    const newCar = {
-      id: newCarId,
-      plateNumber: carInfo.plateNumber,
-      country: carInfo.country,
-      brand: carInfo.brand,
-      model: carInfo.model,
-      color: carInfo.color,
-      carLicenseExpireDate: carInfo.expiryDate,
-      isBlocking: false,
-      isBlocked: false,
-      // Add some additional properties that might be needed
-      make: carInfo.brand,
-      year: '2020',
-      userId: userId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    // Mock response - return all existing cars plus the new one
-    const mockResponse = {
-      success: true,
-      message: 'Car saved successfully',
-      userCars: [...existingCars, newCar]
-    };
-    
-    console.log('🚗 API RESPONSE - saveCar():');
-    console.log(`  Success: ${mockResponse.success}`);
-    console.log(`  Message: ${mockResponse.message}`);
-    console.log(`  Previous cars: ${existingCars.length}`);
-    console.log(`  New car added: ${carInfo.plateNumber}`);
-    console.log(`  Total returned cars: ${mockResponse.userCars.length}`);
-    console.log('  All cars:');
-    mockResponse.userCars.forEach((car, index) => {
-      console.log(`    ${index + 1}. ${car.plateNumber} - ${car.brand} ${car.model} (${car.color})`);
-    });
-    console.log('');
-    
-    return mockResponse;
-  } else {
-    // In production, make real API call
-    return apiCall(`${CARS_URL}/save`, 'post', { carInfo, userId, existingCars });
-  }
+  return apiCall(`${CARS_URL}/save`, 'post', { carInfo, userId, existingCars });
 };
 
 export const deleteCar = async (carId: number, userId: string, existingCars: any[] = []): Promise<any> => {
-  console.log('🚗 API CALL - deleteCar():');
-  console.log(`  Car ID: ${carId}`);
-  console.log(`  User ID: ${userId}`);
-  console.log(`  Existing cars: ${existingCars.length}`);
-  console.log(`  Mode: ${process.env.NODE_ENV === 'development' ? 'DEMO' : 'PRODUCTION'}`);
-  
-  // For demo mode, return a mock response with remaining user cars
-  if (process.env.NODE_ENV === 'development') {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Find the car to delete for logging
-    const carToDelete = existingCars.find(car => car.id === carId);
-    
-    // Filter out the deleted car
-    const remainingCars = existingCars.filter(car => car.id !== carId);
-
-    // Mock response - return remaining cars after deletion
-    const mockResponse = {
-      success: true,
-      message: 'Car deleted successfully',
-      userCars: remainingCars
-    };
-    
-    console.log('🚗 API RESPONSE - deleteCar():');
-    console.log(`  Success: ${mockResponse.success}`);
-    console.log(`  Message: ${mockResponse.message}`);
-    if (carToDelete) {
-      console.log(`  Deleted car: ${carToDelete.plateNumber} - ${carToDelete.brand} ${carToDelete.model}`);
-    }
-    console.log(`  Previous cars: ${existingCars.length}`);
-    console.log(`  Remaining cars: ${mockResponse.userCars.length}`);
-    if (mockResponse.userCars.length > 0) {
-      console.log('  Remaining cars:');
-      mockResponse.userCars.forEach((car, index) => {
-        console.log(`    ${index + 1}. ${car.plateNumber} - ${car.brand} ${car.model} (${car.color})`);
-      });
-    } else {
-      console.log('  No cars remaining');
-    }
-    console.log('');
-    
-    return mockResponse;
-  } else {
-    // In production, make real API call
-    return apiCall(`${CARS_URL}/delete`, 'post', { carId, userId });
-  }
+  return apiCall(`${CARS_URL}/delete`, 'post', { carId, userId });
 };
 
 /* USERS CARS API */

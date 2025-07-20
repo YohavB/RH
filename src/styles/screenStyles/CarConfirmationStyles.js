@@ -41,6 +41,11 @@ export default StyleSheet.create({
     color: "#000",
     marginBottom: 8,
   },
+  brandText: {
+    fontSize: 28,
+    fontFamily: Fonts.bold,
+    color: Colors.mainOrange,
+  },
   subHeaderText: {
     fontSize: 21,
     fontFamily: Fonts.semiBold,
@@ -123,6 +128,14 @@ export default StyleSheet.create({
   blockingButtonText: {
     color: Colors.mainOrange,
   },
+  actionButtonDisabled: {
+    opacity: 0.5,
+    backgroundColor: "#E0E0E0",
+    borderColor: "#E0E0E0",
+  },
+  actionButtonTextDisabled: {
+    color: "#999999",
+  },
   saveButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -131,16 +144,16 @@ export default StyleSheet.create({
     gap: 50,
   },
   cancelButton: {
-    padding: 15,
+    padding: 12,
     borderRadius: 8,
-    minWidth: 120,
-    alignItems: "center",
     borderWidth: 1,
     borderColor: Colors.mainOrange,
+    width: "45%",
+    alignItems: "center",
   },
   cancelButtonText: {
     fontSize: 14,
-    fontFamily: Fonts.semiBold,
+    fontFamily: Fonts.medium,
     color: Colors.mainOrange,
   },
   confirmButton: {

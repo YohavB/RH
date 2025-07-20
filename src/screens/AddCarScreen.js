@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Colors } from "../styles/GlobalStyle";
 import styles from "../styles/screenStyles/AddCarScreenStyles";
 import { setCarPlate, setUserCars } from "../redux/actions";
-import { createOrUpdateCar, findCarByPlateNumber } from "../BE_Api/ApiCalls";
+import { createOrUpdateCar, findCarByPlateNumber } from "../BE_Api/ApiManager";
 import {
   Countries,
   CarDTO,

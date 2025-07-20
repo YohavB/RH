@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo, setUserCars } from "../redux/actions";
 
 import styles from "../styles/screenStyles/LoginScreenStyles";
-import { getUsersCarsByUserId } from "../BE_Api/ApiCalls";
+import { getUsersCarsByUserId } from "../BE_Api/ApiManager";
 import ScreenContainer from '../components/ScreenContainer';
 
 // Import the SVG file directly
