@@ -4,7 +4,7 @@ import { Text, View, Pressable } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { setUserInfo, setUserCars } from "../redux/actions";
 
-import styles from "../styles/LoginScreenStyles";
+import styles from "../styles/screenStyles/LoginScreenStyles";
 import { getUsersCarsByUserId } from "../BE_Api/ApiCalls";
 import ScreenContainer from '../components/ScreenContainer';
 
@@ -52,10 +52,15 @@ const Login = ({ navigation }) => {
           plateNumber: "ABC123",
           userId: 12345
         }];
+        
+        console.log('🚗 INITIAL CAR LOAD:');
+        console.log(`  Loading ${mockCars.length} existing cars for user: ${mockUserInfo.user.name}`);
+        
         dispatch(setUserCars(mockCars));
         navigation.replace("Main");
       } else {
         // No cars registered, go to Welcome screen
+        console.log('🚗 NEW USER: No cars registered, going to AddCarScreen');
         navigation.replace("AddCarScreen");
       }
     } catch (error) {

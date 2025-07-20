@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Camera } from "expo-camera";
 import { Colors, Fonts } from "../styles/GlobalStyle";
-import styles from "../styles/PlateRecognitionStyles";
+import styles from "../styles/screenStyles/PlateRecognitionStyles";
 import {
   Countries,
   CarDTO,

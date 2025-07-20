@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Text, View, Animated, Dimensions, Easing } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Gradients } from "../styles/GlobalStyle";
-import styles from "../styles/SplashScreenStyles";
+import styles from "../styles/screenStyles/SplashScreenStyles";
 import ScreenContainer from '../components/ScreenContainer';
 import { ScreenNames } from "../classes/RHClasses";
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Fonts, Colors } from '../styles/GlobalStyle';
+import { View, Text } from 'react-native';
+import styles from '../styles/componentStyles/InfoFieldStyles';
 
 /**
  * Reusable component for displaying labeled information
@@ -17,21 +17,6 @@ const InfoField = ({ label, value, style }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: Fonts.medium,
-    color: '#A0A0A0',
-    marginBottom: 4,
-  },
-  value: {
-    fontSize: 18,
-    fontFamily: Fonts.semiBold,
-    color: '#000',
-  },
-});
+
 
 export default InfoField; 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Gradients } from '../styles/GlobalStyle';
+import styles from '../styles/componentStyles/CameraButtonStyles';
 
 // Import SVG assets
 import PhotoIcon from '../assets/icons/photo.svg';
@@ -47,19 +48,6 @@ const CameraButton = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    alignItems: 'center',
-  },
-  ringContainer: {
-    position: 'absolute',
 
-  },
-  gradientButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default CameraButton; 

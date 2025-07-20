@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, SafeAreaView, StyleSheet } from 'react-native';
-import GlobalStyle, { Colors } from '../styles/GlobalStyle';
+import GlobalStyle from '../styles/GlobalStyle';
+import baseStyles from '../styles/componentStyles/ScreenContainerStyles';
 
 /**
  * A container component that applies global styling to all screens
@@ -9,7 +10,7 @@ import GlobalStyle, { Colors } from '../styles/GlobalStyle';
 const ScreenContainer = ({ children, style, safeArea = true }) => {
   const containerStyle = StyleSheet.create({
     container: {
-      ...GlobalStyle.container,
+      ...baseStyles.container,
       ...(style || {}),
     }
   });

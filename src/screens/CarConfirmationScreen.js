@@ -11,13 +11,14 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { setUserCars } from "../redux/actions";
 import ScreenContainer from "../components/ScreenContainer";
-import styles from "../styles/CarConfirmationStyles";
+import styles from "../styles/screenStyles/CarConfirmationStyles";
 import { Colors } from "../styles/GlobalStyle";
 import { ScreenNames, UserStatus, CarDTO } from "../classes/RHClasses";
 import { ENV, isDemoMode } from "../config/env";
 import {
   createOrUpdateCar,
   updateBlockedCarByPlateNumber,
+  saveCar,
 } from "../BE_Api/ApiCalls";
 import CarSelector from "../components/CarSelector";
 
@@ -54,23 +55,8 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       let response;
       
       if (isDemoMode()) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, ENV.DEMO_DELAY));
-        
-        // Mock successful response
-        response = {
-          success: true,
-          car: new CarDTO(
-            carInfo.plateNumber,
-            carInfo.country,
-            carInfo.brand,
-            carInfo.model,
-            carInfo.color,
-            carInfo.expiryDate,
-          false,
-          false
-          )
-        };
+        // Call the new saveCar API with mock response, passing existing cars
+        response = await saveCar(carInfo, userId, userCars);
       } else {
         // TODO: Implement real API call
         response = await fetch(`${ENV.API_URL}/cars/confirm`, {
@@ -84,6 +70,16 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       }
 
       if (response.success) {
+        // Save the returned cars to Redux store
+        if (response.userCars) {
+          console.log('🚗 ADDING CAR TO STORE:');
+          console.log(`  New car: ${carInfo.plateNumber} - ${carInfo.brand} ${carInfo.model} (${carInfo.color})`);
+          console.log(`  User ID: ${userId}`);
+          console.log(`  Source: ${source}`);
+          
+          dispatch(setUserCars(response.userCars));
+        }
+
         // Navigate based on source screen
         if (source === ScreenNames.SETTINGS) {
           navigation.navigate(ScreenNames.SETTINGS);

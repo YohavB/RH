@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Colors, Fonts } from './GlobalStyle';
+import { Colors, Fonts } from '../GlobalStyle';
 
 export default StyleSheet.create({
   container: {
@@ -8,8 +8,8 @@ export default StyleSheet.create({
   },
   profileButton: {
     position: 'absolute',
-    top: 20,
-    right: 20,
+    top: 10,
+    right: 10,
     padding: 8,
     zIndex: 1,
   },
@@ -32,7 +32,7 @@ export default StyleSheet.create({
   nameText: {
     fontSize: 32,
     fontFamily: Fonts.semiBold,
-    color: Colors.text,
+    color: Colors.mainOrange  ,
   },
   contentContainer: {
     flex: 1,
@@ -89,6 +89,29 @@ export default StyleSheet.create({
     color: Colors.white,
   },
   submitButtonTextDisabled: {
+    color: Colors.white,
+  },
+  noCarText: {
+    fontSize: 18,
+    fontFamily: Fonts.medium,
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: 40,
+    lineHeight: 24,
+    paddingHorizontal: 20,
+  },
+  goToSettingsButton: {
+    borderRadius: 8,
+    backgroundColor: Colors.mainOrange,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 200,
+  },
+  goToSettingsButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.semiBold,
     color: Colors.white,
   },
 }); 

@@ -1,14 +1,13 @@
 import { StyleSheet } from "react-native";
-import { Colors, Fonts } from "./GlobalStyle";
+import { Colors, Fonts } from "../GlobalStyle";
 
 export default StyleSheet.create({
   contentContainer: {
-    paddingHorizontal: 48,
-    flexDirection: "column",
-    justifyContent: "center",
-    height: "70%",
+    flex: 1,
+    padding: 20,
   },
   welcomeText: {
+    marginTop: 20,
     fontSize: 24,
     fontFamily: Fonts.bold,
     color: "#000",
@@ -28,31 +27,11 @@ export default StyleSheet.create({
     marginBottom: 60,
   },
   cameraButtonContainer: {
-    alignSelf: "center",
-    marginBottom: 40,
-  },
-  inputContainer: {
-    width: "100%",
     marginBottom: 20,
-    flexDirection: "row",
     alignItems: "center",
   },
-  countryPicker: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    backgroundColor: Colors.inputBackground,
-    paddingHorizontal: 16,
-    fontSize: 18,
-    fontFamily: Fonts.semiBold,
-    color: Colors.textDark,
-    borderRadius: 8,
-  },
-  inputFocused: {
-    borderColor: Colors.mainOrange,
-    borderWidth: 1,
+  inputContainer: {
+    paddingHorizontal: 20,
   },
   submitButton: {
     borderRadius: 8,
@@ -78,8 +57,21 @@ export default StyleSheet.create({
     fontSize: 16,
     color: Colors.white,
   },
-  submitButtonTextDisabled: {
-    color: Colors.white,
+  cancelButton: {
+    marginTop: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.mainOrange,
+    backgroundColor: Colors.white,
+    width: 150,
+    padding: 10,
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.semiBold,
+    color: Colors.mainOrange,
   },
   loadingOverlay: {
     position: "absolute",

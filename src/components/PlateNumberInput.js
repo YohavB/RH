@@ -2,9 +2,9 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   TextInput,
-  StyleSheet,
 } from 'react-native';
-import { Colors, Fonts } from '../styles/GlobalStyle';
+import { Colors } from '../styles/GlobalStyle';
+import styles from '../styles/componentStyles/PlateNumberInputStyles';
 import CountryPicker from './CountryPicker';
 
 const PlateNumberInput = ({
@@ -49,29 +49,6 @@ const PlateNumberInput = ({
   );
 };
 
-const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-  },
-  countryPicker: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    backgroundColor: Colors.white,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    fontFamily: Fonts.regular,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  inputFocused: {
-    borderColor: Colors.mainOrange,
-  },
-});
+
 
 export default PlateNumberInput; 

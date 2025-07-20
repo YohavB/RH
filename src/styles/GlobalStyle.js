@@ -9,6 +9,7 @@ export const Colors = {
   mainOrange: "#F5855F", // Main app color
   textDark: "#4f4f4f",
   textBlack: "#000000",
+  textLight: "#A0A0A0",
   background: "#FFFFFF", // Background color for the entire app
   inputBackground:"#F1F3F5",
 };

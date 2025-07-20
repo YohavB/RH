@@ -13,11 +13,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ScreenContainer from '../components/ScreenContainer';
 import PlateNumberInput from '../components/PlateNumberInput';
 import CameraButton from '../components/CameraButton';
-import styles from '../styles/MainScreenStyles';
+import styles from '../styles/screenStyles/MainScreenStyles';
 import { Colors, Gradients } from '../styles/GlobalStyle';
 import { ScreenNames } from '../classes/RHClasses';
 import { ENV, isDemoMode } from '../config/env';
-import ProfileIcon from '../assets/icons/profile_icon.svg';
+import { ProfileIcon } from '../components/Icons';
 
 const MainScreen = ({ navigation, route }) => {
   // Screen load logging and reset navigation stack
@@ -42,8 +42,9 @@ const MainScreen = ({ navigation, route }) => {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { userInfo } = useSelector((state) => state.user) || {};
+  const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
   const userName = userInfo?.user?.name || 'Guest';
+  const hasRegisteredCars = userCars && userCars.length > 0;
 
   const handleCameraPress = () => {
     Keyboard.dismiss();
@@ -124,6 +125,10 @@ const MainScreen = ({ navigation, route }) => {
     navigation.navigate(ScreenNames.SETTINGS);
   };
 
+  const handleGoToSettings = () => {
+    navigation.navigate(ScreenNames.SETTINGS);
+  };
+
   return (
     <ScreenContainer>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -132,14 +137,7 @@ const MainScreen = ({ navigation, route }) => {
             style={styles.profileButton}
             onPress={handleProfilePress}
           >
-            {/* <LinearGradient
-              colors={Gradients.orangeToPink.colors}
-              style={styles.profileIconContainer}
-              start={Gradients.orangeToPink.start}
-              end={Gradients.orangeToPink.end}
-            > */}
-              <ProfileIcon width={24} height={24} fill="red" />
-            {/* </LinearGradient> */}
+              <ProfileIcon size={30} gradient={Gradients.orangeToPink} />
           </TouchableOpacity>
 
           <View style={styles.welcomeContainer}>
@@ -148,41 +146,61 @@ const MainScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.contentContainer}>
-            <Text style={styles.instructionText}>
-              Are you blocking a car ? Or being blocked ? Let's check it out !
-            </Text>
+            {hasRegisteredCars ? (
+              <>
+                <Text style={styles.instructionText}>
+                  Are you blocking a car ? Or being blocked ? Let's check it out !
+                </Text>
 
-            <View style={styles.cameraButtonContainer}>
-              <CameraButton onPress={handleCameraPress} disabled={isLoading} />
-            </View>
+                <View style={styles.cameraButtonContainer}>
+                  <CameraButton onPress={handleCameraPress} disabled={isLoading} />
+                </View>
 
-            <PlateNumberInput
-              plateNumber={plateNumber}
-              setPlateNumber={setPlateNumber}
-              selectedCountry={selectedCountry}
-              setSelectedCountry={setSelectedCountry}
-              onSubmit={isButtonDisabled ? null : handleSubmit}
-              isLoading={isLoading}
-              style={styles.inputContainer}
-            />
+                <PlateNumberInput
+                  plateNumber={plateNumber}
+                  setPlateNumber={setPlateNumber}
+                  selectedCountry={selectedCountry}
+                  setSelectedCountry={setSelectedCountry}
+                  onSubmit={isButtonDisabled ? null : handleSubmit}
+                  isLoading={isLoading}
+                  style={styles.inputContainer}
+                />
 
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                isButtonDisabled && styles.submitButtonDisabled,
-              ]}
-              onPress={handleSubmit}
-              disabled={isButtonDisabled}
-            >
-              <Text
-                style={[
-                  styles.submitButtonText,
-                  isButtonDisabled && styles.submitButtonTextDisabled,
-                ]}
-              >
-                Check
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.submitButton,
+                    isButtonDisabled && styles.submitButtonDisabled,
+                  ]}
+                  onPress={handleSubmit}
+                  disabled={isButtonDisabled}
+                >
+                  <Text
+                    style={[
+                      styles.submitButtonText,
+                      isButtonDisabled && styles.submitButtonTextDisabled,
+                    ]}
+                  >
+                    Check
+                  </Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.noCarText}>
+                  Before using unBlock you must have a registered car.{'\n\n'}
+                  Please go to settings to add your car.
+                </Text>
+
+                <TouchableOpacity
+                  style={styles.goToSettingsButton}
+                  onPress={handleGoToSettings}
+                >
+                  <Text style={styles.goToSettingsButtonText}>
+                    Go to Settings
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
 
           {isLoading && (

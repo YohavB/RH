@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Colors } from "../styles/GlobalStyle";
-import styles from "../styles/AddCarScreenStyles";
+import styles from "../styles/screenStyles/AddCarScreenStyles";
 import { setCarPlate, setUserCars } from "../redux/actions";
 import { createOrUpdateCar, findCarByPlateNumber } from "../BE_Api/ApiCalls";
 import {
@@ -143,10 +143,15 @@ const AddCarScreen = ({ navigation, route }) => {
     }
   };
 
+  const handleCancel = () => {
+    navigation.goBack();
+  };
+
   return (
     <ScreenContainer>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.contentContainer}>
+          
           {hasRegisteredCars ? (
             <>
               <Text style={styles.welcomeText}>Hey {userName},</Text>
@@ -197,11 +202,15 @@ const AddCarScreen = ({ navigation, route }) => {
             <Text
               style={[
                 styles.submitButtonText,
-                isButtonDisabled && styles.submitButtonTextDisabled,
+                isButtonDisabled,
               ]}
             >
               Check
             </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
 
           {isLoading && (

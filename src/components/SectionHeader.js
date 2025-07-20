@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Fonts, Colors } from '../styles/GlobalStyle';
+import React from "react";
+import { View, Text } from "react-native";
+import styles from "../styles/componentStyles/SectionHeaderStyles";
 
 /**
  * Reusable section header component with icon
@@ -17,22 +17,6 @@ const SectionHeader = ({ title, icon, style }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  iconContainer: {
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontFamily: Fonts.bold,
-    color: '#000',
-  },
-});
 
-export default SectionHeader; 
+
+export default SectionHeader;
