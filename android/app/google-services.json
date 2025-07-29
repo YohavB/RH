@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "864165576083-bvs0cgcfsf04401phi1g01be1bdrba0o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rushhour",
+            "certificate_hash": "02c50ce8a967072c9c1555c9a9d80c7f39e331bc"
+          }
+        },
+        {
+          "client_id": "864165576083-oes08kmteb85dqosl866iplcmsru9l9f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rushhour",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +45,13 @@
             {
               "client_id": "864165576083-harqo14kmlvj6lrhmmrjomemo2v6ervu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "864165576083-ql4f8beguutmtrel407bbqog25otpu21.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rushhour"
+              }
             }
           ]
         }

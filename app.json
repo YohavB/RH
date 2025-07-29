@@ -43,8 +43,8 @@
           "icon": "./assets/images/logo.png",
           "iosDisplayInForeground": true,
           "sounds": [
-            "./assets/sounds/car-horn.wav",
-            "./assets/sounds/double-car-horn.wav"
+            "./assets/sounds/car_horn.wav",
+            "./assets/sounds/double_car_horn.wav"
           ]
         }
       ]

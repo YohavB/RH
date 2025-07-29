@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>864165576083-ql4f8beguutmtrel407bbqog25otpu21.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.864165576083-ql4f8beguutmtrel407bbqog25otpu21</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>864165576083-bvs0cgcfsf04401phi1g01be1bdrba0o.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCybEIMTsrclACEjqqlIW2um-PLy14grqA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>864165576083</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.rushhour</string>
+	<key>PROJECT_ID</key>
+	<string>rushhour-yohavb</string>
+	<key>STORAGE_BUCKET</key>
+	<string>rushhour-yohavb.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:864165576083:ios:9bf1f2c7bf114aae40bc66</string>
+</dict>
+</plist>
