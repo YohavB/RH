@@ -1,22 +1,162 @@
-import { Countries } from "../classes/RHClasses";
+import { 
+  Countries, 
+  UserDTO, 
+  CarDTO, 
+  AuthResponseDTO, 
+  UserCarsDTO, 
+  CarRelationsDTO,
+  UserCreationDTO,
+  HealthResponse,
+  NotificationResponse,
+  UserCarSituation
+} from "../classes/RHClasses";
 
 // Import both real and mock API implementations
 import * as RealApiCalls from "./ApiCalls";
 import * as MockApiCalls from "./MockApiCalls";
 
 // Determine which API implementation to use based on environment
-const isDevelopment = process.env.NODE_ENV === 'development';
-const isProduction = process.env.NODE_ENV === 'production';
+// Force using REAL API calls for now
+const nodeEnv = process.env.NODE_ENV || 'development';
+const isDevelopment = nodeEnv === 'development';
+const isProduction = nodeEnv === 'production';
 
 // Log the API mode being used
-console.log(`🚀 API Manager initialized in ${process.env.NODE_ENV || 'development'} mode`);
-console.log(`   Using ${isDevelopment ? 'MOCK' : 'REAL'} API calls`);
+console.log(`🚀 API Manager initialized in ${nodeEnv} mode`);
+console.log(`   Using REAL API calls to server on port 8008`);
 console.log('');
 
 // Helper function to get the appropriate API implementation
 const getApiImplementation = () => {
-  return isDevelopment ? MockApiCalls : RealApiCalls;
+  return RealApiCalls; // Always use real API calls
 };
+
+/* HEALTH ENDPOINTS */
+
+export const healthCheck = async (): Promise<HealthResponse> => {
+  const api = getApiImplementation();
+  return api.healthCheck();
+};
+
+/* AUTHENTICATION ENDPOINTS */
+
+export const googleLogin = async (idToken: string): Promise<AuthResponseDTO> => {
+  const api = getApiImplementation();
+  return api.googleLogin(idToken);
+};
+
+export const facebookLogin = async (accessToken: string): Promise<AuthResponseDTO> => {
+  const api = getApiImplementation();
+  return api.facebookLogin(accessToken);
+};
+
+export const appleLogin = async (idToken: string): Promise<AuthResponseDTO> => {
+  const api = getApiImplementation();
+  return api.appleLogin(idToken);
+};
+
+export const refreshToken = async (): Promise<AuthResponseDTO> => {
+  const api = getApiImplementation();
+  return api.refreshToken();
+};
+
+export const logout = async (): Promise<void> => {
+  const api = getApiImplementation();
+  return api.logout();
+};
+
+/* USER ENDPOINTS */
+
+export const createUser = async (userData: UserCreationDTO): Promise<UserDTO> => {
+  const api = getApiImplementation();
+  return api.createUser(userData);
+};
+
+export const getUserById = async (id: number): Promise<UserDTO> => {
+  const api = getApiImplementation();
+  return api.getUserById(id);
+};
+
+export const getUserByEmail = async (email: string): Promise<UserDTO> => {
+  const api = getApiImplementation();
+  return api.getUserByEmail(email);
+};
+
+export const updateUser = async (userData: UserDTO): Promise<UserDTO> => {
+  const api = getApiImplementation();
+  return api.updateUser(userData);
+};
+
+export const deactivateUser = async (userId: number): Promise<void> => {
+  const api = getApiImplementation();
+  return api.deactivateUser(userId);
+};
+
+export const activateUser = async (userId: number): Promise<void> => {
+  const api = getApiImplementation();
+  return api.activateUser(userId);
+};
+
+/* CAR ENDPOINTS */
+
+export const findOrCreateCar = async (plateNumber: string, country: Countries, userId?: number): Promise<CarDTO> => {
+  const api = getApiImplementation();
+  return api.findOrCreateCar(plateNumber, country, userId);
+};
+
+/* USER-CAR ENDPOINTS */
+
+export const assignCarToUser = async (userId: number, carId: number): Promise<UserCarsDTO> => {
+  const api = getApiImplementation();
+  return api.assignCarToUser(userId, carId);
+};
+
+export const getUserCars = async (userId: number): Promise<UserCarsDTO> => {
+  const api = getApiImplementation();
+  return api.getUserCars(userId);
+};
+
+export const removeCarFromUser = async (userId: number, carId: number): Promise<UserCarsDTO> => {
+  const api = getApiImplementation();
+  return api.removeCarFromUser(userId, carId);
+};
+
+/* CAR RELATIONS ENDPOINTS */
+
+export const createCarBlockingRelationship = async (
+  blockingCarId: number, 
+  blockedCarId: number
+): Promise<CarRelationsDTO> => {
+  const api = getApiImplementation();
+  return api.createCarBlockingRelationship(blockingCarId, blockedCarId);
+};
+
+export const getCarRelations = async (carId: number): Promise<CarRelationsDTO> => {
+  const api = getApiImplementation();
+  return api.getCarRelations(carId);
+};
+
+export const removeCarBlockingRelationship = async (
+  blockingCarId: number, 
+  blockedCarId: number
+): Promise<CarRelationsDTO> => {
+  const api = getApiImplementation();
+  return api.removeCarBlockingRelationship(blockingCarId, blockedCarId);
+};
+
+export const removeAllCarRelations = async (carId: number): Promise<void> => {
+  const api = getApiImplementation();
+  return api.removeAllCarRelations(carId);
+};
+
+/* NOTIFICATION ENDPOINTS */
+
+export const sendNeedToGoNotification = async (blockedCarId: number): Promise<NotificationResponse> => {
+  const api = getApiImplementation();
+  return api.sendNeedToGoNotification(blockedCarId);
+};
+
+/* LEGACY ENDPOINTS FOR BACKWARD COMPATIBILITY */
 
 /* CARS API MANAGER */
 
@@ -101,19 +241,6 @@ export const releaseBlockedCarByPlateNumber = async (
   return api.releaseBlockedCarByPlateNumber(blockingCarPlate, blockedCarPlate, userId, userStatus);
 };
 
-// Additional method from mock API that might be useful
-export const sendNeedToGoNotification = async (blockedCarPlate: string): Promise<any> => {
-  const api = getApiImplementation();
-  // Check if the method exists in the API implementation
-  if ('sendNeedToGoNotification' in api) {
-    return (api as any).sendNeedToGoNotification(blockedCarPlate);
-  } else {
-    // Fallback for real API that doesn't have this method yet
-    console.warn('sendNeedToGoNotification not implemented in real API, using mock fallback');
-    return MockApiCalls.sendNeedToGoNotification(blockedCarPlate);
-  }
-};
-
 /* USERS API MANAGER */
 
 export const findAllUsers = async (): Promise<any> => {
@@ -146,7 +273,7 @@ export const getApiMode = () => {
   return {
     isDevelopment,
     isProduction,
-    mode: isDevelopment ? 'MOCK' : 'REAL',
+    mode: 'REAL',
     nodeEnv: process.env.NODE_ENV || 'development'
   };
 };

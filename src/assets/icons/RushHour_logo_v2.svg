@@ -1,0 +1,15 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#clip0_455_2914)">
+    <rect width="100" height="100" fill="url(#paint0_linear_455_2914)"/>
+    <text x="50%" y="55%" text-anchor="middle" fill="white" font-size="18" font-family="Poppins, sans-serif" font-weight="bold">RushHour</text>
+  </g>
+  <defs>
+    <linearGradient id="paint0_linear_455_2914" x1="50" y1="0" x2="49.9716" y2="108.867" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF9E4E"/>
+      <stop offset="1" stop-color="#ED726B"/>
+    </linearGradient>
+    <clipPath id="clip0_455_2914">
+      <rect width="100" height="100" rx="16" fill="transparent"/>
+    </clipPath>
+  </defs>
+</svg>
