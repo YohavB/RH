@@ -1,3 +1,5 @@
+import { store } from "../redux/store";
+import { logout as logoutAction } from "../redux/actions";
 import { 
   Countries, 
   UserDTO, 
@@ -5,9 +7,14 @@ import {
   AuthResponseDTO, 
   UserCarsDTO, 
   CarRelationsDTO,
+  UserCarRequestDTO,
+  CarsRelationRequestDTO,
+  FindCarRequestDTO,
   UserCreationDTO,
+  OAuthLoginRequestDTO,
   HealthResponse,
   NotificationResponse,
+  ErrorResponse,
   UserCarSituation
 } from "../classes/RHClasses";
 
@@ -62,7 +69,9 @@ export const refreshToken = async (): Promise<AuthResponseDTO> => {
 
 export const logout = async (): Promise<void> => {
   const api = getApiImplementation();
-  return api.logout();
+  await api.logout();
+  // Clear Redux state by calling the thunk action
+  logoutAction()(store.dispatch);
 };
 
 /* USER ENDPOINTS */

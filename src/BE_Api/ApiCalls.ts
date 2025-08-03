@@ -1,5 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { store } from "../redux/store";
 import { 
   Countries, 
   UserDTO, 
@@ -38,20 +39,21 @@ console.log(`   Development Mode: ${isDevelopmentMode()}`);
 console.log(`   Connecting to local server on port 8008`);
 console.log('');
 
-// Add auth token to requests if available
-const setupAuthHeader = async () => {
-  try {
-    const token = await AsyncStorage.getItem('authToken');
-    if (token) {
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-  } catch (error) {
-    console.error("Error setting up auth header:", error);
-  }
+// Function to get auth token from Redux store
+const getAuthTokenFromStore = (): string | null => {
+  const state = store.getState();
+  return state.user.authToken;
 };
 
-// Call setup once
-setupAuthHeader();
+// Add auth token to requests if available
+const setupAuthHeader = () => {
+  const token = getAuthTokenFromStore();
+  if (token) {
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common['Authorization'];
+  }
+};
 
 // Common error handler function
 const handleError = (error: any): ErrorResponse => {
@@ -73,6 +75,8 @@ const handleError = (error: any): ErrorResponse => {
 // Helper function to make API calls
 const apiCall = async <T>(url: string, method: 'get' | 'post' | 'put' | 'delete', data?: any): Promise<T> => {
   try {
+    // Setup auth header before each request
+    setupAuthHeader();
     const response = await axiosInstance[method](url, data);
     return response.data;
   } catch (error) {
@@ -81,16 +85,18 @@ const apiCall = async <T>(url: string, method: 'get' | 'post' | 'put' | 'delete'
   }
 };
 
-// Helper function to update auth token
+// Helper function to update auth token in Redux store
 export const updateAuthToken = async (token: string) => {
-  await AsyncStorage.setItem('authToken', token);
-  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  const { setAuthToken } = await import("../redux/actions");
+  setAuthToken(token)(store.dispatch);
+  setupAuthHeader();
 };
 
-// Helper function to clear auth token
+// Helper function to clear auth token from Redux store
 export const clearAuthToken = async () => {
-  await AsyncStorage.removeItem('authToken');
-  delete axiosInstance.defaults.headers.common['Authorization'];
+  const { setAuthToken } = await import("../redux/actions");
+  setAuthToken("")(store.dispatch);
+  setupAuthHeader();
 };
 
 /* HEALTH ENDPOINTS */

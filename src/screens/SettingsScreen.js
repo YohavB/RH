@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Pressable,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { setUserCars } from "../redux/actions";
+import { setUserCars, setUserInfo, setAuthToken, setUserDetails } from "../redux/actions";
 import { deleteCar } from "../BE_Api/ApiManager";
 import ScreenContainer from "../components/ScreenContainer";
 import styles from "../styles/screenStyles/SettingsScreenStyles";
@@ -19,27 +20,49 @@ import InfoField from "../components/InfoField";
 import CarCard from "../components/CarCard";
 import DeleteNotification from "../components/DeleteNotification";
 import { ScreenNames } from "../classes/RHClasses";
+import GoogleSignInService from "../services/GoogleSignInService";
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.user) || {};
+  const { userInfo, userDetails } = useSelector((state) => state.user) || {};
   const { userCars } = useSelector((state) => state.user) || { userCars: [] };
 
   const [deletedCar, setDeletedCar] = useState(null);
   const [showDeleteNotification, setShowDeleteNotification] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Mock user data - in a real app, this would come from Redux or API
-  const userData = {
-    name: userInfo?.user?.name || "Ben Jacobs",
-    email: userInfo?.user?.email || "Ben@sunbit.com",
-    phone: userInfo?.user?.phone || "058-089-2242",
+  // Use real user data from Redux
+  const getUserData = () => {
+    if (userDetails) {
+      return {
+        name: `${userDetails.firstName} ${userDetails.lastName}`,
+        email: userDetails.email,
+        phone: "Not provided", // Phone is not part of UserDTO
+      };
+    }
+    if (userInfo?.user) {
+      return {
+        name: userInfo.user.name || "Unknown",
+        email: userInfo.user.email || "Not provided",
+        phone: userInfo.user.phone || "Not provided",
+      };
+    }
+    return {
+      name: "Unknown",
+      email: "Not provided",
+      phone: "Not provided",
+    };
   };
+
+  const userData = getUserData();
 
   // Screen load logging
   useEffect(() => {
     console.log("Settings Screen Loaded");
-  }, []);
+    console.log("User Details:", userDetails);
+    console.log("User Info:", userInfo);
+    console.log("User Data:", userData);
+  }, [userDetails, userInfo, userData]);
 
   // Handle deleting a car
   const handleDeleteCar = async (car) => {
@@ -52,7 +75,7 @@ const Settings = ({ navigation }) => {
       } (${car.color})`
     );
     console.log(`  Car ID: ${car.id}`);
-    console.log(`  User: ${userInfo?.user?.name || "Unknown"}`);
+    console.log(`  User: ${getUserData().name}`);
 
     setIsDeleting(true);
 
@@ -103,6 +126,64 @@ const Settings = ({ navigation }) => {
     navigation.goBack();
   };
 
+  const signOutWithGoogle = async () => {
+    // Show confirmation dialog before signing out
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              console.log("Starting sign out process...");
+              
+              // Sign out from Google
+              const result = await GoogleSignInService.signOutWithGoogle();
+              
+              if (result.success) {
+                console.log("Google sign out successful");
+                
+                // Clear all user data from Redux store
+                dispatch(setUserInfo(null));
+                dispatch(setUserCars([]));
+                dispatch(setAuthToken(null));
+                dispatch(setUserDetails(null));
+                
+                console.log("User data cleared from Redux store");
+                
+                // Navigate back to login screen
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: ScreenNames.LOGIN }],
+                });
+              } else {
+                console.log("Google sign out failed:", result.error);
+                Alert.alert(
+                  "Sign Out Error",
+                  "Failed to sign out from Google. Please try again.",
+                  [{ text: "OK" }]
+                );
+              }
+            } catch (error) {
+              console.log("Sign out error:", error);
+              Alert.alert(
+                "Sign Out Error",
+                "An unexpected error occurred while signing out. Please try again.",
+                [{ text: "OK" }]
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -134,6 +215,12 @@ const Settings = ({ navigation }) => {
                   value={userData.phone}
                   style={{ marginBottom: 0 }}
                 />
+
+                <Pressable style={styles.googleButton} onPress={signOutWithGoogle}>
+                  <View style={styles.googleButtonContent}>
+                    <Text style={styles.googleButtonText}>Sign out</Text>
+                  </View>
+                </Pressable>
               </View>
             </View>
 

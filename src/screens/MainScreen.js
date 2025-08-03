@@ -23,6 +23,10 @@ const MainScreen = ({ navigation, route }) => {
   // Screen load logging and reset navigation stack
   useEffect(() => {
     console.log("Main Screen Loaded");
+    console.log("User Details:", userDetails);
+    console.log("User Info:", userInfo);
+    console.log("Display Name:", userName);
+    
     if (route?.params) {
       console.log("Route params:", route.params);
     }
@@ -36,14 +40,26 @@ const MainScreen = ({ navigation, route }) => {
         routes: [{ name: ScreenNames.MAIN }],
       });
     }
-  }, [navigation]);
+  }, [navigation, userDetails, userInfo, userName]);
 
   const [plateNumber, setPlateNumber] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
-  const userName = userInfo?.user?.name || 'Guest';
+  const { userInfo, userCars = [], authToken, userDetails } = useSelector((state) => state.user) || {};
+  
+  // Use real user data from Redux
+  const getUserDisplayName = () => {
+    if (userDetails) {
+      return `${userDetails.firstName} ${userDetails.lastName}`;
+    }
+    if (userInfo?.user?.name) {
+      return userInfo.user.name;
+    }
+    return 'Guest';
+  };
+  
+  const userName = getUserDisplayName();
   const hasRegisteredCars = userCars && userCars.length > 0;
 
   const handleCameraPress = () => {
@@ -87,7 +103,7 @@ const MainScreen = ({ navigation, route }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userInfo?.token}`,
+            'Authorization': `Bearer ${authToken}`,
           },
           body: JSON.stringify({
             plateNumber,

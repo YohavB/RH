@@ -1,4 +1,5 @@
-import { UserActionTypes, SET_USER_INFO, SET_USER_ID, SET_EXPO_TOKEN, SET_USER_CARS, SET_CAR_PLATE, LOGOUT } from "./actions";
+import { UserActionTypes, SET_USER_INFO, SET_USER_ID, SET_EXPO_TOKEN, SET_USER_CARS, SET_CAR_PLATE, SET_AUTH_TOKEN, SET_USER_DETAILS, LOGOUT } from "./actions";
+import { UserDTO } from "../classes/RHClasses";
 
 // Define the initial state interface
 interface UserState {
@@ -7,6 +8,8 @@ interface UserState {
   expoToken: string | null;
   userCars: any[];
   carPlate: string | null;
+  authToken: string | null;
+  userDetails: UserDTO | null;
 }
 
 const initialState: UserState = {
@@ -15,6 +18,8 @@ const initialState: UserState = {
   expoToken: null,
   userCars: [],
   carPlate: null,
+  authToken: null,
+  userDetails: null,
 };
 
 function userReducer(state = initialState, action: UserActionTypes): UserState {
@@ -32,9 +37,6 @@ function userReducer(state = initialState, action: UserActionTypes): UserState {
       const carChange = newCarCount - previousCarCount;
       
       console.log('🚗 CAR STORE UPDATE:');
-      console.log(`  Previous cars: ${previousCarCount}`);
-      console.log(`  New cars: ${newCarCount}`);
-      console.log(`  Change: ${carChange > 0 ? '+' : ''}${carChange}`);
       
       if (action.payload && action.payload.length > 0) {
         console.log('  Car details:');
@@ -49,6 +51,10 @@ function userReducer(state = initialState, action: UserActionTypes): UserState {
       return { ...state, userCars: action.payload };
     case SET_CAR_PLATE:
       return { ...state, carPlate: action.payload };
+    case SET_AUTH_TOKEN:
+      return { ...state, authToken: action.payload };
+    case SET_USER_DETAILS:
+      return { ...state, userDetails: action.payload };
     case LOGOUT:
       console.log('🚗 CAR STORE CLEARED: User logged out');
       return initialState;

@@ -1,163 +1,153 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Text, View, Animated, Dimensions, Easing } from "react-native";
+import { Text, View, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Gradients } from "../styles/GlobalStyle";
 import styles from "../styles/screenStyles/SplashScreenStyles";
 import ScreenContainer from '../components/ScreenContainer';
 import { ScreenNames } from "../classes/RHClasses";
-
-
-const { height } = Dimensions.get("window");
+import GoogleSignInService from "../services/GoogleSignInService";
+import SplashAnimationService from "../services/SplashAnimationService";
+import { setUserCars, setUserInfo, setAuthToken, setUserDetails } from "../redux/actions";
+import { getUserCars, googleLogin } from "../BE_Api/ApiManager";
+import { useDispatch } from "react-redux";
 
 const SplashScreen = ({ navigation }) => {
-  const [_, setAnimationPhase] = useState(0);
+  const [animationPhase, setAnimationPhase] = useState(0);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [authComplete, setAuthComplete] = useState(false);
+  const [authSuccess, setAuthSuccess] = useState(false);
+  const [prelimaryUserInfo, setPrelimaryUserInfo] = useState(null);
+  const dispatch = useDispatch();
 
-  // Animation values
-  const topLeftRectAnim = useRef(new Animated.Value(0)).current;
-  const topRightRectAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-  const bottomRectAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const carRotation = useRef(new Animated.Value(0)).current;
+  // Animation service instance
+  const animationService = useRef(new SplashAnimationService()).current;
 
-  // Create interpolated rotation value - simplified to just use 0-2 range
-  const rotateInterpolated = carRotation.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: ["0deg", "-15deg", "0deg"],
-  });
-
-  // Navigate to login page after animation completes
+  // Navigate to appropriate screen when both animation and auth are complete
   useEffect(() => {
-    if (animationComplete) {
+    if (animationComplete && authComplete) {
       const timer = setTimeout(() => {
-        navigation.replace(ScreenNames.LOGIN)
+        if (authSuccess) {
+          navigation.replace(ScreenNames.MAIN);
+        } else {
+          navigation.replace(ScreenNames.LOGIN);
+        }
       }, 500);
       
       return () => clearTimeout(timer);
     }
-  }, [animationComplete, navigation]);
+  }, [animationComplete, authComplete, authSuccess, navigation]);
 
-  // Start animation when component mounts
-  useEffect(() => {
-    startAnimation();
-  }, []);
-
-  // Screen load logging
+  // Start animation and authentication in parallel when component mounts
   useEffect(() => {
     console.log("Splash Screen Loaded");
+    startAnimation();
+    startAuthenticationFlow();
   }, []);
 
+  useEffect(() => {
+    console.log("prelimaryUserInfo");
+    console.log(prelimaryUserInfo);
+    if (prelimaryUserInfo) {
+      authUser();
+    }
+  }, [prelimaryUserInfo]);
+
   const startAnimation = () => {
-    // Reset animation values
-    topLeftRectAnim.setValue(0);
-    topRightRectAnim.setValue({ x: 0, y: 0 });
-    bottomRectAnim.setValue({ x: 0, y: 0 });
-    fadeAnim.setValue(0);
-    carRotation.setValue(0);
-    setAnimationPhase(0);
-    setAnimationComplete(false);
-
-    // Initial fade in of all rectangles
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(topLeftRectAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setTimeout(() => startCarMovementSequence(), 300);
-    });
+    animationService.startAnimation(
+      (phase) => setAnimationPhase(phase),
+      () => setAnimationComplete(true)
+    );
   };
 
-  const startCarMovementSequence = () => {
-    setAnimationPhase(1);
-    // Animation positions
-    const initialPosition = { x: 0, y: 0 };
-    const moveOutPosition = { x: 40, y: 40 };
-    const finalPosition = { x: 0, y: -45 };
-    
-    // Full animation sequence
-    Animated.sequence([
-      // 1. Move bottom car out of the way with rotation
-      Animated.parallel([
-        Animated.timing(bottomRectAnim, {
-          toValue: moveOutPosition,
-          duration: 1000,
-          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          useNativeDriver: true,
-        }),
-        Animated.timing(carRotation, {
-          toValue: 1,
-          duration: 1000,
-          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          useNativeDriver: true,
-        }),
-      ]),
-      
-      // 2. Top car exits
-      Animated.timing(topRightRectAnim, {
-        toValue: { x: 0, y: height },
-        duration: 1200,
-        useNativeDriver: true,
-      }),
-      
-      // 3. Bottom car returns to original position then moves up
-      Animated.sequence([
-        // Return to starting position
-        Animated.parallel([
-          Animated.timing(bottomRectAnim, {
-            toValue: initialPosition,
-            duration: 600,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-            useNativeDriver: true,
-          }),
-          Animated.timing(carRotation, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ]),
-        // Move to final position
-        Animated.timing(bottomRectAnim, {
-          toValue: finalPosition,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start(() => {
-      setAnimationComplete(true);
-    });
+  const startAuthenticationFlow = async () => {
+    try {
+      console.log("Starting authentication flow");
+      await signInSilently();
+    } catch (error) {
+      console.log("Authentication flow failed:", error);
+      setAuthComplete(true);
+      setAuthSuccess(false);
+    }
   };
 
-  // Animation styles
-  const topLeftRectStyle = {
-    ...styles.rectangle,
-    opacity: topLeftRectAnim,
+  const signInSilently = async () => {
+    try {
+      console.log("signInSilently in Splash Screen");
+      const result = await GoogleSignInService.getCurrentUser();
+      if (result.success) {
+        console.log("signInSilently success in Splash Screen");
+        console.log(result.data);
+        setPrelimaryUserInfo(result.data);
+      } else {
+        console.log("Silent sign-in failed:", result.error);
+        // If silent sign-in fails, mark auth as complete with failure
+        setAuthComplete(true);
+        setAuthSuccess(false);
+      }
+    } catch (error) {
+      console.log("signInSilently error in Splash Screen");
+      console.log(error);
+      setAuthComplete(true);
+      setAuthSuccess(false);
+    }
   };
 
-  const topRightRectStyle = {
-    ...styles.rectangle,
-    opacity: fadeAnim,
-    transform: [
-      { translateX: topRightRectAnim.x },
-      { translateY: topRightRectAnim.y },
-    ],
+  const authUser = async () => {
+    try {
+      console.log("authUser");
+      console.log(prelimaryUserInfo);
+
+      const idToken = prelimaryUserInfo.idToken;
+      if (!idToken) {
+        console.log("No idToken found in Google user info");
+        setAuthComplete(true);
+        setAuthSuccess(false);
+        return;
+      }
+
+      const result = await googleLogin(idToken);
+      console.log("authUser result");
+      console.log(result);
+
+      if (result && result.user) {
+        dispatch(setAuthToken(result.token));
+        dispatch(setUserDetails(result.user));
+        dispatch(setUserInfo(result.user));
+
+        console.log("Authentication successful");
+        console.log("Token stored in Redux");
+
+        // Retrieve user cars
+        await retrieveUserCars(result.user.id);
+        
+        setAuthComplete(true);
+        setAuthSuccess(true);
+      } else {
+        console.log("Authentication failed - no user data");
+        setAuthComplete(true);
+        setAuthSuccess(false);
+      }
+    } catch (error) {
+      console.log("authUser error:", error);
+      setAuthComplete(true);
+      setAuthSuccess(false);
+    }
   };
 
-  const bottomRectStyle = {
-    ...styles.rectangle,
-    opacity: fadeAnim,
-    transform: [
-      { translateX: bottomRectAnim.x },
-      { translateY: bottomRectAnim.y },
-      { rotate: rotateInterpolated },
-    ],
+  const retrieveUserCars = async (userId) => {
+    try {
+      console.log("getting user cars");
+      const userCars = await getUserCars(userId);
+      console.log("userCars", userCars);
+      dispatch(setUserCars(userCars));
+    } catch (error) {
+      console.log("Error retrieving user cars:", error);
+      // Don't fail the entire auth flow if cars retrieval fails
+    }
   };
+
+  // Get animation styles from the service
+  const { topLeftRectStyle, topRightRectStyle, bottomRectStyle } = animationService.getAnimationStyles();
 
   return (
     <ScreenContainer safeArea={false}>
@@ -171,11 +161,11 @@ const SplashScreen = ({ navigation }) => {
           <Text style={styles.title}>unBlock</Text>
           <View style={styles.logoContainer}>
             <View style={styles.topRow}>
-              <Animated.View style={topLeftRectStyle} />
-              <Animated.View style={topRightRectStyle} />
+              <Animated.View style={[styles.rectangle, topLeftRectStyle]} />
+              <Animated.View style={[styles.rectangle, topRightRectStyle]} />
             </View>
             <View style={styles.bottomRow}>
-              <Animated.View style={bottomRectStyle} />
+              <Animated.View style={[styles.rectangle, bottomRectStyle]} />
             </View>
           </View>
         </View>

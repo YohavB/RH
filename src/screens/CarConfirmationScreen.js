@@ -33,7 +33,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
+  const { userInfo, userCars = [], authToken } = useSelector((state) => state.user) || {};
   const userName = userInfo?.user?.name || "Ben Jacobs";
   const userId = userInfo?.user?.id || null;
   
@@ -63,7 +63,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userInfo?.token}`,
+            'Authorization': `Bearer ${authToken}`,
           },
           body: JSON.stringify(carInfo),
         }).then(res => res.json());

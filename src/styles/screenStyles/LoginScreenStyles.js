@@ -47,6 +47,11 @@ export default StyleSheet.create({
     width: "90%",
     padding: (11, 102, 11, 8),
   },
+  googleButtonDisabled: {
+    backgroundColor: "#f5f5f5",
+    borderColor: "#e0e0e0",
+    opacity: 0.7,
+  },
   googleButtonContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -61,5 +66,12 @@ export default StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.medium,
     color: Colors.textDark,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.textDark,
+    textAlign: "center",
+    marginTop: 16,
   },
 });

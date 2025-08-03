@@ -72,6 +72,23 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+
+  googleButton: {
+    borderRadius: 16,
+    padding: 10,
+    backgroundColor: Colors.mainOrange,
+    textColor: Colors.white,
+    marginTop: 16,
+    alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   addCarButton: {
     borderRadius: 16,
     padding: 10,

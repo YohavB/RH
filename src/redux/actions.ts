@@ -1,17 +1,5 @@
 import { Dispatch } from "redux";
-import { CarDTO } from "../classes/RHClasses";
-
-// Define UserDTO interface
-interface UserDTO {
-  user?: {
-    id?: string;
-    name?: string;
-    email?: string;
-    photo?: string;
-  };
-  carNumber?: string;
-  // Add other properties as needed
-}
+import { CarDTO, UserDTO } from "../classes/RHClasses";
 
 // Action Types
 export const SET_USER_INFO = "SET_USER_INFO";
@@ -20,6 +8,8 @@ export const SET_EXPO_TOKEN = "SET_EXPO_TOKEN";
 export const SET_USER_CARS = "SET_USER_CARS";
 export const SET_CAR_PLATE = "SET_CAR_PLATE";
 export const SET_CAR_COUNTRY = "SET_CAR_COUNTRY";
+export const SET_AUTH_TOKEN = "SET_AUTH_TOKEN";
+export const SET_USER_DETAILS = "SET_USER_DETAILS";
 export const LOGOUT = "LOGOUT";
 
 // Action Creators with proper typing
@@ -53,6 +43,16 @@ export interface SetCarCountryAction {
   payload: string;
 }
 
+export interface SetAuthTokenAction {
+  type: typeof SET_AUTH_TOKEN;
+  payload: string;
+}
+
+export interface SetUserDetailsAction {
+  type: typeof SET_USER_DETAILS;
+  payload: UserDTO;
+}
+
 export interface LogoutAction {
   type: typeof LOGOUT;
 }
@@ -64,6 +64,8 @@ export type UserActionTypes =
     | SetUserCarsAction
     | SetCarPlateAction
     | SetCarCountryAction
+    | SetAuthTokenAction
+    | SetUserDetailsAction
     | LogoutAction;
 
 export const setUserInfo = (userInfo: UserDTO) => (dispatch: Dispatch<UserActionTypes>) => {
@@ -102,6 +104,20 @@ export const setCarPlate = (plateNumber: string, country: string) => (dispatch: 
   dispatch({
     type: SET_CAR_COUNTRY,
     payload: country,
+  });
+};
+
+export const setAuthToken = (token: string) => (dispatch: Dispatch<UserActionTypes>) => {
+  dispatch({
+    type: SET_AUTH_TOKEN,
+    payload: token,
+  });
+};
+
+export const setUserDetails = (userDetails: UserDTO) => (dispatch: Dispatch<UserActionTypes>) => {
+  dispatch({
+    type: SET_USER_DETAILS,
+    payload: userDetails,
   });
 };
 
