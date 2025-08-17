@@ -148,7 +148,7 @@ export default StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: Colors.mainOrange,
-    width: "45%",
+    width: "35%",
     alignItems: "center",
   },
   cancelButtonText: {
@@ -160,7 +160,7 @@ export default StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     backgroundColor: Colors.mainOrange,
-    minWidth: 120,
+    width: "35%",
     alignItems: "center",
     borderWidth: 1,
     borderColor: Colors.mainOrange,

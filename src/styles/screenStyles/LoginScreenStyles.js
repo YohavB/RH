@@ -31,6 +31,29 @@ export default StyleSheet.create({
     color: Colors.mainOrange,
     marginTop: 16,
   },
+  retryLoginButton: {
+    backgroundColor: Colors.mainOrange,
+    width: "80%",
+    borderRadius: 4,
+    height: 52,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  retryLoginButtonDisabled: {
+    backgroundColor: Colors.white,
+    borderColor: Colors.mainOrange,
+    opacity: 0.7,
+  },
+  retryLoginButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  retryLoginButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.medium,
+    color: Colors.white,
+  },
   googleButton: {
     backgroundColor: Colors.white,
     borderRadius: 4,

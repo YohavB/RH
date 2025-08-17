@@ -1,167 +1,177 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Pressable, Alert } from "react-native";
+import { Text, View, Pressable } from "react-native";
+import { Alert } from "../components/CustomAlert";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setUserInfo,
   setUserCars,
   setAuthToken,
-  setUserDetails,
+  setGoogleIdToken,
 } from "../redux/actions";
 
 import styles from "../styles/screenStyles/LoginScreenStyles";
-import { googleLogin, getUserCars } from "../BE_Api/ApiManager";
+import { googleLogin, getCurrentUserCars } from "../BE_Api/ApiManager";
 import ScreenContainer from "../components/ScreenContainer";
 import GoogleSignInService from "../services/GoogleSignInService";
-import { ScreenNames } from "../classes/RHClasses";
+import { ScreenNames } from "./ScreenNames";
+import UserConsentModal from "../components/UserConsentModal";
 
 import GoogleLogo from "../assets/icons/google_logo.svg";
+import { APP_CONFIG } from "../config/appConfig";
 
-const Login = ({ navigation }) => {
-  const [prelimaryUserInfo, setPrelimaryUserInfo] = useState(null);
-  const [isSigninInProgress, setIsSigninInProgress] = useState(false);
-  const [authStep, setAuthStep] = useState("idle"); // idle, google, server, cars
+const Login = ({ navigation, route }) => {
+  // Redux & navigation helpers
   const dispatch = useDispatch();
+  const googleIdTokenFromStore = useSelector(
+    (state) => state?.user?.googleIdToken || state?.googleIdToken || null
+  );
+  const source = route.params?.source;
 
+  // UI / Auth states
+  const [isSigninInProgress, setIsSigninInProgress] = useState(false);
+  const [authStep, setAuthStep] = useState("idle"); // idle | google | server | cars
+  const [canRetryServerAuth, setCanRetryServerAuth] = useState(false);
+
+  // Tokens & consent
+  const [prelimaryUserInfo, setPrelimaryUserInfo] = useState(null);
+  const [pendingIdToken, setPendingIdToken] = useState(null);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+
+  /** ─────────── Effects ─────────── */
   useEffect(() => {
-    console.log("Login Screen Loaded");
-    getCurrentUser();
+    console.log("Login Screen loaded from:", source);
   }, []);
 
+  // Preload Google token from Redux if available
   useEffect(() => {
-    console.log("prelimaryUserInfo");
-    console.log(prelimaryUserInfo);
-    if (prelimaryUserInfo) {
-      authUser();
+    if (!prelimaryUserInfo && googleIdTokenFromStore) {
+      setPrelimaryUserInfo({ idToken: googleIdTokenFromStore });
     }
+  }, [googleIdTokenFromStore]);
+
+  // Trigger auth when we get prelimary Google info
+  useEffect(() => {
+    if (prelimaryUserInfo) authUser();
   }, [prelimaryUserInfo]);
 
+  /** ─────────── Google Sign In ─────────── */
   const signInWithGoogle = async () => {
     try {
-      console.log("Starting Google sign-in process...");
       setIsSigninInProgress(true);
       setAuthStep("google");
-      
+      setCanRetryServerAuth(false);
+
       const result = await GoogleSignInService.signInWithGoogle();
-      
-      if (result.success) {
-        console.log("Google sign-in successful");
-        setPrelimaryUserInfo(result.data);
-      } else {
-        console.log("Google sign-in failed:", result.error);
-        Alert.alert(
-          "Sign In Error",
-          "Failed to sign in with Google. Please try again.",
-          [{ text: "OK" }]
-        );
-        setIsSigninInProgress(false);
-        setAuthStep("idle");
-      }
+      if (!result.success) throw new Error(result.error);
+
+      const idToken = result?.data?.idToken;
+      if (idToken) dispatch(setGoogleIdToken(idToken));
+
+      setPrelimaryUserInfo(result.data);
     } catch (error) {
-      console.log("Sign in error:", error);
-      Alert.alert(
-        "Sign In Error",
-        "An unexpected error occurred during sign in. Please try again.",
-        [{ text: "OK" }]
-      );
-      setIsSigninInProgress(false);
-      setAuthStep("idle");
+      console.log("Google sign-in error:", error);
+      Alert.alert("Sign In Error", "Failed to sign in with Google.", [
+        { text: "OK" },
+      ]);
+      resetAuthState();
     }
   };
 
-  const getCurrentUser = async () => {
-    try {
-      console.log("Checking for existing Google user...");
-      const result = await GoogleSignInService.getCurrentUser();
-      if (result.success) {
-        console.log("Found existing Google user");
-        console.log(result.data);
-        setPrelimaryUserInfo(result.data);
-      } else {
-        console.log("No existing Google user found:", result.error);
-      }
-    } catch (error) {
-      console.log("getCurrentUser error");
-      console.log(error);
-    }
-  };
-
+  /** ─────────── Server Auth ─────────── */
   const authUser = async () => {
+    const effectiveIdToken = prelimaryUserInfo?.idToken || googleIdTokenFromStore;
+    if (!effectiveIdToken) {
+      Alert.alert("Authentication Error", "No Google ID token found.", [
+        { text: "OK" },
+      ]);
+      return resetAuthState();
+    }
+
     try {
-      console.log("Starting BE server authentication...");
+      setIsSigninInProgress(true);
       setAuthStep("server");
-      console.log("prelimaryUserInfo");
-      console.log(prelimaryUserInfo);
 
-      const idToken = prelimaryUserInfo.idToken;
-      if (!idToken) {
-        console.log("No idToken found in Google user info");
-        Alert.alert(
-          "Authentication Error",
-          "Failed to get authentication token from Google. Please try again.",
-          [{ text: "OK" }]
-        );
-        setIsSigninInProgress(false);
-        setAuthStep("idle");
-        return;
-      }
+      const result = await googleLogin(effectiveIdToken);
 
-      const result = await googleLogin(idToken);
-      console.log("BE server authentication result");
-      console.log(result);
+      if (!result?.user) throw new Error("Missing user data");
 
-      if (result && result.user) {
-        console.log("BE server authentication successful");
-        
-        // Store authentication data in Redux
-        dispatch(setAuthToken(result.token));
-        dispatch(setUserDetails(result.user));
-        dispatch(setUserInfo(result.user));
+      dispatch(setAuthToken(result.token));
+      dispatch(setUserInfo(result.user));
 
-        console.log("Authentication data stored in Redux");
+      const hasCars = await retrieveUserCars();
+      navigateAfterAuth(hasCars);
 
-        // Retrieve user cars
-        await retrieveUserCars(result.user.id);
-        
-        // Navigate to main screen
-        console.log("Authentication complete, navigating to main screen");
-        navigation.replace(ScreenNames.MAIN);
-      } else {
-        console.log("BE server authentication failed - no user data");
-        Alert.alert(
-          "Authentication Error",
-          "Failed to authenticate with server. Please try again.",
-          [{ text: "OK" }]
-        );
-        setIsSigninInProgress(false);
-        setAuthStep("idle");
-      }
     } catch (error) {
       console.log("authUser error:", error);
-      Alert.alert(
-        "Authentication Error",
-        "An error occurred during authentication. Please try again.",
-        [{ text: "OK" }]
-      );
-      setIsSigninInProgress(false);
-      setAuthStep("idle");
+
+      // Special case: consent required
+      if (error.status === 403 && error.code === "USER_CONSENT_REQUIRED") {
+        setPendingIdToken(effectiveIdToken);
+        setShowConsentModal(true);
+        return resetAuthState();
+      }
+
+      Alert.alert("Authentication Error", "Server authentication failed.", [
+        { text: "OK" },
+      ]);
+      resetAuthState(true);
     }
   };
 
-  const retrieveUserCars = async (userId) => {
+  /** ─────────── Cars Retrieval ─────────── */
+  const retrieveUserCars = async () => {
     try {
-      console.log("Retrieving user cars...");
       setAuthStep("cars");
-      
-      const userCars = await getUserCars(userId);
-      console.log("User cars retrieved:", userCars);
-      dispatch(setUserCars(userCars));
-      
-      console.log("User cars stored in Redux");
+      const cars = (await getCurrentUserCars())?.cars || [];
+      dispatch(setUserCars(cars));
+      return cars.length > 0;
     } catch (error) {
-      console.log("Error retrieving user cars:", error);
-      // Don't fail the entire auth flow if cars retrieval fails
-      // Just log the error and continue
+      console.log("Error retrieving cars:", error);
+      return false; // fail silently
     }
+  };
+
+  /** ─────────── Consent Handling ─────────── */
+  const handleConsentAccept = async () => {
+    if (!pendingIdToken) return;
+
+    try {
+      setIsSigninInProgress(true);
+      setAuthStep("server");
+      setShowConsentModal(false);
+
+      const result = await googleLogin(pendingIdToken, true);
+      if (!result?.user) throw new Error("Consent auth failed");
+
+      dispatch(setAuthToken(result.token));
+      dispatch(setUserInfo(result.user));
+
+      const hasCars = await retrieveUserCars();
+      navigateAfterAuth(hasCars);
+
+    } catch (error) {
+      console.log("Consent auth error:", error);
+      Alert.alert("Authentication Error", "Failed after consent.", [
+        { text: "OK" },
+      ]);
+      resetAuthState(true);
+    } finally {
+      setPendingIdToken(null);
+    }
+  };
+
+  /** ─────────── Helpers ─────────── */
+  const resetAuthState = (allowRetry = false) => {
+    setIsSigninInProgress(false);
+    setAuthStep("idle");
+    setCanRetryServerAuth(allowRetry);
+  };
+
+  const navigateAfterAuth = (hasCars) => {
+    navigation.replace(hasCars ? ScreenNames.MAIN : ScreenNames.ADD_CAR, {
+      source: ScreenNames.LOGIN,
+    });
+    setCanRetryServerAuth(false);
   };
 
   const getLoadingText = () => {
@@ -177,33 +187,62 @@ const Login = ({ navigation }) => {
     }
   };
 
+  /** ─────────── UI ─────────── */
   return (
-    <ScreenContainer>
-      <View style={styles.contentContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>Get started with</Text>
-          <Text style={styles.titleBrand}>unBlock</Text>
-          <Text style={styles.subtitle}>Park without fear.</Text>
-        </View>
-
-        <Pressable 
-          style={[styles.googleButton, isSigninInProgress && styles.googleButtonDisabled]} 
-          onPress={signInWithGoogle}
-          disabled={isSigninInProgress}
-        >
-          <View style={styles.googleButtonContent}>
-            <GoogleLogo style={styles.googleIcon} />
-            <Text style={styles.googleButtonText}>
-              {isSigninInProgress ? "Signing in..." : "Sign in with Google"}
-            </Text>
+    <>
+      <ScreenContainer>
+        <View style={styles.contentContainer}>
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>Get started with</Text>
+            <Text style={styles.titleBrand}>{APP_CONFIG.APP_NAME}</Text>
+            <Text style={styles.subtitle}>Park without fear.</Text>
           </View>
-        </Pressable>
 
-        {isSigninInProgress && (
-          <Text style={styles.loadingText}>{getLoadingText()}</Text>
-        )}
-      </View>
-    </ScreenContainer>
+          {/* Auth buttons */}
+          {canRetryServerAuth ? (
+            <Pressable
+              style={[
+                styles.retryLoginButton,
+                isSigninInProgress && styles.retryLoginButtonDisabled,
+              ]}
+              onPress={authUser}
+              disabled={isSigninInProgress}
+            >
+              <Text style={styles.retryLoginButtonText}>
+                {isSigninInProgress ? "Retrying..." : "Retry to Log in"}
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={[
+                styles.googleButton,
+                isSigninInProgress && styles.googleButtonDisabled,
+              ]}
+              onPress={signInWithGoogle}
+              disabled={isSigninInProgress}
+            >
+              <View style={styles.googleButtonContent}>
+                <GoogleLogo style={styles.googleIcon} />
+                <Text style={styles.googleButtonText}>
+                  {isSigninInProgress ? "Signing in..." : "Sign in with Google"}
+                </Text>
+              </View>
+            </Pressable>
+          )}
+
+          {isSigninInProgress && (
+            <Text style={styles.loadingText}>{getLoadingText()}</Text>
+          )}
+        </View>
+      </ScreenContainer>
+
+      {/* Consent Modal */}
+      <UserConsentModal
+        isVisible={showConsentModal}
+        onAccept={handleConsentAccept}
+      />
+    </>
   );
 };
 

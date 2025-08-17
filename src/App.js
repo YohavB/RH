@@ -9,10 +9,11 @@ import SplashScreen from "./screens/SplashScreen";
 import AddCarScreen from "./screens/AddCarScreen";
 import PlateRecognitionScreen from "./screens/PlateRecognitionScreen";
 import CarConfirmationScreen from "./screens/CarConfirmationScreen";
-import { ScreenNames } from "./classes/RHClasses";
+import { ScreenNames } from "./screens/ScreenNames";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import GlobalStyle, { Colors } from "./styles/GlobalStyle";
+import CustomAlertProvider from "./components/CustomAlertProvider";
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 const Stack = createStackNavigator();
@@ -45,9 +46,10 @@ export default function App() {
   return (
     <Provider store={store}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-      <View style={GlobalStyle.container}>
-        <NavigationContainer theme={navigationTheme}>
-          <Stack.Navigator screenOptions={{ header: () => null }}>
+      <CustomAlertProvider>
+        <View style={GlobalStyle.container}>
+          <NavigationContainer theme={navigationTheme}>
+            <Stack.Navigator screenOptions={{ header: () => null }}>
             <Stack.Screen
               name={ScreenNames.SPLASH}
               component={SplashScreen}
@@ -83,9 +85,10 @@ export default function App() {
               component={Settings}
               options={{ gestureEnabled: false }}
             />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </View>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </View>
+      </CustomAlertProvider>
     </Provider>
   );
 }

@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-  Alert,
-  Pressable,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { Alert } from "../components/CustomAlert";
 import { useSelector, useDispatch } from "react-redux";
-import { setUserCars, setUserInfo, setAuthToken, setUserDetails } from "../redux/actions";
-import { deleteCar } from "../BE_Api/ApiManager";
+import { setUserCars, setUserInfo, setAuthToken } from "../redux/actions";
+import { removeCarFromUser } from "../BE_Api/ApiManager";
 import ScreenContainer from "../components/ScreenContainer";
 import styles from "../styles/screenStyles/SettingsScreenStyles";
 import { PersonIcon, CarIcon, BackIcon } from "../components/Icons";
@@ -19,13 +12,15 @@ import SectionHeader from "../components/SectionHeader";
 import InfoField from "../components/InfoField";
 import CarCard from "../components/CarCard";
 import DeleteNotification from "../components/DeleteNotification";
-import { ScreenNames } from "../classes/RHClasses";
+import { ScreenNames } from "./ScreenNames";
 import GoogleSignInService from "../services/GoogleSignInService";
 
-const Settings = ({ navigation }) => {
+const Settings = ({ navigation, route }) => {
+  // Get the source from route params to understand where user came from
+  const source = route.params?.source;
+  
   const dispatch = useDispatch();
-  const { userInfo, userDetails } = useSelector((state) => state.user) || {};
-  const { userCars } = useSelector((state) => state.user) || { userCars: [] };
+  const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
 
   const [deletedCar, setDeletedCar] = useState(null);
   const [showDeleteNotification, setShowDeleteNotification] = useState(false);
@@ -33,24 +28,15 @@ const Settings = ({ navigation }) => {
 
   // Use real user data from Redux
   const getUserData = () => {
-    if (userDetails) {
+    if (userInfo) {
       return {
-        name: `${userDetails.firstName} ${userDetails.lastName}`,
-        email: userDetails.email,
-        phone: "Not provided", // Phone is not part of UserDTO
-      };
-    }
-    if (userInfo?.user) {
-      return {
-        name: userInfo.user.name || "Unknown",
-        email: userInfo.user.email || "Not provided",
-        phone: userInfo.user.phone || "Not provided",
+        name: `${userInfo.firstName} ${userInfo.lastName}`,
+        email: userInfo.email,
       };
     }
     return {
       name: "Unknown",
       email: "Not provided",
-      phone: "Not provided",
     };
   };
 
@@ -59,10 +45,11 @@ const Settings = ({ navigation }) => {
   // Screen load logging
   useEffect(() => {
     console.log("Settings Screen Loaded");
-    console.log("User Details:", userDetails);
     console.log("User Info:", userInfo);
     console.log("User Data:", userData);
-  }, [userDetails, userInfo, userData]);
+    console.log("User Cars:", userCars);
+    console.log("Source:", source);
+  }, []);
 
   // Handle deleting a car
   const handleDeleteCar = async (car) => {
@@ -80,8 +67,7 @@ const Settings = ({ navigation }) => {
     setIsDeleting(true);
 
     try {
-      // Call the deleteCar API
-      const response = await deleteCar(car.id, userInfo?.user?.id, userCars);
+      const response = await removeCarFromUser(car.id, userInfo.id);
 
       if (response.success) {
         // Store the deleted car info for notification
@@ -152,8 +138,7 @@ const Settings = ({ navigation }) => {
                 // Clear all user data from Redux store
                 dispatch(setUserInfo(null));
                 dispatch(setUserCars([]));
-                dispatch(setAuthToken(null));
-                dispatch(setUserDetails(null));
+                dispatch(setAuthToken(""));
                 
                 console.log("User data cleared from Redux store");
                 
@@ -210,17 +195,9 @@ const Settings = ({ navigation }) => {
 
                 <InfoField label="Email:" value={userData.email} />
 
-                <InfoField
-                  label="Phone:"
-                  value={userData.phone}
-                  style={{ marginBottom: 0 }}
-                />
-
-                <Pressable style={styles.googleButton} onPress={signOutWithGoogle}>
-                  <View style={styles.googleButtonContent}>
+                <TouchableOpacity style={styles.googleButton} onPress={signOutWithGoogle}>
                     <Text style={styles.googleButtonText}>Sign out</Text>
-                  </View>
-                </Pressable>
+                </TouchableOpacity>
               </View>
             </View>
 

@@ -1,15 +1,14 @@
 import { Dispatch } from "redux";
-import { CarDTO, UserDTO } from "../classes/RHClasses";
+import { CarDTO, UserDTO, CarRelationsDTO } from "../BE_Api/ServerDTOs";
 
 // Action Types
 export const SET_USER_INFO = "SET_USER_INFO";
-export const SET_USER_ID = "SET_USER_ID";
-export const SET_EXPO_TOKEN = "SET_EXPO_TOKEN";
 export const SET_USER_CARS = "SET_USER_CARS";
-export const SET_CAR_PLATE = "SET_CAR_PLATE";
-export const SET_CAR_COUNTRY = "SET_CAR_COUNTRY";
 export const SET_AUTH_TOKEN = "SET_AUTH_TOKEN";
-export const SET_USER_DETAILS = "SET_USER_DETAILS";
+export const SET_GOOGLE_ID_TOKEN = "SET_GOOGLE_ID_TOKEN";
+export const SET_CAR_RELATIONS = "SET_CAR_RELATIONS";
+export const ADD_CAR_RELATION = "ADD_CAR_RELATION";
+export const CLEAR_CAR_RELATIONS = "CLEAR_CAR_RELATIONS";
 export const LOGOUT = "LOGOUT";
 
 // Action Creators with proper typing
@@ -18,29 +17,9 @@ export interface SetUserInfoAction {
   payload: UserDTO;
 }
 
-export interface SetUserIdAction {
-  type: typeof SET_USER_ID;
-  payload: number;
-}
-
-export interface SetExpoTokenAction {
-  type: typeof SET_EXPO_TOKEN;
-  payload: string;
-}
-
 export interface SetUserCarsAction {
   type: typeof SET_USER_CARS;
   payload: CarDTO[];
-}
-
-export interface SetCarPlateAction {
-  type: typeof SET_CAR_PLATE;
-  payload: string;
-}
-
-export interface SetCarCountryAction {
-  type: typeof SET_CAR_COUNTRY;
-  payload: string;
 }
 
 export interface SetAuthTokenAction {
@@ -48,9 +27,23 @@ export interface SetAuthTokenAction {
   payload: string;
 }
 
-export interface SetUserDetailsAction {
-  type: typeof SET_USER_DETAILS;
-  payload: UserDTO;
+export interface SetGoogleIdTokenAction {
+  type: typeof SET_GOOGLE_ID_TOKEN;
+  payload: string | null;
+}
+
+export interface SetCarRelationsAction {
+  type: typeof SET_CAR_RELATIONS;
+  payload: CarRelationsDTO[];
+}
+
+export interface AddCarRelationAction {
+  type: typeof ADD_CAR_RELATION;
+  payload: CarRelationsDTO;
+}
+
+export interface ClearCarRelationsAction {
+  type: typeof CLEAR_CAR_RELATIONS;
 }
 
 export interface LogoutAction {
@@ -59,33 +52,18 @@ export interface LogoutAction {
 
 export type UserActionTypes =
     | SetUserInfoAction
-    | SetUserIdAction
-    | SetExpoTokenAction
     | SetUserCarsAction
-    | SetCarPlateAction
-    | SetCarCountryAction
     | SetAuthTokenAction
-    | SetUserDetailsAction
+    | SetGoogleIdTokenAction
+    | SetCarRelationsAction
+    | AddCarRelationAction
+    | ClearCarRelationsAction
     | LogoutAction;
 
 export const setUserInfo = (userInfo: UserDTO) => (dispatch: Dispatch<UserActionTypes>) => {
   dispatch({
     type: SET_USER_INFO,
     payload: userInfo,
-  });
-};
-
-export const setUserIdFromDB = (userIdFromDB: number) => (dispatch: Dispatch<UserActionTypes>) => {
-  dispatch({
-    type: SET_USER_ID,
-    payload: userIdFromDB,
-  });
-};
-
-export const setExpoToken = (expoToken: string) => (dispatch: Dispatch<UserActionTypes>) => {
-  dispatch({
-    type: SET_EXPO_TOKEN,
-    payload: expoToken,
   });
 };
 
@@ -96,17 +74,6 @@ export const setUserCars = (cars: CarDTO[]) => (dispatch: Dispatch<UserActionTyp
   });
 };
 
-export const setCarPlate = (plateNumber: string, country: string) => (dispatch: Dispatch<UserActionTypes>) => {
-  dispatch({
-    type: SET_CAR_PLATE,
-    payload: plateNumber,
-  });
-  dispatch({
-    type: SET_CAR_COUNTRY,
-    payload: country,
-  });
-};
-
 export const setAuthToken = (token: string) => (dispatch: Dispatch<UserActionTypes>) => {
   dispatch({
     type: SET_AUTH_TOKEN,
@@ -114,10 +81,30 @@ export const setAuthToken = (token: string) => (dispatch: Dispatch<UserActionTyp
   });
 };
 
-export const setUserDetails = (userDetails: UserDTO) => (dispatch: Dispatch<UserActionTypes>) => {
+export const setGoogleIdToken = (token: string | null) => (dispatch: Dispatch<UserActionTypes>) => {
   dispatch({
-    type: SET_USER_DETAILS,
-    payload: userDetails,
+    type: SET_GOOGLE_ID_TOKEN,
+    payload: token,
+  });
+};
+
+export const setCarRelations = (carRelations: CarRelationsDTO[]) => (dispatch: Dispatch<UserActionTypes>) => {
+  dispatch({
+    type: SET_CAR_RELATIONS,
+    payload: carRelations,
+  });
+};
+
+export const addCarRelation = (carRelation: CarRelationsDTO) => (dispatch: Dispatch<UserActionTypes>) => {
+  dispatch({
+    type: ADD_CAR_RELATION,
+    payload: carRelation,
+  });
+};
+
+export const clearCarRelations = () => (dispatch: Dispatch<UserActionTypes>) => {
+  dispatch({
+    type: CLEAR_CAR_RELATIONS,
   });
 };
 

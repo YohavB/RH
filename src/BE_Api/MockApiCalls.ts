@@ -9,7 +9,7 @@ import {
   HealthResponse,
   NotificationResponse,
   UserCarSituation
-} from "../classes/RHClasses";
+} from "./ServerDTOs";
 
 // Mock data types based on backend entities
 interface MockCar {

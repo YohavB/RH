@@ -5,20 +5,21 @@ import {
   TouchableOpacity,
   StatusBar,
   Animated,
-  ActivityIndicator,
   Dimensions,
   Platform,
-  Alert,
 } from "react-native";
+import { Alert } from "../components/CustomAlert";
 import { Camera } from "expo-camera";
 import { Colors, Fonts } from "../styles/GlobalStyle";
 import styles from "../styles/screenStyles/PlateRecognitionStyles";
 import {
   Countries,
   CarDTO,
-  ScreenNames,
-} from "../classes/RHClasses";
-import {ENV, isDemoMode } from "../config/env";
+} from "../BE_Api/ServerDTOs";
+import { ScreenNames } from "./ScreenNames";
+import { ENV } from "../config/env";
+import { findOrCreateCar } from "../BE_Api/ApiManager";
+import RushHourLoader from "../components/RushHourLoader";
 
 const PlateRecognitionScreen = ({ navigation, route }) => {
   // Screen load logging
@@ -85,12 +86,10 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
 
   // Periodic scanning
   useEffect(() => {
-    if (isDemoMode()) return;
-
     if (isScanning && !isProcessing && !detectedPlate) {
       const interval = setInterval(() => {
         captureHandler();
-      }, 3000); // Try to detect every 3 seconds
+      }, 3000);
 
       return () => clearInterval(interval);
     }
@@ -102,8 +101,8 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
 
     setIsProcessing(true);
 
-    // Take picture (or skip in demo mode)
-    const photo = isDemoMode() ? null : await takePicture();
+    // Take picture
+    const photo = await takePicture();
     const imageUri = photo?.uri || "";
 
     // Process with OCR (real or mock)
@@ -140,17 +139,8 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     setIsProcessing(true);
 
     try {
-      if (isDemoMode()) {
-        await new Promise((resolve) => setTimeout(resolve, ENV.DEMO_DELAY));
-        return {
-          plate: "32-544-33",
-          country: Countries.IL,
-        };
-      } else {
-        // Production mode: Call real OCR API
-        // TODO: Implement real OCR API call here
-        console.log("Processing image:", imageUri);
-      }
+      // TODO: Implement real OCR API call here
+      console.log("Processing image:", imageUri);
     } catch (error) {
       console.error("OCR processing error:", error);
       return null;
@@ -190,33 +180,15 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     }
   };
 
-  // Mock API call to get car info
+  // API call to get car info
   const getCarInfo = async (plateNumber, country) => {
-    // In demo mode, return mock data after a delay
-    if (isDemoMode()) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock car DTO with proper enum types and serializable date
-      let car = new CarDTO(
-        plateNumber,
-        country,
-        "DACIA",
-        "Sandero",
-        "Black",
-        "2025-06-01", // Changed from new Date("2025-06-01") to string
-        false,
-        false
-      );
-
+    try {
+      // Use the real API to find or create car
+      const car = await findOrCreateCar(plateNumber, country);
       return car;
-    } else {
-      // TODO: Replace with actual API call
-      try {
-        throw new Error("Failed to fetch car information");
-      } catch (error) {
-        console.error("API error:", error);
-        throw error;
-      }
+    } catch (error) {
+      console.error("API error:", error);
+      throw new Error("Failed to fetch car information");
     }
   };
 
@@ -231,8 +203,8 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="black" translucent />
 
-      {hasPermission && !isDemoMode() ? (
-        // Real camera in production mode
+      {hasPermission ? (
+        // Real camera
         <Camera
           ref={cameraRef}
           style={styles.camera}
@@ -251,7 +223,7 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
           />
         </Camera>
       ) : (
-        // Simulated camera view in demo mode
+        // Fallback view when camera permission is not granted
         <View style={styles.camera}>
           <CameraOverlay
             isScanning={isScanning}
@@ -311,7 +283,7 @@ const CameraOverlay = ({
         <View style={styles.loadingContainer}>
           {isProcessing ? (
             <View style={styles.processingContainer}>
-              <ActivityIndicator size="small" color={Colors.white} />
+              <RushHourLoader size={0.7} color={Colors.white} speed={1.2} loop={true} />
               <Text style={styles.loadingText}>Processing...</Text>
             </View>
           ) : (

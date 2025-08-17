@@ -64,26 +64,32 @@ class GoogleSignInService {
         }
       } else {
         console.log("An error that's not related to google sign in occurred");
-        return { success: false, error: "An error that's not related to google sign in occurred" };
+        return {
+          success: false,
+          error: "An error that's not related to google sign in occurred",
+        };
       }
     }
   }
 
-  async getCurrentUser() {
+  async getGoogleCurrentUserSilently() {
     try {
-      console.log("getCurrentUser");
+      console.log("getGoogleCurrentUserSilently");
       const response = await GoogleSignin.signInSilently();
       if (this.isSuccessResponse(response)) {
-        console.log("getCurrentUser success");
+        console.log("getGoogleCurrentUserSilently success");
         return { success: true, data: response.data };
       } else if (this.isNoSavedCredentialFoundResponse(response)) {
-        console.log("getCurrentUser no saved credential found");
+        console.log("getGoogleCurrentUserSilently no saved credential found");
         return { success: false, error: "No saved credential found" };
       }
     } catch (error) {
-      console.log("getCurrentUser error");
+      console.log("getGoogleCurrentUserSilently error");
       console.log(error);
-      return { success: false, error: error.message || "Failed to get current user" };
+      return {
+        success: false,
+        error: error.message || "Failed to get google current user silently",
+      };
     }
   }
 
@@ -98,4 +104,4 @@ class GoogleSignInService {
   }
 }
 
-export default new GoogleSignInService(); 
+export default new GoogleSignInService();

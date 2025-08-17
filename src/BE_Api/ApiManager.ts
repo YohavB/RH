@@ -7,16 +7,11 @@ import {
   AuthResponseDTO, 
   UserCarsDTO, 
   CarRelationsDTO,
-  UserCarRequestDTO,
-  CarsRelationRequestDTO,
-  FindCarRequestDTO,
-  UserCreationDTO,
-  OAuthLoginRequestDTO,
   HealthResponse,
   NotificationResponse,
   ErrorResponse,
   UserCarSituation
-} from "../classes/RHClasses";
+} from "./ServerDTOs";
 
 // Import both real and mock API implementations
 import * as RealApiCalls from "./ApiCalls";
@@ -45,21 +40,26 @@ export const healthCheck = async (): Promise<HealthResponse> => {
   return api.healthCheck();
 };
 
+export const testServerConnectivity = async (): Promise<boolean> => {
+  const api = getApiImplementation();
+  return api.testServerConnectivity();
+};
+
 /* AUTHENTICATION ENDPOINTS */
 
-export const googleLogin = async (idToken: string): Promise<AuthResponseDTO> => {
+export const googleLogin = async (idToken: string, agreedConsent?: boolean): Promise<AuthResponseDTO> => {
   const api = getApiImplementation();
-  return api.googleLogin(idToken);
+  return api.googleLogin(idToken, agreedConsent);
 };
 
-export const facebookLogin = async (accessToken: string): Promise<AuthResponseDTO> => {
+export const facebookLogin = async (accessToken: string, agreedConsent?: boolean): Promise<AuthResponseDTO> => {
   const api = getApiImplementation();
-  return api.facebookLogin(accessToken);
+  return api.facebookLogin(accessToken, agreedConsent);
 };
 
-export const appleLogin = async (idToken: string): Promise<AuthResponseDTO> => {
+export const appleLogin = async (idToken: string, agreedConsent?: boolean): Promise<AuthResponseDTO> => {
   const api = getApiImplementation();
-  return api.appleLogin(idToken);
+  return api.appleLogin(idToken, agreedConsent);
 };
 
 export const refreshToken = async (): Promise<AuthResponseDTO> => {
@@ -76,35 +76,22 @@ export const logout = async (): Promise<void> => {
 
 /* USER ENDPOINTS */
 
-export const createUser = async (userData: UserCreationDTO): Promise<UserDTO> => {
+export const getCurrentUser = async (): Promise<UserDTO> => {
   const api = getApiImplementation();
-  return api.createUser(userData);
+  return api.getCurrentUser();
 };
 
-export const getUserById = async (id: number): Promise<UserDTO> => {
+export const deactivateCurrentUser = async (): Promise<void> => {
   const api = getApiImplementation();
-  return api.getUserById(id);
+  return api.deactivateCurrentUser();
 };
 
-export const getUserByEmail = async (email: string): Promise<UserDTO> => {
+export const updatePushNotificationToken = async (pushNotificationToken: string): Promise<UserDTO> => {
   const api = getApiImplementation();
-  return api.getUserByEmail(email);
+  return api.updatePushNotificationToken(pushNotificationToken);
 };
 
-export const updateUser = async (userData: UserDTO): Promise<UserDTO> => {
-  const api = getApiImplementation();
-  return api.updateUser(userData);
-};
 
-export const deactivateUser = async (userId: number): Promise<void> => {
-  const api = getApiImplementation();
-  return api.deactivateUser(userId);
-};
-
-export const activateUser = async (userId: number): Promise<void> => {
-  const api = getApiImplementation();
-  return api.activateUser(userId);
-};
 
 /* CAR ENDPOINTS */
 
@@ -120,10 +107,12 @@ export const assignCarToUser = async (userId: number, carId: number): Promise<Us
   return api.assignCarToUser(userId, carId);
 };
 
-export const getUserCars = async (userId: number): Promise<UserCarsDTO> => {
+export const getCurrentUserCars = async (): Promise<UserCarsDTO> => {
   const api = getApiImplementation();
-  return api.getUserCars(userId);
+  return api.getCurrentUserCars();
 };
+
+
 
 export const removeCarFromUser = async (userId: number, carId: number): Promise<UserCarsDTO> => {
   const api = getApiImplementation();
@@ -132,25 +121,31 @@ export const removeCarFromUser = async (userId: number, carId: number): Promise<
 
 /* CAR RELATIONS ENDPOINTS */
 
-export const createCarBlockingRelationship = async (
+export const createCarRelationship = async (
   blockingCarId: number, 
-  blockedCarId: number
+  blockedCarId: number,
+  userCarSituation: UserCarSituation
 ): Promise<CarRelationsDTO> => {
   const api = getApiImplementation();
-  return api.createCarBlockingRelationship(blockingCarId, blockedCarId);
+  return api.createCarRelationship(blockingCarId, blockedCarId, userCarSituation);
 };
 
 export const getCarRelations = async (carId: number): Promise<CarRelationsDTO> => {
   const api = getApiImplementation();
-  return api.getCarRelations(carId);
+  return api.getCarRelationsByCarId(carId);
 };
 
-export const removeCarBlockingRelationship = async (
+export const getCurrentUserCarRelations = async (): Promise<CarRelationsDTO[]> => {
+  const api = getApiImplementation();
+  return api.getCurrentUserCarRelations();
+};
+
+export const removeCarRelationship = async (
   blockingCarId: number, 
   blockedCarId: number
 ): Promise<CarRelationsDTO> => {
   const api = getApiImplementation();
-  return api.removeCarBlockingRelationship(blockingCarId, blockedCarId);
+  return api.removeCarRelationship(blockingCarId, blockedCarId);
 };
 
 export const removeAllCarRelations = async (carId: number): Promise<void> => {
@@ -165,117 +160,7 @@ export const sendNeedToGoNotification = async (blockedCarId: number): Promise<No
   return api.sendNeedToGoNotification(blockedCarId);
 };
 
-/* LEGACY ENDPOINTS FOR BACKWARD COMPATIBILITY */
 
-/* CARS API MANAGER */
-
-export const findAllCars = async (): Promise<any[]> => {
-  const api = getApiImplementation();
-  return api.findAllCars();
-};
-
-export const findCarByPlateNumber = async (plateNumber: string, country: Countries): Promise<any> => {
-  const api = getApiImplementation();
-  return api.findCarByPlateNumber(plateNumber, country);
-};
-
-export const createOrUpdateCar = async (
-  plateNumber: string, 
-  country: Countries,
-  userId: number | null,
-): Promise<any> => {
-  const api = getApiImplementation();
-  return api.createOrUpdateCar(plateNumber, country, userId);
-};
-
-export const saveCar = async (carInfo: any, userId: string, existingCars: any[] = []): Promise<any> => {
-  const api = getApiImplementation();
-  return api.saveCar(carInfo, userId, existingCars);
-};
-
-export const deleteCar = async (carId: number, userId: string, existingCars: any[] = []): Promise<any> => {
-  const api = getApiImplementation();
-  return api.deleteCar(carId, userId, existingCars);
-};
-
-/* USERS CARS API MANAGER */
-
-export const getAllUsersCars = async (): Promise<any> => {
-  const api = getApiImplementation();
-  return api.getAllUsersCars();
-};
-
-export const getUsersCarsByPlateNumber = async (plateNumber: string): Promise<any[]> => {
-  const api = getApiImplementation();
-  return api.getUsersCarsByPlateNumber(plateNumber);
-};
-
-export const getUsersCarsByUserId = async (userId: number): Promise<any[]> => {
-  const api = getApiImplementation();
-  return api.getUsersCarsByUserId(userId);
-};
-
-export const getUsersCarsByUserAndPlate = async (userId: number, plateNumber: string): Promise<any> => {
-  const api = getApiImplementation();
-  return api.getUsersCarsByUserAndPlate(userId, plateNumber);
-};
-
-export const getUsersCarsByBlockedPlateNumber = async (blockedPlateNumber: string): Promise<any> => {
-  const api = getApiImplementation();
-  return api.getUsersCarsByBlockedPlateNumber(blockedPlateNumber);
-};
-
-export const getUsersCarsByBlockingPlateNumber = async (blockingPlateNumber: string): Promise<any> => {
-  const api = getApiImplementation();
-  return api.getUsersCarsByBlockingPlateNumber(blockingPlateNumber);
-};
-
-export const updateBlockedCarByPlateNumber = async (
-  blockingCarPlate: string,
-  blockedCarPlate: string,
-  userId: number,
-  userStatus: any
-): Promise<any> => {
-  const api = getApiImplementation();
-  return api.updateBlockedCarByPlateNumber(blockingCarPlate, blockedCarPlate, userId, userStatus);
-};
-
-export const releaseBlockedCarByPlateNumber = async (
-  blockingCarPlate: string,
-  blockedCarPlate: string,
-  userId: number,
-  userStatus: any
-): Promise<any> => {
-  const api = getApiImplementation();
-  return api.releaseBlockedCarByPlateNumber(blockingCarPlate, blockedCarPlate, userId, userStatus);
-};
-
-/* USERS API MANAGER */
-
-export const findAllUsers = async (): Promise<any> => {
-  const api = getApiImplementation();
-  return api.findAllUsers();
-};
-
-export const findUserById = async (id: number): Promise<any> => {
-  const api = getApiImplementation();
-  return api.findUserById(id);
-};
-
-export const findUserByEmail = async (email: string): Promise<any> => {
-  const api = getApiImplementation();
-  return api.findUserByEmail(email);
-};
-
-export const findUserByExternalId = async (externalId: string): Promise<any> => {
-  const api = getApiImplementation();
-  return api.findUserByExternalId(externalId);
-};
-
-export const createOrUpdateUser = async (userDTO: any): Promise<any> => {
-  const api = getApiImplementation();
-  return api.createOrUpdateUser(userDTO);
-};
 
 // Utility function to check current API mode
 export const getApiMode = () => {

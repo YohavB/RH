@@ -95,6 +95,8 @@
 - [ ] Social features
 - [ ] Premium features
 - [ ] Integration with other services
+- [ ] Add default car country for car addition
+
 
 ### 🔄 Maintenance
 - [ ] Regular dependency updates

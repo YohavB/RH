@@ -11,24 +11,25 @@ import {
   UserCarRequestDTO,
   CarsRelationRequestDTO,
   FindCarRequestDTO,
-  UserCreationDTO,
   OAuthLoginRequestDTO,
   HealthResponse,
   NotificationResponse,
   ErrorResponse,
   UserCarSituation
-} from "../classes/RHClasses";
+} from "./ServerDTOs";
 import { getApiUrl, isDevelopmentMode } from "../config/env";
 
 // Use environment configuration to manage the base URL for different environments
-const BASE_URL = getApiUrl();
+let BASE_URL = getApiUrl();
 
 // Create axios instance without auth header first
-const axiosInstance = axios.create({
+let axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000,
+  timeoutErrorMessage: 'Request timeout - server not responding',
 });
 
 // Log the API configuration
@@ -42,7 +43,7 @@ console.log('');
 // Function to get auth token from Redux store
 const getAuthTokenFromStore = (): string | null => {
   const state = store.getState();
-  return state.user.authToken;
+  return state.user.userToken;
 };
 
 // Add auth token to requests if available
@@ -59,15 +60,21 @@ const setupAuthHeader = () => {
 const handleError = (error: any): ErrorResponse => {
   if (axios.isAxiosError(error)) {
     if (!error.response) {
-      console.log("Network error. Please check your connection.");
-      return { cause: "Network error. Please check your connection.", errorCode: 0 };
+      // Network error or timeout
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        console.log("❌ Request timeout - server not responding");
+        return { cause: "Request timeout - server not responding. Please check if your server is running on port 8008.", errorCode: 0 };
+      } else {
+        console.log("❌ Network error. Please check your connection.");
+        return { cause: "Network error. Please check your connection and ensure the server is running.", errorCode: 0 };
+      }
     } else {
       const errorData = error.response.data as ErrorResponse;
-      console.log(`Error: ${error.response.status} - ${errorData?.cause || 'Unknown error'}`);
+      console.log(`❌ Error: ${error.response.status} - ${errorData?.cause || 'Unknown error'}`);
       return errorData || { cause: 'Unknown error', errorCode: error.response.status };
     }
   } else {
-    console.log("An unexpected error occurred.");
+    console.log("❌ An unexpected error occurred.");
     return { cause: "An unexpected error occurred.", errorCode: 500 };
   }
 };
@@ -77,7 +84,15 @@ const apiCall = async <T>(url: string, method: 'get' | 'post' | 'put' | 'delete'
   try {
     // Setup auth header before each request
     setupAuthHeader();
+    
+    console.log(`🌐 Making ${method.toUpperCase()} request to: ${BASE_URL}${url}`);
+    if (data) {
+      console.log(`📤 Request data:`, JSON.stringify(data, null, 2));
+    }
+    
     const response = await axiosInstance[method](url, data);
+    
+    console.log(`✅ Response received:`, response.status);
     return response.data;
   } catch (error) {
     const errorResponse = handleError(error);
@@ -105,27 +120,69 @@ export const healthCheck = async (): Promise<HealthResponse> => {
   return apiCall<HealthResponse>('/api/v1/health', 'get');
 };
 
+// Test server connectivity
+export const testServerConnectivity = async (): Promise<boolean> => {
+  try {
+    console.log('🔍 Testing server connectivity...');
+    const response = await healthCheck();
+    console.log('✅ Server is reachable:', response);
+    return true;
+  } catch (error) {
+    console.log('❌ Server connectivity test failed:', error);
+    return false;
+  }
+};
+
 /* AUTHENTICATION ENDPOINTS */
 
-export const googleLogin = async (idToken: string): Promise<AuthResponseDTO> => {
+export const googleLogin = async (idToken: string, agreedConsent?: boolean): Promise<AuthResponseDTO> => {
   console.log('🔐 Making real Google login request to server...');
+  console.log(`🔑 ID Token length: ${idToken?.length || 0} characters`);
+  
+  if (!idToken) {
+    throw { cause: "No ID token provided", errorCode: 400 };
+  }
+  
   const request: OAuthLoginRequestDTO = { token: idToken };
-  const response = await apiCall<AuthResponseDTO>('/api/v1/auth/google', 'post', request);
-  console.log('✅ Google login successful, updating auth token...');
-  await updateAuthToken(response.token);
-  return response;
+  let url = '/api/v1/auth/google';
+  
+  if (agreedConsent !== undefined) {
+    url += `?agreedConsent=${agreedConsent}`;
+  }
+  
+  try {
+    const response = await apiCall<AuthResponseDTO>(url, 'post', request);
+    console.log('✅ Google login successful, updating auth token...');
+    await updateAuthToken(response.token);
+    return response;
+  } catch (error) {
+    console.log('❌ Google login failed:', error);
+    throw error;
+  }
 };
 
-export const facebookLogin = async (accessToken: string): Promise<AuthResponseDTO> => {
+export const facebookLogin = async (accessToken: string, agreedConsent?: boolean): Promise<AuthResponseDTO> => {
   const request: OAuthLoginRequestDTO = { token: accessToken };
-  const response = await apiCall<AuthResponseDTO>('/api/v1/auth/facebook', 'post', request);
+  let url = '/api/v1/auth/facebook';
+  
+  if (agreedConsent !== undefined) {
+    url += `?agreedConsent=${agreedConsent}`;
+  }
+  
+  const response = await apiCall<AuthResponseDTO>(url, 'post', request);
   await updateAuthToken(response.token);
   return response;
 };
 
-export const appleLogin = async (idToken: string): Promise<AuthResponseDTO> => {
+export const appleLogin = async (idToken: string, agreedConsent?: boolean): Promise<AuthResponseDTO> => {
   const request: OAuthLoginRequestDTO = { token: idToken };
-  const response = await apiCall<AuthResponseDTO>('/api/v1/auth/apple', 'post', request);
+  let url = '/api/v1/auth/apple';
+  
+  if (agreedConsent !== undefined) {
+    url += `?agreedConsent=${agreedConsent}`;
+  }
+  
+  const response = await apiCall<AuthResponseDTO>(url, 'post', request);
   await updateAuthToken(response.token);
   return response;
 };
@@ -143,29 +200,19 @@ export const logout = async (): Promise<void> => {
 
 /* USER ENDPOINTS */
 
-export const createUser = async (userData: UserCreationDTO): Promise<UserDTO> => {
-  return apiCall<UserDTO>('/api/v1/user', 'post', userData);
+export const getCurrentUser = async (): Promise<UserDTO> => {
+  return apiCall<UserDTO>('/api/v1/user', 'get');
 };
 
-export const getUserById = async (id: number): Promise<UserDTO> => {
-  return apiCall<UserDTO>(`/api/v1/user?id=${id}`, 'get');
+export const deactivateCurrentUser = async (): Promise<void> => {
+  return apiCall('/api/v1/user/deactivate', 'put');
 };
 
-export const getUserByEmail = async (email: string): Promise<UserDTO> => {
-  return apiCall<UserDTO>(`/api/v1/user/by-email?email=${encodeURIComponent(email)}`, 'get');
+export const updatePushNotificationToken = async (pushNotificationToken: string): Promise<UserDTO> => {
+  return apiCall<UserDTO>('/api/v1/user/push-notification-token', 'put', pushNotificationToken);
 };
 
-export const updateUser = async (userData: UserDTO): Promise<UserDTO> => {
-  return apiCall<UserDTO>('/api/v1/user', 'put', userData);
-};
 
-export const deactivateUser = async (userId: number): Promise<void> => {
-  return apiCall(`/api/v1/user/deactivate/${userId}`, 'put');
-};
-
-export const activateUser = async (userId: number): Promise<void> => {
-  return apiCall(`/api/v1/user/activate/${userId}`, 'put');
-};
 
 /* CAR ENDPOINTS */
 
@@ -181,10 +228,10 @@ export const assignCarToUser = async (userId: number, carId: number): Promise<Us
   return apiCall<UserCarsDTO>('/api/v1/user-car', 'post', request);
 };
 
-export const getUserCars = async (userId: number): Promise<UserCarsDTO> => {
-  console.log(`🚗 Fetching user cars for user ID: ${userId}`);
-  const response = await apiCall<UserCarsDTO>(`/api/v1/user-car/by-user-id?userId=${userId}`, 'get');
-  console.log(`✅ Found ${response.cars?.length || 0} cars for user`);
+export const getCurrentUserCars = async (): Promise<UserCarsDTO> => {
+  console.log(`🚗 Fetching current user's cars`);
+  const response = await apiCall<UserCarsDTO>('/api/v1/user-car', 'get');
+  console.log(`✅ Found ${response.cars?.length || 0} cars for current user`);
   return response;
 };
 
@@ -195,23 +242,28 @@ export const removeCarFromUser = async (userId: number, carId: number): Promise<
 
 /* CAR RELATIONS ENDPOINTS */
 
-export const createCarBlockingRelationship = async (
+export const createCarRelationship = async (
   blockingCarId: number, 
-  blockedCarId: number
+  blockedCarId: number,
+  userCarSituation: UserCarSituation
 ): Promise<CarRelationsDTO> => {
   const request: CarsRelationRequestDTO = {
     blockingCarId,
     blockedCarId,
-    userCarSituation: UserCarSituation.IS_BLOCKING
+    userCarSituation
   };
   return apiCall<CarRelationsDTO>('/api/v1/car-relations', 'post', request);
 };
 
-export const getCarRelations = async (carId: number): Promise<CarRelationsDTO> => {
-  return apiCall<CarRelationsDTO>(`/api/v1/car-relations?carId=${carId}`, 'get');
+export const getCarRelationsByCarId = async (carId: number): Promise<CarRelationsDTO> => {
+  return apiCall<CarRelationsDTO>(`/api/v1/car-relations/by-car-id?carId=${carId}`, 'get');
 };
 
-export const removeCarBlockingRelationship = async (
+export const getCurrentUserCarRelations = async (): Promise<CarRelationsDTO[]> => {
+  return apiCall<CarRelationsDTO[]>('/api/v1/car-relations/by-user', 'get');
+};
+
+export const removeCarRelationship = async (
   blockingCarId: number, 
   blockedCarId: number
 ): Promise<CarRelationsDTO> => {
@@ -233,117 +285,3 @@ export const sendNeedToGoNotification = async (blockedCarId: number): Promise<No
   return apiCall<NotificationResponse>(`/api/v1/notification/send-need-to-go?blockedCarId=${blockedCarId}`, 'post');
 };
 
-/* LEGACY ENDPOINTS FOR BACKWARD COMPATIBILITY */
-
-// Legacy car endpoints (deprecated - use new endpoints above)
-export const findAllCars = async (): Promise<any[]> => {
-  console.warn('findAllCars is deprecated. Use the new car endpoints instead.');
-  return apiCall('/api/v1/cars', 'get');
-};
-
-export const findCarByPlateNumber = async (plateNumber: string, country: Countries): Promise<any> => {
-  console.warn('findCarByPlateNumber is deprecated. Use findOrCreateCar instead.');
-  return findOrCreateCar(plateNumber, country);
-};
-
-export const createOrUpdateCar = async (
-  plateNumber: string, 
-  country: Countries,
-  userId: number | null,
-): Promise<any> => {
-  console.warn('createOrUpdateCar is deprecated. Use findOrCreateCar instead.');
-  return findOrCreateCar(plateNumber, country, userId || undefined);
-};
-
-export const saveCar = async (carInfo: any, userId: string, existingCars: any[] = []): Promise<any> => {
-  console.warn('saveCar is deprecated. Use findOrCreateCar and assignCarToUser instead.');
-  // This would need to be implemented based on the legacy logic
-  throw new Error('saveCar is deprecated. Please use the new car endpoints.');
-};
-
-export const deleteCar = async (carId: number, userId: string, existingCars: any[] = []): Promise<any> => {
-  console.warn('deleteCar is deprecated. Use removeCarFromUser instead.');
-  return removeCarFromUser(parseInt(userId), carId);
-};
-
-// Legacy user-car endpoints (deprecated - use new endpoints above)
-export const getAllUsersCars = async (): Promise<any> => {
-  console.warn('getAllUsersCars is deprecated. Use getUserCars with specific userId instead.');
-  throw new Error('getAllUsersCars is deprecated. Please use getUserCars with a specific userId.');
-};
-
-export const getUsersCarsByPlateNumber = async (plateNumber: string): Promise<any[]> => {
-  console.warn('getUsersCarsByPlateNumber is deprecated. Use findOrCreateCar and getCarRelations instead.');
-  throw new Error('getUsersCarsByPlateNumber is deprecated. Please use the new car endpoints.');
-};
-
-export const getUsersCarsByUserId = async (userId: number): Promise<any[]> => {
-  console.warn('getUsersCarsByUserId is deprecated. Use getUserCars instead.');
-  const result = await getUserCars(userId);
-  return result.cars;
-};
-
-export const getUsersCarsByUserAndPlate = async (userId: number, plateNumber: string): Promise<any> => {
-  console.warn('getUsersCarsByUserAndPlate is deprecated. Use findOrCreateCar and getUserCars instead.');
-  throw new Error('getUsersCarsByUserAndPlate is deprecated. Please use the new car endpoints.');
-};
-
-export const getUsersCarsByBlockedPlateNumber = async (blockedPlateNumber: string): Promise<any> => {
-  console.warn('getUsersCarsByBlockedPlateNumber is deprecated. Use getCarRelations instead.');
-  throw new Error('getUsersCarsByBlockedPlateNumber is deprecated. Please use getCarRelations instead.');
-};
-
-export const getUsersCarsByBlockingPlateNumber = async (blockingPlateNumber: string): Promise<any> => {
-  console.warn('getUsersCarsByBlockingPlateNumber is deprecated. Use getCarRelations instead.');
-  throw new Error('getUsersCarsByBlockingPlateNumber is deprecated. Please use getCarRelations instead.');
-};
-
-export const updateBlockedCarByPlateNumber = async (
-  blockingCarPlate: string,
-  blockedCarPlate: string,
-  userId: number,
-  userStatus: any
-): Promise<any> => {
-  console.warn('updateBlockedCarByPlateNumber is deprecated. Use createCarBlockingRelationship instead.');
-  throw new Error('updateBlockedCarByPlateNumber is deprecated. Please use createCarBlockingRelationship instead.');
-};
-
-export const releaseBlockedCarByPlateNumber = async (
-  blockingCarPlate: string,
-  blockedCarPlate: string,
-  userId: number,
-  userStatus: any
-): Promise<any> => {
-  console.warn('releaseBlockedCarByPlateNumber is deprecated. Use removeCarBlockingRelationship instead.');
-  throw new Error('releaseBlockedCarByPlateNumber is deprecated. Please use removeCarBlockingRelationship instead.');
-};
-
-// Legacy user endpoints (deprecated - use new endpoints above)
-export const findAllUsers = async (): Promise<any> => {
-  console.warn('findAllUsers is deprecated. Use getUserById or getUserByEmail instead.');
-  throw new Error('findAllUsers is deprecated. Please use getUserById or getUserByEmail instead.');
-};
-
-export const findUserById = async (id: number): Promise<any> => {
-  console.warn('findUserById is deprecated. Use getUserById instead.');
-  return getUserById(id);
-};
-
-export const findUserByEmail = async (email: string): Promise<any> => {
-  console.warn('findUserByEmail is deprecated. Use getUserByEmail instead.');
-  return getUserByEmail(email);
-};
-
-export const findUserByExternalId = async (externalId: string): Promise<any> => {
-  console.warn('findUserByExternalId is deprecated. This endpoint is not available in the new API.');
-  throw new Error('findUserByExternalId is deprecated. This endpoint is not available in the new API.');
-};
-
-export const createOrUpdateUser = async (userDTO: any): Promise<any> => {
-  console.warn('createOrUpdateUser is deprecated. Use createUser or updateUser instead.');
-  if (userDTO.id) {
-    return updateUser(userDTO);
-  } else {
-    return createUser(userDTO);
-  }
-};

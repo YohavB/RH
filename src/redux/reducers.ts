@@ -1,35 +1,27 @@
-import { UserActionTypes, SET_USER_INFO, SET_USER_ID, SET_EXPO_TOKEN, SET_USER_CARS, SET_CAR_PLATE, SET_AUTH_TOKEN, SET_USER_DETAILS, LOGOUT } from "./actions";
-import { UserDTO } from "../classes/RHClasses";
+import { UserActionTypes, SET_USER_INFO, SET_USER_CARS, SET_AUTH_TOKEN, SET_CAR_RELATIONS, ADD_CAR_RELATION, CLEAR_CAR_RELATIONS, LOGOUT, SET_GOOGLE_ID_TOKEN } from "./actions";
+import { UserDTO, CarDTO, CarRelationsDTO } from "../BE_Api/ServerDTOs";
 
-// Define the initial state interface
+// Define the optimized state interface
 interface UserState {
-  userInfo: any | null;
-  userIdFromDB: number | null;
-  expoToken: string | null;
-  userCars: any[];
-  carPlate: string | null;
-  authToken: string | null;
-  userDetails: UserDTO | null;
+  userToken: string | null;
+  userInfo: UserDTO | null;
+  userCars: CarDTO[];
+  carRelations: CarRelationsDTO[];
+  googleIdToken: string | null;
 }
 
 const initialState: UserState = {
+  userToken: null,
   userInfo: null,
-  userIdFromDB: null,
-  expoToken: null,
   userCars: [],
-  carPlate: null,
-  authToken: null,
-  userDetails: null,
+  carRelations: [],
+  googleIdToken: null,
 };
 
 function userReducer(state = initialState, action: UserActionTypes): UserState {
   switch (action.type) {
     case SET_USER_INFO:
       return { ...state, userInfo: action.payload };
-    case SET_USER_ID:
-      return { ...state, userIdFromDB: action.payload };
-    case SET_EXPO_TOKEN:
-      return { ...state, expoToken: action.payload };
     case SET_USER_CARS:
       // Log car store changes
       const previousCarCount = state.userCars?.length || 0;
@@ -49,12 +41,20 @@ function userReducer(state = initialState, action: UserActionTypes): UserState {
       console.log('');
       
       return { ...state, userCars: action.payload };
-    case SET_CAR_PLATE:
-      return { ...state, carPlate: action.payload };
     case SET_AUTH_TOKEN:
-      return { ...state, authToken: action.payload };
-    case SET_USER_DETAILS:
-      return { ...state, userDetails: action.payload };
+      return { ...state, userToken: action.payload };
+    case SET_GOOGLE_ID_TOKEN:
+      return { ...state, googleIdToken: action.payload };
+    case SET_CAR_RELATIONS:
+      return { ...state, carRelations: action.payload };
+    case ADD_CAR_RELATION:
+      // Add a new car relation to the existing array
+      return { 
+        ...state, 
+        carRelations: [...state.carRelations, action.payload] 
+      };
+    case CLEAR_CAR_RELATIONS:
+      return { ...state, carRelations: [] };
     case LOGOUT:
       console.log('🚗 CAR STORE CLEARED: User logged out');
       return initialState;

@@ -48,8 +48,13 @@ const CarCard = ({ car, onDelete, isLastCar }) => {
             </View>
 
             <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Country:</Text>
+              <Text style={styles.detailValue}>{car.country}</Text>
+            </View>
+
+            <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Make:</Text>
-              <Text style={styles.detailValue}>{car.make}</Text>
+              <Text style={styles.detailValue}>{car.brand}</Text>
             </View>
 
             <View style={styles.detailRow}>

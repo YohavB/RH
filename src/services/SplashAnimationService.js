@@ -114,6 +114,13 @@ class SplashAnimationService {
           duration: 500,
           useNativeDriver: true,
         }),
+
+        Animated.timing(this.animationValues.topRightRectAnim, {
+          toValue: { x: 0, y: 45 },
+          duration: 1200,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+          useNativeDriver: true,
+        }),
       ]),
     ]).start(() => {
       this.onAnimationComplete && this.onAnimationComplete();

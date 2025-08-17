@@ -85,9 +85,9 @@ export default StyleSheet.create({
     zIndex: 1000,
   },
   loadingText: {
-    marginTop: 16,
     fontSize: 16,
     fontFamily: Fonts.medium,
-    color: Colors.textDark,
+    color: Colors.mainOrange,
+    marginBottom: 16,
   },
 });

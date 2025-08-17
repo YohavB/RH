@@ -6,7 +6,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { Countries } from "../classes/RHClasses";
+import { Countries, getAllCountries, getCountryInfo } from "../BE_Api/ServerDTOs";
 import { Colors } from "../styles/GlobalStyle";
 import styles from "../styles/componentStyles/CountryPickerStyles";
 import PickerIcon from "../assets/icons/earth_picker.svg";
@@ -20,35 +20,9 @@ import PickerIcon from "../assets/icons/earth_picker.svg";
 const CountryPicker = ({ value, onValueChange, style }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Build countries list from enum
-  const countryList = Object.keys(Countries).map((key) => ({
-    code: key,
-    name: getCountryName(key),
-    flag: getCountryFlag(key),
-  }));
+  const countryList = getAllCountries();
 
-  // Helper function to get human-readable country name
-  function getCountryName(countryCode) {
-    switch (countryCode) {
-      case "IL":
-        return "Israel";
-      default:
-        return "None";
-    }
-  }
-
-  // Helper function to get country flag emoji
-  function getCountryFlag(countryCode) {
-    switch (countryCode) {
-      case "IL":
-        return "🇮🇱";
-      default:
-        return "";
-    }
-  }
-
-  // Get current country display info
-  const selectedCountry = countryList.find((c) => c.code === value);
+  const selectedCountry = getCountryInfo(value);
 
   return (
     <View style={[styles.container, style]}>
@@ -56,7 +30,7 @@ const CountryPicker = ({ value, onValueChange, style }) => {
         style={styles.pickerButton}
         onPress={() => setModalVisible(true)}
       >
-        {selectedCountry ? (
+        {selectedCountry && selectedCountry.code !== 'UNKNOWN' ? (
           <>
             <Text style={styles.flagText}>{selectedCountry.flag}</Text>
             <Text style={styles.codeText}>{selectedCountry.code}</Text>
@@ -78,12 +52,12 @@ const CountryPicker = ({ value, onValueChange, style }) => {
 
             <FlatList
               data={countryList}
-              keyExtractor={(item) => item.code}
+              keyExtractor={(item) => item.value.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.countryItem}
                   onPress={() => {
-                    onValueChange(item.code);
+                    onValueChange(item.value);
                     setModalVisible(false);
                   }}
                 >
@@ -92,7 +66,7 @@ const CountryPicker = ({ value, onValueChange, style }) => {
                     <Text style={styles.countryCode}>{item.code}</Text>
                     <Text style={styles.countryName}>{item.name}</Text>
                   </View>
-                  {value === item.code && (
+                  {value === item.value && (
                     <View style={styles.selectedIndicator} />
                   )}
                 </TouchableOpacity>

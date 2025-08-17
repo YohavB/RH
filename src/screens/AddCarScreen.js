@@ -2,30 +2,21 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   Text,
   View,
-  TextInput,
-  Alert,
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
+import { Alert } from "../components/CustomAlert";
+import { useSelector } from "react-redux";
 import { Colors } from "../styles/GlobalStyle";
 import styles from "../styles/screenStyles/AddCarScreenStyles";
-import { setCarPlate, setUserCars } from "../redux/actions";
-import { createOrUpdateCar, findCarByPlateNumber } from "../BE_Api/ApiManager";
-import {
-  Countries,
-  CarDTO,
-  Brands,
-  Colors as CarColors,
-  ScreenNames,
-} from "../classes/RHClasses";
+import { findOrCreateCar } from "../BE_Api/ApiManager";
+import { ScreenNames } from "./ScreenNames";
 import ScreenContainer from "../components/ScreenContainer";
 import CameraButton from "../components/CameraButton";
-import CountryPicker from "../components/CountryPicker";
-import { isDemoMode } from "../config/env";
+import RushHourLoader from "../components/RushHourLoader";
 import PlateNumberInput from '../components/PlateNumberInput';
+import { APP_CONFIG } from "../config/appConfig";
 
 const AddCarScreen = ({ navigation, route }) => {
   // Screen load logging
@@ -34,22 +25,19 @@ const AddCarScreen = ({ navigation, route }) => {
     if (route?.params) {
       console.log("Route params:", route.params);
     }
+    console.log("userInfo", userInfo);
   }, []);
 
   const [plateNumber, setPlateNumber] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-
   // Get user information from Redux store
-  const { userInfo, userCars } = useSelector((state) => state.user) || {};
-  const userName = userInfo?.user?.name;
-  const userId = userInfo?.user?.id;
-
-  // Check if we're in demo environment
-  const IS_DEMO = true;
-
-  const source = ScreenNames.ADD_CAR;
+  const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
+  const userName = userInfo?.firstName;
+  
+  // Get the source from route params to determine navigation behavior
+  const source = route.params?.source || ScreenNames.MAIN;
 
   // Check if user already has cars registered
   const hasRegisteredCars = userCars && userCars.length > 0;
@@ -120,31 +108,22 @@ const AddCarScreen = ({ navigation, route }) => {
   };
 
   const getCarInfo = async (plateNumber, country) => {
-    if (isDemoMode()) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      let car = new CarDTO(
-        plateNumber,
-        country,
-        "DACIA",
-        "Sandero",
-        "Black",
-        "2025-06-01",
-        false,
-        false
-      );
+    try {
+      const car = await findOrCreateCar(plateNumber, country);
       return car;
-    } else {
-      try {
-        throw new Error("Failed to fetch car information");
-      } catch (error) {
-        console.error("API error:", error);
-        throw error;
-      }
+    } catch (error) {
+      console.error("API error:", error);
+      throw new Error("Failed to fetch car information");
     }
   };
 
+  // Navigate based on source screen
   const handleCancel = () => {
-    navigation.goBack();
+    if (source === ScreenNames.SPLASH || source === ScreenNames.LOGIN) {
+      navigation.navigate(ScreenNames.MAIN);
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -156,15 +135,18 @@ const AddCarScreen = ({ navigation, route }) => {
             <>
               <Text style={styles.welcomeText}>
                 Adding another car?{" "}
-                <Text style={styles.brandText}>unBlock</Text> has got you
+                <Text style={styles.brandText}>{APP_CONFIG.APP_NAME}</Text> has got you
                 covered.
               </Text>
             </>
           ) : (
             <>
+            <Text style={styles.welcomeText}>
+                Hey <Text style={[styles.brandText, {fontSize: 24}]}>{userName}</Text> !
+              </Text>
               <Text style={styles.welcomeText}>
-                Welcome to{" "}
-                <Text style={styles.brandText}>unBlock</Text>.
+                Welcome back to{" "}
+                <Text style={styles.brandText}>{APP_CONFIG.APP_NAME}</Text>.
               </Text>
             </>
           )}
@@ -213,8 +195,8 @@ const AddCarScreen = ({ navigation, route }) => {
 
           {isLoading && (
             <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color={Colors.mainOrange} />
               <Text style={styles.loadingText}>Checking plate number...</Text>
+              <RushHourLoader size={1} color={Colors.mainOrange} speed={1} loop={true} />
             </View>
           )}
         </View>

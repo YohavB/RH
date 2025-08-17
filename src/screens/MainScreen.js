@@ -5,31 +5,27 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   Keyboard,
-  ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { Alert } from "../components/CustomAlert";
 import { useSelector } from 'react-redux';
-import { LinearGradient } from 'expo-linear-gradient';
 import ScreenContainer from '../components/ScreenContainer';
 import PlateNumberInput from '../components/PlateNumberInput';
 import CameraButton from '../components/CameraButton';
 import styles from '../styles/screenStyles/MainScreenStyles';
 import { Colors, Gradients } from '../styles/GlobalStyle';
-import { ScreenNames } from '../classes/RHClasses';
-import { ENV, isDemoMode } from '../config/env';
+import { ScreenNames } from './ScreenNames';
 import { ProfileIcon } from '../components/Icons';
+import { APP_CONFIG } from '../config/appConfig';
+import RushHourLoader from '../components/RushHourLoader';
+import { findOrCreateCar, getCurrentUserCarRelations } from '../BE_Api/ApiManager';
 
-const MainScreen = ({ navigation, route }) => {
+const MainScreen = ({ navigation }) => { 
   // Screen load logging and reset navigation stack
+  const { userInfo, userCars = [], userToken } = useSelector((state) => state.user) || {};
+  const [userCarsRelations, setUserCarsRelations] = useState(null);
+
   useEffect(() => {
     console.log("Main Screen Loaded");
-    console.log("User Details:", userDetails);
-    console.log("User Info:", userInfo);
-    console.log("Display Name:", userName);
-    
-    if (route?.params) {
-      console.log("Route params:", route.params);
-    }
     
     // Reset navigation stack to make MainScreen the root screen
     // Only reset if we have more than one screen in the stack
@@ -40,23 +36,23 @@ const MainScreen = ({ navigation, route }) => {
         routes: [{ name: ScreenNames.MAIN }],
       });
     }
-  }, [navigation, userDetails, userInfo, userName]);
+
+    getUserCarsRelation();
+    console.log("🚗 USER CARS RELATIONS:", userCarsRelations);
+  }, []);
 
   const [plateNumber, setPlateNumber] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const { userInfo, userCars = [], authToken, userDetails } = useSelector((state) => state.user) || {};
   
-  // Use real user data from Redux
   const getUserDisplayName = () => {
-    if (userDetails) {
-      return `${userDetails.firstName} ${userDetails.lastName}`;
-    }
-    if (userInfo?.user?.name) {
-      return userInfo.user.name;
-    }
-    return 'Guest';
+    return `${userInfo.firstName}`;
+  };
+
+  const getUserCarsRelation = async () => {
+    const response = await getCurrentUserCarRelations();
+    console.log("🚗 USER CARS RELATIONS:", response);
+    setUserCarsRelations(response);
   };
   
   const userName = getUserDisplayName();
@@ -81,44 +77,17 @@ const MainScreen = ({ navigation, route }) => {
 
     setIsLoading(true);
     try {
-      if (isDemoMode()) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, ENV.DEMO_DELAY));
-        
-        // Navigate to car confirmation with mock data
+      const response = await findOrCreateCar(plateNumber, selectedCountry);
+
+      console.log("🚗 RESPONSE:", response);
+
+      if (response) {
         navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
-          carInfo: {
-            plateNumber,
-            country: selectedCountry,
-            brand: 'DACIA',
-            model: 'Sandero',
-            color: 'Black',
-            expiryDate: '2025-06-01',
-          },
           source: ScreenNames.MAIN,
+          foundCar: response,
         });
       } else {
-        // TODO: Implement real API call
-        const response = await fetch(`${ENV.API_URL}/cars/search`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            plateNumber,
-            country: selectedCountry,
-          }),
-        }).then(res => res.json());
-
-        if (response.success) {
-          navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
-            carInfo: response.car,
-            source: ScreenNames.MAIN,
-          });
-        } else {
-          throw new Error('Car not found');
-        }
+        throw new Error('Car not found');
       }
     } catch (error) {
       console.error('Error searching car:', error);
@@ -138,11 +107,15 @@ const MainScreen = ({ navigation, route }) => {
     selectedCountry === '';
 
   const handleProfilePress = () => {
-    navigation.navigate(ScreenNames.SETTINGS);
+    navigation.navigate(ScreenNames.SETTINGS, {
+      source: ScreenNames.MAIN,
+    });
   };
 
   const handleGoToSettings = () => {
-    navigation.navigate(ScreenNames.SETTINGS);
+    navigation.navigate(ScreenNames.SETTINGS, {
+      source: ScreenNames.MAIN,
+    });
   };
 
   return (
@@ -203,7 +176,7 @@ const MainScreen = ({ navigation, route }) => {
             ) : (
               <>
                 <Text style={styles.noCarText}>
-                  Before using unBlock you must have a registered car.{'\n\n'}
+                  Before using {APP_CONFIG.APP_NAME} you must have a registered car.{'\n\n'}
                   Please go to settings to add your car.
                 </Text>
 
@@ -221,7 +194,7 @@ const MainScreen = ({ navigation, route }) => {
 
           {isLoading && (
             <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color={Colors.mainOrange} />
+              <RushHourLoader size={1} color={Colors.mainOrange} speed={1} loop={true} />
               <Text style={styles.loadingText}>Searching...</Text>
             </View>
           )}

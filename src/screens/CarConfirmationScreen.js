@@ -1,101 +1,67 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-  StatusBar,
-} from "react-native";
+import { View, Text, TouchableOpacity, StatusBar } from "react-native";
+import { Alert } from "../components/CustomAlert";
 import { useSelector, useDispatch } from "react-redux";
-import { setUserCars } from "../redux/actions";
+import { setCarRelations, setUserCars } from "../redux/actions";
 import ScreenContainer from "../components/ScreenContainer";
 import styles from "../styles/screenStyles/CarConfirmationStyles";
 import { Colors } from "../styles/GlobalStyle";
-import { ScreenNames, UserStatus, CarDTO } from "../classes/RHClasses";
-import { ENV, isDemoMode } from "../config/env";
-import {
-  createOrUpdateCar,
-  updateBlockedCarByPlateNumber,
-  saveCar,
-} from "../BE_Api/ApiManager";
+import { UserCarSituation } from "../BE_Api/ServerDTOs";
+import { ScreenNames } from "./ScreenNames";
+import { createCarRelationship, assignCarToUser } from "../BE_Api/ApiManager";
 import CarSelector from "../components/CarSelector";
+import RushHourLoader from "../components/RushHourLoader";
 
 const CarConfirmationScreen = ({ navigation, route }) => {
-  // Screen load logging
-  useEffect(() => {
-    console.log("Car Confirmation Screen Loaded");
-    if (route?.params) {
-      console.log("Route params:", route.params);
-    }
-  }, []);
-
-  const dispatch = useDispatch();
+   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const { userInfo, userCars = [], authToken } = useSelector((state) => state.user) || {};
-  const userName = userInfo?.user?.name || "Ben Jacobs";
-  const userId = userInfo?.user?.id || null;
-  
-  // Get the source and car info from route params
-  const source = route.params?.source || ScreenNames.MAIN;
-  const carInfo = route.params?.carInfo;
-
-  // Log the source for debugging
-  useEffect(() => {
-    console.log("CarConfirmationScreen source:", source);
-  }, [source]);
-
+  const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
   const [selectedUserCar, setSelectedUserCar] = useState(null);
+  const [foundCar, setFoundCar] = useState(null);
+  const userId = userInfo?.id;
+
+  // Get the source and car info from route params
+  const source = route.params?.source;
+
+   // Screen load logging
+   useEffect(() => {
+    console.log("Car Confirmation Screen Loaded");
+
+    const foundCar = route.params?.foundCar;
+    setFoundCar(foundCar);
+  }, []);
 
   // Handle confirming car details
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      let response;
-      
-      if (isDemoMode()) {
-        // Call the new saveCar API with mock response, passing existing cars
-        response = await saveCar(carInfo, userId, userCars);
-      } else {
-        // TODO: Implement real API call
-        response = await fetch(`${ENV.API_URL}/cars/confirm`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(carInfo),
-        }).then(res => res.json());
+      let response = await assignCarToUser(userId, foundCar.id);
+
+      // Save the returned cars to Redux store
+      console.log("🚗 RESPONSE:", response);
+      if (response.cars) {
+        console.log("🚗 ADDING CAR TO STORE:");
+        console.log(`  New car: id ${foundCar.id} - ${foundCar.plateNumber})`);
+        console.log(`  To CurrentUser ID: ${userId}`);
+
+        dispatch(setUserCars(response.cars));
       }
 
-      if (response.success) {
-        // Save the returned cars to Redux store
-        if (response.userCars) {
-          console.log('🚗 ADDING CAR TO STORE:');
-          console.log(`  New car: ${carInfo.plateNumber} - ${carInfo.brand} ${carInfo.model} (${carInfo.color})`);
-          console.log(`  User ID: ${userId}`);
-          console.log(`  Source: ${source}`);
-          
-          dispatch(setUserCars(response.userCars));
-        }
-
-        // Navigate based on source screen
-        if (source === ScreenNames.SETTINGS) {
-          navigation.navigate(ScreenNames.SETTINGS);
-        } else {
-          navigation.navigate(ScreenNames.MAIN);
-        }
+      // Navigate based on source screen
+      if (source === ScreenNames.SETTINGS) {
+        navigation.navigate(ScreenNames.SETTINGS, {
+          source: ScreenNames.ADD_CAR,
+        });
       } else {
-        throw new Error('Failed to confirm car');
+        navigation.navigate(ScreenNames.MAIN, {
+          source: ScreenNames.ADD_CAR,
+        });
       }
     } catch (error) {
-      console.error('Error confirming car:', error);
-      Alert.alert(
-        'Error',
-        'Failed to confirm car. Please try again.',
-        [{ text: 'OK' }]
-      );
+      console.error("Error assigning car to user:", error);
+      Alert.alert("Error", "Failed to assign car to user. Please try again.", [
+        { text: "OK" },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -103,31 +69,30 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
   // Handle "I'm blocked by this car" action
   const handleBlockedBy = async () => {
-    if (!validateCarSelection()) return;
+    validateCarSelection();
 
-    const userCarPlate = getUserCarPlate();
-    if (!userCarPlate) {
-      Alert.alert("Error", "You need to register a car first.");
-      return;
-    }
+    console.log("🚗 SELECTED USER CAR ID:", selectedUserCar.id);
+    console.log("🚗 FOUND CAR ID:", foundCar.id);
 
     setIsLoading(true);
     try {
-      // Call API to update blocked status
-      const response = await updateBlockedCarByPlateNumber(
-        carInfo.plateNumber, // blocking car
-        userCarPlate, // blocked car (user's selected car)
-        userId,
-        UserStatus.BLOCKED
+      // Create the blocking relationship
+      const response = await createCarRelationship(
+        foundCar.id, // blocking car ID
+        selectedUserCar.id, // blocked car ID (user's car)
+        UserCarSituation.IS_BLOCKED
       );
 
-      if (response && response.data) {
-        returnToMain("blocked");
+      console.log(response)
+
+      if (response) {
+        console.log("Blocking relationship created:", response.message);
+        returnToMain();
       } else {
-        throw new Error("Failed to update blocked status");
+        throw new Error("Failed to create blocking relationship");
       }
     } catch (error) {
-      console.error("Error updating blocked status:", error);
+      console.error("Error creating blocking relationship:", error);
       Alert.alert(
         "Error",
         "Failed to update blocked status. Please try again."
@@ -139,31 +104,35 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
   // Handle "I'm blocking this car" action
   const handleBlocking = async () => {
-    if (!validateCarSelection()) return;
-
-    const userCarPlate = getUserCarPlate();
-    if (!userCarPlate) {
-      Alert.alert("Error", "You need to register a car first.");
-      return;
-    }
+    validateCarSelection();
 
     setIsLoading(true);
     try {
-      // Call API to update blocking status
-      const response = await updateBlockedCarByPlateNumber(
-        userCarPlate, // blocking car (user's selected car)
-        carInfo.plateNumber, // blocked car
-        userId,
-        UserStatus.BLOCKING
+      // Create the blocking relationship
+
+      console.log("🚗 SELECTED USER CAR:", selectedUserCar);
+      console.log("🚗 CAR INFO:", foundCar);
+
+      console.log("🚗 SELECTED USER CAR ID:", selectedUserCar.id);
+      console.log("🚗 FOUND CAR ID:", foundCar.id);
+
+      const response = await createCarRelationship(
+        selectedUserCar.id, // blocking car ID (user's car)
+        foundCar.id, // blocked car ID
+        UserCarSituation.IS_BLOCKING
       );
 
-      if (response && response.data) {
-        returnToMain("blocking");
+      if (response) {
+        console.log("Blocking relationship created:", response.message);
+
+        dispatch(setCarRelations(response));
+
+        returnToMain();
       } else {
-        throw new Error("Failed to update blocking status");
+        throw new Error("Failed to create blocking relationship");
       }
     } catch (error) {
-      console.error("Error updating blocking status:", error);
+      console.error("Error creating blocking relationship:", error);
       Alert.alert(
         "Error",
         "Failed to update blocking status. Please try again."
@@ -184,18 +153,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       Alert.alert("Error", "Please select which of your cars is involved.");
       return false;
     }
+    console.log("🚗 USER CARS:", userCars);
+    setSelectedUserCar(userCars[0]);
+    console.log("🚗 SELECTED USER CAR:", userCars[0]);
     return true;
-  };
-
-  // Get the appropriate car plate number based on user's cars
-  const getUserCarPlate = () => {
-    if (userCars.length === 0) {
-      return null;
-    }
-    if (userCars.length === 1) {
-      return userCars[0].plateNumber;
-    }
-    return selectedUserCar?.plateNumber;
   };
 
   // Check if blocking buttons should be disabled
@@ -210,11 +171,9 @@ const CarConfirmationScreen = ({ navigation, route }) => {
   };
 
   // Return to main screen with appropriate action
-  const returnToMain = (action) => {
+  const returnToMain = () => {
     navigation.navigate(ScreenNames.MAIN, {
-      carDetails: carInfo,
-      plateNumber: carInfo.plateNumber,
-      action: action,
+      source: ScreenNames.ADD_CAR,
     });
   };
 
@@ -223,7 +182,12 @@ const CarConfirmationScreen = ({ navigation, route }) => {
     return (
       <ScreenContainer>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.mainOrange} />
+          <RushHourLoader
+            size={1}
+            color={Colors.mainOrange}
+            speed={1}
+            loop={true}
+          />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       </ScreenContainer>
@@ -231,7 +195,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
   }
 
   // If no car information is provided, show an error message
-  if (!carInfo) {
+  if (!foundCar) {
     return (
       <ScreenContainer>
         <View style={styles.errorContainer}>
@@ -245,10 +209,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
     <ScreenContainer>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
       <View style={styles.container}>
-                  <View style={styles.headerContainer}>
-            <Text style={styles.headerText}>
-              Found <Text style={styles.brandText}>it</Text>!
-            </Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>
+            Found <Text style={styles.brandText}>it</Text>!
+          </Text>
           <Text style={styles.subHeaderText}>
             {source === ScreenNames.MAIN
               ? "How do you want to proceed ?"
@@ -259,27 +223,32 @@ const CarConfirmationScreen = ({ navigation, route }) => {
         <View style={styles.cardContainer}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Plate #:</Text>
-            <Text style={styles.detailValue}>{carInfo.plateNumber}</Text>
+            <Text style={styles.detailValue}>{foundCar.plateNumber}</Text>
           </View>
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Country:</Text>
-            <Text style={styles.detailValue}>{carInfo.country}</Text>
+            <Text style={styles.detailValue}>{foundCar.country}</Text>
           </View>
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Make:</Text>
-            <Text style={styles.detailValue}>{carInfo.brand}</Text>
+            <Text style={styles.detailValue}>{foundCar.brand}</Text>
           </View>
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Model:</Text>
-            <Text style={styles.detailValue}>{carInfo.model}</Text>
+            <Text style={styles.detailValue}>{foundCar.model}</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Year:</Text>
+            <Text style={styles.detailValue}>{foundCar.year}</Text>
           </View>
 
           <View style={[styles.detailRow, styles.lastDetailRow]}>
             <Text style={styles.detailLabel}>Color:</Text>
-            <Text style={styles.detailValue}>{carInfo.color}</Text>
+            <Text style={styles.detailValue}>{foundCar.color}</Text>
           </View>
         </View>
 
@@ -297,35 +266,39 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
               <TouchableOpacity
                 style={[
-                  styles.actionButton, 
+                  styles.actionButton,
                   styles.blockedByButton,
-                  isBlockingButtonsDisabled() && styles.actionButtonDisabled
+                  isBlockingButtonsDisabled() && styles.actionButtonDisabled,
                 ]}
                 onPress={handleBlockedBy}
                 disabled={isBlockingButtonsDisabled()}
               >
-                <Text style={[
-                  styles.actionButtonText,
-                  isBlockingButtonsDisabled() && styles.actionButtonTextDisabled
-                ]}>
+                <Text
+                  style={[
+                    styles.actionButtonText,
+                    isBlockingButtonsDisabled() &&
+                      styles.actionButtonTextDisabled,
+                  ]}
+                >
                   I'm blocked by this car
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  styles.actionButton, 
+                  styles.actionButton,
                   styles.blockingButton,
-                  isBlockingButtonsDisabled() && styles.actionButtonDisabled
+                  isBlockingButtonsDisabled() && styles.actionButtonDisabled,
                 ]}
                 onPress={handleBlocking}
                 disabled={isBlockingButtonsDisabled()}
               >
                 <Text
                   style={[
-                    styles.actionButtonText, 
+                    styles.actionButtonText,
                     styles.blockingButtonText,
-                    isBlockingButtonsDisabled() && styles.actionButtonTextDisabled
+                    isBlockingButtonsDisabled() &&
+                      styles.actionButtonTextDisabled,
                   ]}
                 >
                   I'm blocking this car
@@ -349,7 +322,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={handleConfirm}
+              >
                 <Text style={styles.confirmButtonText}>Confirm</Text>
               </TouchableOpacity>
             </View>
