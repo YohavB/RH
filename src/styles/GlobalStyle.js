@@ -7,11 +7,16 @@ export const Colors = {
   white: "#FFFFFF",
   blue: "#2169B6",
   mainOrange: "#F5855F", // Main app color
+  mainGreen: "#4CAF50", // Green color for success/checkmarks
+  gradientOrange: "#FF9E4E", // Orange color for gradients/warnings
   textDark: "#4f4f4f",
   textBlack: "#000000",
   textLight: "#A0A0A0",
   background: "#FFFFFF", // Background color for the entire app
   inputBackground:"#F1F3F5",
+  lightGray: "#E5E5E5",
+  mediumGray: "#9E9E9E",
+  darkGray: "#424242",
 };
 
 // Define font families

@@ -29,6 +29,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
     const foundCar = route.params?.foundCar;
     setFoundCar(foundCar);
+
+    if (userCars.length === 1) {
+      setSelectedUserCar(userCars[0]);
+    }
   }, []);
 
   // Handle confirming car details
@@ -86,7 +90,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       console.log(response)
 
       if (response) {
-        console.log("Blocking relationship created:", response.message);
+        console.log("Blocking relationship created:", response);
+
+        dispatch(setCarRelations(response));
+
         returnToMain();
       } else {
         throw new Error("Failed to create blocking relationship");
@@ -123,7 +130,10 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       );
 
       if (response) {
-        console.log("Blocking relationship created:", response.message);
+        console.log("Blocking relationship created:", response);
+        console.log("🚗 RESPONSE:", response[0]);
+        console.log("🚗 RESPONSE:", response[0].isBlockedBy);
+        console.log("🚗 RESPONSE:", response[0].isBlocking);
 
         dispatch(setCarRelations(response));
 
@@ -153,10 +163,6 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       Alert.alert("Error", "Please select which of your cars is involved.");
       return false;
     }
-    console.log("🚗 USER CARS:", userCars);
-    setSelectedUserCar(userCars[0]);
-    console.log("🚗 SELECTED USER CAR:", userCars[0]);
-    return true;
   };
 
   // Check if blocking buttons should be disabled
@@ -173,7 +179,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
   // Return to main screen with appropriate action
   const returnToMain = () => {
     navigation.navigate(ScreenNames.MAIN, {
-      source: ScreenNames.ADD_CAR,
+      source: ScreenNames.CAR_CONFIRMATION,
     });
   };
 

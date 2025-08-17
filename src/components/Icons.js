@@ -1,7 +1,13 @@
-import React from 'react';
-import { View } from 'react-native';
-import Svg, { Path, Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { Colors } from '../styles/GlobalStyle';
+import React from "react";
+import { View } from "react-native";
+import Svg, {
+  Path,
+  Circle,
+  Defs,
+  LinearGradient,
+  Stop,
+} from "react-native-svg";
+import { Colors } from "../styles/GlobalStyle";
 
 export const PersonIcon = ({ size = 24, color = Colors.mainOrange, style }) => {
   return (
@@ -32,16 +38,16 @@ export const CarIcon = ({ size = 24, color = Colors.mainOrange, style }) => {
   );
 };
 
-export const BackIcon = ({ 
-  size = 24, 
-  color = '#000', 
-  gradient = null, 
-  style 
+export const BackIcon = ({
+  size = 24,
+  color = "#000",
+  gradient = null,
+  style,
 }) => {
   // Generate unique gradient ID to avoid conflicts
   const gradientId = `backGradient_${Math.random().toString(36).substr(2, 9)}`;
   const fillColor = gradient ? `url(#${gradientId})` : color;
-  
+
   return (
     <View style={style}>
       <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
@@ -63,16 +69,18 @@ export const BackIcon = ({
   );
 };
 
-export const ProfileIcon = ({ 
-  size = 24, 
-  color = Colors.mainOrange, 
-  gradient = null, 
-  style 
+export const ProfileIcon = ({
+  size = 24,
+  color = Colors.mainOrange,
+  gradient = null,
+  style,
 }) => {
   // Generate unique gradient ID to avoid conflicts
-  const gradientId = `profileGradient_${Math.random().toString(36).substr(2, 9)}`;
+  const gradientId = `profileGradient_${Math.random()
+    .toString(36)
+    .substr(2, 9)}`;
   const fillColor = gradient ? `url(#${gradientId})` : color;
-  
+
   return (
     <View style={style}>
       <Svg width={size} height={size} viewBox="0 0 512 512" fill="none">
@@ -102,4 +110,49 @@ export const ProfileIcon = ({
       </Svg>
     </View>
   );
-}; 
+};
+
+export const TopViewCarIcon = ({ size, color, style }) => {
+  return (
+    <View style={style}>
+      <Svg width={size} height={size} viewBox="0 0 314 512.55" fill="none">
+        <Path
+          d="M42.3 110.94c2.22 24.11 2.48 51.07 1.93 79.75-13.76.05-24.14 1.44-32.95 6.69-4.96 2.96-8.38 6.28-10.42 12.15-1.37 4.3-.36 7.41 2.31 8.48 4.52 1.83 22.63-.27 28.42-1.54 2.47-.54 4.53-1.28 5.44-2.33.55-.63 1-1.4 1.35-2.31 1.49-3.93.23-8.44 3.22-12.08.73-.88 1.55-1.37 2.47-1.61-1.46 62.21-6.21 131.9-2.88 197.88 0 43.41 1 71.27 43.48 97.95 41.46 26.04 117.93 25.22 155.25-8.41 32.44-29.23 30.38-50.72 30.38-89.54 5.44-70.36 1.21-134.54-.79-197.69.69.28 1.32.73 1.89 1.42 2.99 3.64 1.73 8.15 3.22 12.08.35.91.8 1.68 1.35 2.31.91 1.05 2.97 1.79 5.44 2.33 5.79 1.27 23.9 3.37 28.42 1.54 2.67-1.07 3.68-4.18 2.31-8.48-2.04-5.87-5.46-9.19-10.42-12.15-8.7-5.18-18.93-6.6-32.44-6.69-.75-25.99-1.02-51.83-.01-77.89C275.52-48.32 29.74-25.45 42.3 110.94zm69.63-90.88C83.52 30.68 62.75 48.67 54.36 77.59c21.05-15.81 47.13-39.73 57.57-57.53zm89.14-4.18c28.41 10.62 49.19 28.61 57.57 57.53-21.05-15.81-47.13-39.73-57.57-57.53zM71.29 388.22l8.44-24.14c53.79 8.36 109.74 7.72 154.36-.15l7.61 22.8c-60.18 28.95-107.37 32.1-170.41 1.49zm185.26-34.13c5.86-34.1 4.8-86.58-1.99-120.61-12.64 47.63-9.76 74.51 1.99 120.61zM70.18 238.83l-10.34-47.2c45.37-57.48 148.38-53.51 193.32 0l-12.93 47.2c-57.58-14.37-114.19-13.21-170.05 0zM56.45 354.09c-5.86-34.1-4.8-86.58 1.99-120.61 12.63 47.63 9.76 74.51-1.99 120.61z"
+          fill={color}
+          stroke="#000000"
+          strokeWidth="10"
+        />
+      </Svg>
+    </View>
+  );
+};
+
+export const ExclamationMarkIcon = ({ size = 24, color = Colors.mainOrange, style }) => {
+  return (
+    <View style={style}>
+      <Svg width={size} height={size} viewBox="0 0 56 56" fill="none">
+        <Path
+          d="M 27.9999 51.9063 C 41.0546 51.9063 51.9063 41.0781 51.9063 28 C 51.9063 14.9453 41.0312 4.0937 27.9765 4.0937 C 14.8983 4.0937 4.0937 14.9453 4.0937 28 C 4.0937 41.0781 14.9218 51.9063 27.9999 51.9063 Z M 27.9999 47.9219 C 16.9374 47.9219 8.1014 39.0625 8.1014 28 C 8.1014 16.9609 16.9140 8.0781 27.9765 8.0781 C 39.0155 8.0781 47.8983 16.9609 47.9219 28 C 47.9454 39.0625 39.0390 47.9219 27.9999 47.9219 Z M 27.9765 32.2422 C 29.1014 32.2422 29.7343 31.6094 29.7577 30.3906 L 30.1093 18.0156 C 30.1327 16.8203 29.1952 15.9297 27.9530 15.9297 C 26.6874 15.9297 25.7968 16.7968 25.8202 17.9922 L 26.1249 30.3906 C 26.1483 31.5859 26.8046 32.2422 27.9765 32.2422 Z M 27.9765 39.8594 C 29.3124 39.8594 30.5077 38.7812 30.5077 37.4219 C 30.5077 36.0390 29.3358 34.9844 27.9765 34.9844 C 26.5936 34.9844 25.4452 36.0625 25.4452 37.4219 C 25.4452 38.7578 26.6171 39.8594 27.9765 39.8594 Z"
+          fill={color}
+        />
+      </Svg>
+    </View>
+  );
+};
+
+export const CheckMarkIcon = ({ size = 24, color = Colors.mainGreen, style }) => {
+  return (
+    <View style={style}>
+      <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <Path
+          d="M12,21h0a9,9,0,0,1-9-9H3a9,9,0,0,1,9-9h0a9,9,0,0,1,9,9h0A9,9,0,0,1,12,21ZM8,11.5l3,3,5-5"
+          stroke={color}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </Svg>
+    </View>
+  );
+};

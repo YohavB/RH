@@ -246,13 +246,13 @@ export const createCarRelationship = async (
   blockingCarId: number, 
   blockedCarId: number,
   userCarSituation: UserCarSituation
-): Promise<CarRelationsDTO> => {
+): Promise<CarRelationsDTO[]> => {
   const request: CarsRelationRequestDTO = {
     blockingCarId,
     blockedCarId,
     userCarSituation
   };
-  return apiCall<CarRelationsDTO>('/api/v1/car-relations', 'post', request);
+  return apiCall<CarRelationsDTO[]>('/api/v1/car-relations', 'post', request);
 };
 
 export const getCarRelationsByCarId = async (carId: number): Promise<CarRelationsDTO> => {
@@ -266,13 +266,13 @@ export const getCurrentUserCarRelations = async (): Promise<CarRelationsDTO[]> =
 export const removeCarRelationship = async (
   blockingCarId: number, 
   blockedCarId: number
-): Promise<CarRelationsDTO> => {
+): Promise<CarRelationsDTO[]> => {
   const request: CarsRelationRequestDTO = {
     blockingCarId,
     blockedCarId,
     userCarSituation: UserCarSituation.IS_BLOCKING
   };
-  return apiCall<CarRelationsDTO>('/api/v1/car-relations', 'delete', request);
+  return apiCall<CarRelationsDTO[]>('/api/v1/car-relations', 'delete', request);
 };
 
 export const removeAllCarRelations = async (carId: number): Promise<void> => {

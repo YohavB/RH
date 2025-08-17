@@ -21,13 +21,12 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   welcomeContainer: {
-    marginTop: 20,
-    marginBottom: 40,
+    marginBottom: 5,
   },
   welcomeText: {
     fontSize: 24,
     fontFamily: Fonts.semiBold,
-    color: Colors.text,
+    color: Colors.textDark,
   },
   nameText: {
     fontSize: 32,
@@ -36,12 +35,15 @@ export default StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+  },
+  contentContainerStyle: {
     alignItems: 'center',
+    paddingBottom: 40, // Add some bottom padding for scrolling
   },
   instructionText: {
     fontSize: 16,
     fontFamily: Fonts.regular,
-    color: Colors.text,
+    color: Colors.textDark,
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -94,7 +96,7 @@ export default StyleSheet.create({
   noCarText: {
     fontSize: 18,
     fontFamily: Fonts.medium,
-    color: Colors.text,
+    color: Colors.textDark,
     textAlign: 'center',
     marginBottom: 40,
     lineHeight: 24,
@@ -113,5 +115,9 @@ export default StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.semiBold,
     color: Colors.white,
+  },
+  userCarsRelationsContainer: {
+    width: '100%',
+    marginTop: 20,
   },
 }); 

@@ -125,7 +125,7 @@ export const createCarRelationship = async (
   blockingCarId: number, 
   blockedCarId: number,
   userCarSituation: UserCarSituation
-): Promise<CarRelationsDTO> => {
+): Promise<CarRelationsDTO[]> => {
   const api = getApiImplementation();
   return api.createCarRelationship(blockingCarId, blockedCarId, userCarSituation);
 };
@@ -143,7 +143,7 @@ export const getCurrentUserCarRelations = async (): Promise<CarRelationsDTO[]> =
 export const removeCarRelationship = async (
   blockingCarId: number, 
   blockedCarId: number
-): Promise<CarRelationsDTO> => {
+): Promise<CarRelationsDTO[]> => {
   const api = getApiImplementation();
   return api.removeCarRelationship(blockingCarId, blockedCarId);
 };
