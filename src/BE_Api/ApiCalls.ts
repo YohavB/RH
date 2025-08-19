@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { store } from "../redux/store";
 import { 
@@ -18,6 +18,7 @@ import {
   UserCarSituation
 } from "./ServerDTOs";
 import { getApiUrl, isDevelopmentMode } from "../config/env";
+import { setAuthToken } from "../redux/actions";
 
 // Use environment configuration to manage the base URL for different environments
 let BASE_URL = getApiUrl();
@@ -28,7 +29,7 @@ let axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 30000,
   timeoutErrorMessage: 'Request timeout - server not responding',
 });
 
@@ -90,7 +91,13 @@ const apiCall = async <T>(url: string, method: 'get' | 'post' | 'put' | 'delete'
       console.log(`Request data:`, JSON.stringify(data, null, 2));
     }
     
-    const response = await axiosInstance[method](url, data);
+    let response: AxiosResponse<any, any>;
+    if (method === 'delete' && data) {
+      // For DELETE requests with data, we need to explicitly set the data in the config
+      response = await axiosInstance.delete(url, { data });
+    } else {
+      response = await axiosInstance[method](url, data);
+    }
     
     console.log(`✅ Response received ${method.toUpperCase()} ${url} :`, response.status);
     return response.data;
@@ -101,15 +108,13 @@ const apiCall = async <T>(url: string, method: 'get' | 'post' | 'put' | 'delete'
 };
 
 // Helper function to update auth token in Redux store
-export const updateAuthToken = async (token: string) => {
-  const { setAuthToken } = await import("../redux/actions");
+export const updateAuthToken = async (token: string) => {;
   setAuthToken(token)(store.dispatch);
   setupAuthHeader();
 };
 
 // Helper function to clear auth token from Redux store
 export const clearAuthToken = async () => {
-  const { setAuthToken } = await import("../redux/actions");
   setAuthToken("")(store.dispatch);
   setupAuthHeader();
 };

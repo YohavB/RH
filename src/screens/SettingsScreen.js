@@ -14,7 +14,6 @@ import CarCard from "../components/CarCard";
 import DeleteNotification from "../components/DeleteNotification";
 import { ScreenNames } from "./ScreenNames";
 import GoogleSignInService from "../services/GoogleSignInService";
-import FirebaseTest from "../components/FirebaseTest";
 
 const Settings = ({ navigation, route }) => {
   // Get the source from route params to understand where user came from
@@ -52,35 +51,30 @@ const Settings = ({ navigation, route }) => {
     console.log("Source:", source);
   }, []);
 
+  useEffect(() => {
+    console.log("🚗 IS DELETING:", isDeleting);
+  },[isDeleting]);
+
   // Handle deleting a car
   const handleDeleteCar = async (car) => {
     if (isDeleting) return; // Prevent multiple simultaneous deletions
 
     console.log("🚗 DELETING CAR FROM STORE:");
-    console.log(
-      `  Deleted car: ${car.plateNumber} - ${car.make || car.brand} ${
-        car.model
-      } (${car.color})`
-    );
-    console.log(`  Car ID: ${car.id}`);
-    console.log(`  User: ${getUserData().name}`);
 
     setIsDeleting(true);
 
     try {
       const response = await removeCarFromUser(car.id, userInfo.id);
-
-      if (response.success) {
-        // Store the deleted car info for notification
+      
+      if (response) {
         setDeletedCar({
-          make: car.make || car.brand,
+          brand: car.brand,
+          model: car.model,
           plateNumber: car.plateNumber,
         });
 
-        // Update Redux state with the returned cars
         dispatch(setUserCars(response.userCars));
 
-        // Show success notification
         setShowDeleteNotification(true);
       } else {
         throw new Error("Failed to delete car");
@@ -239,21 +233,12 @@ const Settings = ({ navigation, route }) => {
                 style={styles.addCarButton}
                 onPress={handleAddCar}
               >
-                <Text style={styles.addCarText}>Add another car</Text>
+                {userCars && userCars.length > 0 ? (
+                  <Text style={styles.addCarText}>Add another car</Text>
+                ) : (
+                  <Text style={styles.addCarText}>Add a car</Text>
+                )}
               </TouchableOpacity>
-            </View>
-
-            {/* Firebase Test Section */}
-            <View style={styles.section}>
-              <SectionHeader
-                title="Firebase Test"
-                icon={
-                  <View style={styles.iconContainer}>
-                    <Text style={styles.iconText}>🔥</Text>
-                  </View>
-                }
-              />
-              <FirebaseTest />
             </View>
           </View>
         </View>
@@ -263,7 +248,8 @@ const Settings = ({ navigation, route }) => {
       {deletedCar && (
         <DeleteNotification
           visible={showDeleteNotification}
-          make={deletedCar.make}
+          brand={deletedCar.brand}
+          model={deletedCar.model}
           licensePlate={deletedCar.plateNumber}
           onClose={handleCloseNotification}
         />

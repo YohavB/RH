@@ -13,7 +13,7 @@ import CarSelector from "../components/CarSelector";
 import RushHourLoader from "../components/RushHourLoader";
 
 const CarConfirmationScreen = ({ navigation, route }) => {
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
   const [selectedUserCar, setSelectedUserCar] = useState(null);
@@ -22,9 +22,8 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
   // Get the source and car info from route params
   const source = route.params?.source;
-
-   // Screen load logging
-   useEffect(() => {
+  // Screen load logging
+  useEffect(() => {
     console.log("Car Confirmation Screen Loaded");
 
     const foundCar = route.params?.foundCar;
@@ -42,7 +41,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       let response = await assignCarToUser(userId, foundCar.id);
 
       // Save the returned cars to Redux store
-      console.log("🚗 RESPONSE:", response);
+      console.log("🚗 RESPONSE ASSIGN CAR TO USER:", response);
       if (response.cars) {
         console.log("🚗 ADDING CAR TO STORE:");
         console.log(`  New car: id ${foundCar.id} - ${foundCar.plateNumber})`);
@@ -87,7 +86,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
         UserCarSituation.IS_BLOCKED
       );
 
-      console.log(response)
+      console.log(response);
 
       if (response) {
         console.log("Blocking relationship created:", response);
@@ -131,9 +130,6 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
       if (response) {
         console.log("Blocking relationship created:", response);
-        console.log("🚗 RESPONSE:", response[0]);
-        console.log("🚗 RESPONSE:", response[0].isBlockedBy);
-        console.log("🚗 RESPONSE:", response[0].isBlocking);
 
         dispatch(setCarRelations(response));
 
@@ -206,6 +202,9 @@ const CarConfirmationScreen = ({ navigation, route }) => {
       <ScreenContainer>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>No car information provided</Text>
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <Text style={styles.cancelButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </View>
       </ScreenContainer>
     );
@@ -273,26 +272,6 @@ const CarConfirmationScreen = ({ navigation, route }) => {
               <TouchableOpacity
                 style={[
                   styles.actionButton,
-                  styles.blockedByButton,
-                  isBlockingButtonsDisabled() && styles.actionButtonDisabled,
-                ]}
-                onPress={handleBlockedBy}
-                disabled={isBlockingButtonsDisabled()}
-              >
-                <Text
-                  style={[
-                    styles.actionButtonText,
-                    isBlockingButtonsDisabled() &&
-                      styles.actionButtonTextDisabled,
-                  ]}
-                >
-                  I'm blocked by this car
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
                   styles.blockingButton,
                   isBlockingButtonsDisabled() && styles.actionButtonDisabled,
                 ]}
@@ -302,12 +281,32 @@ const CarConfirmationScreen = ({ navigation, route }) => {
                 <Text
                   style={[
                     styles.actionButtonText,
-                    styles.blockingButtonText,
                     isBlockingButtonsDisabled() &&
                       styles.actionButtonTextDisabled,
                   ]}
                 >
                   I'm blocking this car
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  styles.blockedButton,
+                  isBlockingButtonsDisabled() && styles.actionButtonDisabled,
+                ]}
+                onPress={handleBlockedBy}
+                disabled={isBlockingButtonsDisabled()}
+              >
+                <Text
+                  style={[
+                    styles.actionButtonText,
+                    styles.blockedButtonText,
+                    isBlockingButtonsDisabled() &&
+                      styles.actionButtonTextDisabled,
+                  ]}
+                >
+                  I'm blocked by this car
                 </Text>
               </TouchableOpacity>
 

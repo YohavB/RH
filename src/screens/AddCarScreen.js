@@ -86,15 +86,17 @@ const AddCarScreen = ({ navigation, route }) => {
     setIsLoading(true);
 
     try {
-      const carInfo = await getCarInfo(plateNumber, selectedCountry);
+      console.log("🚗 FINDING OR CREATING CAR add car screen:", plateNumber, selectedCountry);
+      const foundCar = await getCarInfo(plateNumber, selectedCountry);
+      console.log("🚗 CAR INFO ADD CAR SCREEN:", foundCar);
 
       //reset the plate recognition screen
       setSelectedCountry("");
       setPlateNumber("");
 
       navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
-        carInfo,
         source,
+        foundCar,
       });
     } catch (error) {
       console.error("Error checking car plate:", error);

@@ -182,14 +182,15 @@ const MainScreen = ({ navigation, route }) => {
 
     setIsLoading(true);
     try {
-      const response = await findOrCreateCar(plateNumber, selectedCountry);
+      console.log("🚗 FINDING OR CREATING CAR:", plateNumber, selectedCountry);
+      const foundCar = await findOrCreateCar(plateNumber, selectedCountry);
 
-      console.log("🚗 RESPONSE:", response);
+      console.log("🚗 RESPONSE FIND OR CREATE CAR MAIN SCREEN:", foundCar);
 
-      if (response) {
+      if (foundCar) {
         navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
           source: ScreenNames.MAIN,
-          foundCar: response,
+          foundCar,
         });
       } else {
         throw new Error("Car not found");

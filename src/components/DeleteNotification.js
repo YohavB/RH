@@ -1,16 +1,16 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback } from "react-native";
-import { Colors } from "../styles/GlobalStyle";
 import styles from "../styles/componentStyles/DeleteNotificationStyles";
 
 /**
  * Delete notification modal component
  * @param {boolean} visible - Whether the notification is visible
  * @param {string} licensePlate - The deleted car's license plate
- * @param {string} make - The deleted car's make
+ * @param {string} brand - The deleted car's brand
+ * @param {string} model - The deleted car's model
  * @param {function} onClose - Function to call when notification is closed
  */
-const DeleteNotification = ({ visible, licensePlate, make, onClose }) => {
+const DeleteNotification = ({ visible, licensePlate, brand, model, onClose }) => {
   const handleOutsidePress = () => {
     onClose();
   };
@@ -31,7 +31,7 @@ const DeleteNotification = ({ visible, licensePlate, make, onClose }) => {
           <TouchableWithoutFeedback onPress={handleModalPress}>
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>
-                Your {make} {licensePlate} was deleted.
+                Your {brand} {model} - {licensePlate} was removed from your car list.
               </Text>
 
               <TouchableOpacity style={styles.okButton} onPress={onClose}>

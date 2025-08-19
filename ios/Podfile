@@ -11,29 +11,25 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '15.0'
 install! 'cocoapods',
   :deterministic_uuids => false
 
+# Use modular headers for Firebase compatibility
+use_modular_headers!
+
+# Use dynamic frameworks for Firebase compatibility
+use_frameworks! :linkage => :static
+
 prepare_react_native_project!
 
-# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
-# because `react-native-flipper` depends on (FlipperKit,...), which will be excluded. To fix this,
-# you can also exclude `react-native-flipper` in `react-native.config.js`
-#
-# ```js
-# module.exports = {
-#   dependencies: {
-#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } : {}),
-#   }
-# }
-# ```
-flipper_config = FlipperConfiguration.disabled
+# Flipper configuration - disabled by default for compatibility
+flipper_config = nil
 if ENV['NO_FLIPPER'] == '1' then
   # Explicitly disabled through environment variables
-  flipper_config = FlipperConfiguration.disabled
+  flipper_config = nil
 elsif podfile_properties.key?('ios.flipper') then
   # Configure Flipper in Podfile.properties.json
   if podfile_properties['ios.flipper'] == 'true' then
-    flipper_config = FlipperConfiguration.enabled(["Debug", "Release"])
+    flipper_config = nil  # Disabled for compatibility
   elsif podfile_properties['ios.flipper'] != 'false' then
-    flipper_config = FlipperConfiguration.enabled(["Debug", "Release"], { 'Flipper' => podfile_properties['ios.flipper'] })
+    flipper_config = nil  # Disabled for compatibility
   end
 end
 
@@ -52,9 +48,7 @@ target 'RushHour' do
     :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
     :fabric_enabled => flags[:fabric_enabled],
     # An absolute path to your application root.
-    :app_path => "#{Pod::Config.instance.installation_root}/..",
-    # Note that if you have use_frameworks! enabled, Flipper will not work if enabled
-    :flipper_configuration => flipper_config
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   post_install do |installer|
@@ -63,7 +57,6 @@ target 'RushHour' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
 
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.

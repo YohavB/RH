@@ -157,15 +157,15 @@ const PlateRecognitionScreen = ({ navigation, route }) => {
       // Show processing state
       setIsProcessing(true);
       try {
-        const carInfo = await getCarInfo(detectedPlate, detectedCountry);
+        const foundCar = await getCarInfo(detectedPlate, detectedCountry);
 
         // Reset the recognition screen state
         setDetectedCountry("");
         setDetectedPlate("");
 
         navigation.navigate(ScreenNames.CAR_CONFIRMATION, {
-          carInfo,
           source,
+          foundCar,
         });
       } catch (error) {
         console.error("Error handling plate recognition:", error);

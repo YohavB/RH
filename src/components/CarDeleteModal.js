@@ -51,7 +51,7 @@ const CarDeleteModal = ({ isVisible, car, onConfirm, onCancel, isLastCar }) => {
                   </View>
                   <View style={styles.previewRow}>
                     <Text style={styles.previewLabel}>Make:</Text>
-                    <Text style={styles.previewValue}>{car?.make}</Text>
+                    <Text style={styles.previewValue}>{car?.brand}</Text>
                   </View>
                   <View style={styles.previewRow}>
                     <Text style={styles.previewLabel}>Model:</Text>

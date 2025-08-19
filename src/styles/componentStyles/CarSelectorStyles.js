@@ -4,11 +4,9 @@ import { Fonts } from '../GlobalStyle';
 
 export default StyleSheet.create({
   selector: {
-    backgroundColor: Colors.white,
     padding: 12,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.pinkish,
+    borderWidth: 1
   },
   selectorText: {
     color: Colors.darkGray,
@@ -41,21 +39,31 @@ export default StyleSheet.create({
     width: '80%',
     maxHeight: '80%',
   },
-  carItem: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.lightGray,
+  carInfoContainer: {
+    borderWidth: 1,
+    borderColor: Colors.mediumGray,
+    borderRadius: 12,
+    backgroundColor: Colors.white,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    marginBottom: 12,
+    position: "relative",
   },
-  plateNumber: {
+  carIconContainer: {
+    position: "absolute",
+    left: 0,
+  },
+  carDetails: {
+    width: "80%",
     fontSize: 16,
     fontFamily: Fonts.semiBold,
     color: Colors.darkGray,
+    textAlign: "center",
   },
-  carDetails: {
-    fontSize: 14,
-    fontFamily: Fonts.regular,
-    color: Colors.gray,
-    marginTop: 4,
+  carSelector: {
+    marginBottom: 16,
   },
   cancelButton: {
     marginTop: 16,

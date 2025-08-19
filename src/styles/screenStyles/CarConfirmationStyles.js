@@ -23,14 +23,18 @@ export default StyleSheet.create({
     color: Colors.darkGray,
   },
   errorContainer: {
+    display: "flex",
     flex: 1,
     padding: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
   errorText: {
     fontFamily: Fonts.medium,
     fontSize: 16,
     color: Colors.darkGray,
     textAlign: "center",
+    marginBottom: 24,
   },
   headerContainer: {
     width: "90%",
@@ -112,10 +116,10 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  blockedByButton: {
+  blockingButton: {
     backgroundColor: Colors.mainOrange,
   },
-  blockingButton: {
+  blockedButton: {
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.mainOrange,
@@ -125,7 +129,7 @@ export default StyleSheet.create({
     fontFamily: Fonts.semiBold,
     color: Colors.white,
   },
-  blockingButtonText: {
+  blockedButtonText: {
     color: Colors.mainOrange,
   },
   actionButtonDisabled: {
@@ -169,8 +173,5 @@ export default StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.semiBold,
     color: Colors.white,
-  },
-  carSelector: {
-    marginBottom: 16,
-  },
+  }
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,8 +6,11 @@ import {
   Modal,
   FlatList,
   TouchableWithoutFeedback,
-} from 'react-native';
-import styles from '../styles/componentStyles/CarSelectorStyles';
+} from "react-native";
+import styles from "../styles/componentStyles/CarSelectorStyles";
+import { getCarColorHex } from "../assets/car_colors";
+import { TopViewCarIcon } from "./Icons";
+import { Colors } from "../styles/GlobalStyle";
 
 const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -22,31 +25,34 @@ const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.carItem}
+      style={styles.carInfoContainer}
       onPress={() => {
         onSelect(item);
         setModalVisible(false);
       }}
     >
-      <Text style={styles.plateNumber}>{item.plateNumber}</Text>
+      <View style={styles.carIconContainer}>
+        <TopViewCarIcon size={40} color={getCarColorHex(item.color)} />
+      </View>
       <Text style={styles.carDetails}>
-        {item.make} {item.model} - {item.color}
+        {item.brand} {item.model}
       </Text>
+      <Text style={styles.carDetails}>{item.plateNumber}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={styles.carSelector}>
       <TouchableOpacity
-        style={styles.selector}
+        style={[styles.selector, selectedCar? {borderColor: Colors.mainGreen} : {borderColor: Colors.pinkish}]}
         onPress={() => setModalVisible(true)}
       >
         <Text style={styles.selectorText}>
           {selectedCar
-            ? `${selectedCar.plateNumber} (${selectedCar.make} ${selectedCar.model})`
-            : 'Select your current car'}
+            ? `${selectedCar.brand} ${selectedCar.model} - ${selectedCar.plateNumber}`
+            : "Select your current car"}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> 
 
       <Modal
         animationType="slide"
@@ -58,7 +64,9 @@ const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
           <View style={styles.modalContainer}>
             <TouchableWithoutFeedback onPress={handleModalPress}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Which car are you driving?</Text>
+                <Text style={styles.modalTitle}>
+                  Which car are you driving?
+                </Text>
                 <FlatList
                   data={cars}
                   renderItem={renderItem}
@@ -80,6 +88,4 @@ const CarSelector = ({ cars, selectedCar, onSelect, style }) => {
   );
 };
 
-
-
-export default CarSelector; 
+export default CarSelector;
