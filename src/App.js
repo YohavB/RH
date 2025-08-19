@@ -1,4 +1,7 @@
-import React, { useEffect } from "react";
+// Suppress Firebase deprecation warnings during migration to v23+ modular API
+globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
+
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View, StatusBar, Platform } from "react-native";

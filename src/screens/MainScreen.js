@@ -29,7 +29,12 @@ import {
 import UserCarsRelations from "../components/UserCarsRelations";
 import NotificationService from "../services/NotificationService";
 import { PermissionsAndroid } from "react-native";
-import { getMessaging, getApp } from "../firebase/config";
+import { 
+  getMessaging, 
+  getApp, 
+  requestPermission, 
+  AuthorizationStatus 
+} from '@react-native-firebase/messaging';
 
 const MainScreen = ({ navigation, route }) => {
   // Screen load logging and reset navigation stack
@@ -113,7 +118,7 @@ const MainScreen = ({ navigation, route }) => {
   async function requestUserPermission() {
     try {
       const messaging = getMessaging(getApp());
-      const authStatus = await messaging.requestPermission({
+      const authStatus = await requestPermission(messaging, {
         alert: true,
         announcement: false,
         badge: true,
@@ -124,8 +129,8 @@ const MainScreen = ({ navigation, route }) => {
       });
       
       const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        authStatus === AuthorizationStatus.AUTHORIZED ||
+        authStatus === AuthorizationStatus.PROVISIONAL;
     
       if (enabled) {
         console.log('Authorization status:', authStatus);

@@ -1,12 +1,12 @@
 import { registerRootComponent } from "expo";
 import App from "./src/App";
-import { getMessaging } from "@react-native-firebase/messaging";
+import { getMessaging, setBackgroundMessageHandler } from "@react-native-firebase/messaging";
 import { getApp } from "@react-native-firebase/app";
 import { Platform } from "react-native";
 
 // Set up background message handler using Firebase v23+ modular API
 const messaging = getMessaging(getApp());
-messaging.setBackgroundMessageHandler(async (remoteMessage) => {
+setBackgroundMessageHandler(messaging, async (remoteMessage) => {
   console.log("Message handled in the background!", remoteMessage);
   
   // Play custom sound for background notifications based on type

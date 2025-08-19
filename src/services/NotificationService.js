@@ -1,5 +1,14 @@
 import { Platform } from 'react-native';
 import { getMessaging, getApp } from '../firebase/config';
+import { 
+  requestPermission, 
+  onMessage, 
+  onNotificationOpenedApp, 
+  getInitialNotification,
+  getToken as getFCMToken,
+  deleteToken as deleteFCMToken,
+  AuthorizationStatus
+} from '@react-native-firebase/messaging';
 import { getSoundType } from '../config/notificationSounds';
 
 class NotificationService {
@@ -13,7 +22,7 @@ class NotificationService {
     try {
       // Request permission with sound enabled using Firebase v23+ modular API
       const messaging = getMessaging(getApp());
-      const authStatus = await messaging.requestPermission({
+      const authStatus = await requestPermission(messaging, {
         alert: true,
         announcement: false,
         badge: true,
@@ -26,19 +35,19 @@ class NotificationService {
       console.log('Notification permission status:', authStatus);
 
       // Set up foreground message handler using Firebase v23+ modular API
-      this.unsubscribeForeground = messaging.onMessage(async (remoteMessage) => {
+      this.unsubscribeForeground = onMessage(messaging, async (remoteMessage) => {
         console.log('Foreground message received:', remoteMessage);
         this.handleForegroundMessage(remoteMessage);
       });
 
       // Set up notification opened handler using Firebase v23+ modular API
-      this.unsubscribeNotificationOpened = messaging.onNotificationOpenedApp(remoteMessage => {
+      this.unsubscribeNotificationOpened = onNotificationOpenedApp(messaging, remoteMessage => {
         console.log('Notification opened app:', remoteMessage);
         this.handleNotificationOpened(remoteMessage);
       });
 
       // Check if app was opened from a notification using Firebase v23+ modular API
-      messaging.getInitialNotification().then(remoteMessage => {
+      getInitialNotification(messaging).then(remoteMessage => {
         if (remoteMessage) {
           console.log('App opened from notification:', remoteMessage);
           this.handleNotificationOpened(remoteMessage);
@@ -79,7 +88,7 @@ class NotificationService {
   async getToken() {
     try {
       const messaging = getMessaging(getApp());
-      const token = await messaging.getToken();
+      const token = await getFCMToken(messaging);
       console.log('FCM Token:', token);
       return token;
     } catch (error) {
@@ -91,7 +100,7 @@ class NotificationService {
   async deleteToken() {
     try {
       const messaging = getMessaging(getApp());
-      await messaging.deleteToken();
+      await deleteFCMToken(messaging);
       console.log('FCM Token deleted');
     } catch (error) {
       console.error('Error deleting FCM token:', error);
