@@ -1,19 +1,22 @@
-import * as firebase from "firebase";
-import "@firebase/auth";
-import "@firebase/firestore";
+import { initializeApp, getApps, getApp } from '@react-native-firebase/app';
+import { getAuth } from '@react-native-firebase/auth';
+import { getMessaging } from '@react-native-firebase/messaging';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCTk0uX6U_vABHf-hGaVSNhj2HRWPaNELc",
-  authDomain: "your-auth-domain-b1234.firebaseapp.com",
-  databaseURL: "https://your-database-name.firebaseio.com",
+  authDomain: "rushhour-yohavb.firebaseapp.com",
+  databaseURL: "https://rushhour-yohavb-default-rtdb.firebaseio.com",
   projectId: "rushhour-yohavb",
-  storageBucket: "your-project-id-1234.appspot.com",
-  messagingSenderId: "12345-insert-yourse",
-  appId: "insert yours: 1:1234:web:ee873bd1234c0deb7eba61ce",
+  storageBucket: "rushhour-yohavb.appspot.com",
+  messagingSenderId: "864165576083",
+  appId: "1:864165576083:web:ee873bd1234c0deb7eba61ce",
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+// Initialize Firebase if not already initialized
+if (getApps().length === 0) {
+  initializeApp(firebaseConfig);
 }
 
-export { firebase };
+// Export the Firebase service instances using the new modular v23+ API
+// Use getApp() and getXxx() functions for the new API pattern
+export { getApp, getAuth, getMessaging };

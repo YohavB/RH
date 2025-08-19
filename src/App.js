@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { View, StatusBar } from "react-native";
+import { View, StatusBar, Platform } from "react-native";
 import Login from "./screens/LoginScreen";
 import MainScreen from "./screens/MainScreen";
 import Settings from "./screens/SettingsScreen";
@@ -15,7 +15,6 @@ import { store } from "./redux/store";
 import GlobalStyle, { Colors } from "./styles/GlobalStyle";
 import CustomAlertProvider from "./components/CustomAlertProvider";
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
-
 const Stack = createStackNavigator();
 
 // Default navigation theme with a white background

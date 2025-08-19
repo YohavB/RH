@@ -85,14 +85,14 @@ const apiCall = async <T>(url: string, method: 'get' | 'post' | 'put' | 'delete'
     // Setup auth header before each request
     setupAuthHeader();
     
-    console.log(`🌐 Making ${method.toUpperCase()} request to: ${BASE_URL}${url}`);
+    console.log(`Making ${method.toUpperCase()} request to: ${BASE_URL}${url}`);
     if (data) {
-      console.log(`📤 Request data:`, JSON.stringify(data, null, 2));
+      console.log(`Request data:`, JSON.stringify(data, null, 2));
     }
     
     const response = await axiosInstance[method](url, data);
     
-    console.log(`✅ Response received:`, response.status);
+    console.log(`✅ Response received ${method.toUpperCase()} ${url} :`, response.status);
     return response.data;
   } catch (error) {
     const errorResponse = handleError(error);
@@ -209,7 +209,8 @@ export const deactivateCurrentUser = async (): Promise<void> => {
 };
 
 export const updatePushNotificationToken = async (pushNotificationToken: string): Promise<UserDTO> => {
-  return apiCall<UserDTO>('/api/v1/user/push-notification-token', 'put', pushNotificationToken);
+  // Send the token as a query parameter since the backend expects @RequestParam
+  return apiCall<UserDTO>(`/api/v1/user/push-notification-token?token=${encodeURIComponent(pushNotificationToken)}`, 'put');
 };
 
 

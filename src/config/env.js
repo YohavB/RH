@@ -4,7 +4,7 @@ export const ENV = {
   ENVIRONMENT: process.env.NODE_ENV || 'DEVELOPMENT', // 'DEVELOPMENT' | 'PRODUCTION'
   
   // API Configuration
-  API_URL: process.env.API_URL || 'http://192.168.0.110:8008',  // Local server URL
+  API_URL: process.env.API_URL || 'http://192.168.1.48:8008',  // Local server URL
   
 };
 

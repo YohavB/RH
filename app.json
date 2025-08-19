@@ -5,14 +5,14 @@
     "slug": "RushHour",
     "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./src/assets/images/RushHour_logo_v2.png",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./src/assets/images/RushHour_logo_v2.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FF9E4E"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "url": "https://u.expo.dev/43444348-9663-4af8-aaa7-188ed46f6d8c"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -20,39 +20,58 @@
     "ios": {
       "bundleIdentifier": "com.rushhour",
       "googleServicesFile": "./GoogleService-Info.plist",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "entitlements": {
+        "aps-environment": "production"
+      },
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification",
+          "background-processing"
+        ],
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "REVERSED_CLIENT_ID",
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.864165576083-ql4f8beguutmtrel407bbqog25otpu21"
+            ]
+          }
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./src/assets/images/RushHour_logo_v2.png",
+        "backgroundColor": "#FF9E4E"
       },
       "package": "com.rushhour",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "notification": {
+        "icon": "@drawable/notification_icon_simple",
+        "color": "#FF6B35"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.WAKE_LOCK",
+        "android.permission.VIBRATE",
+        "android.permission.RECEIVE_BOOT_COMPLETED"
+      ]
     },
     "web": {
-      "favicon": "./assets/images/logo.png"
+      "favicon": "./src/assets/images/RushHour_logo_v2.png"
     },
     "plugins": [
-      [
-        "@react-native-google-signin/google-signin"
-      ],
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/images/logo.png",
-          "iosDisplayInForeground": true,
-          "sounds": [
-            "./assets/sounds/car_horn.wav",
-            "./assets/sounds/double_car_horn.wav"
-          ]
-        }
-      ]
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      "expo-font"
     ],
     "extra": {
       "eas": {
         "projectId": "43444348-9663-4af8-aaa7-188ed46f6d8c"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

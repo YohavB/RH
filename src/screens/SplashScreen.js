@@ -8,6 +8,7 @@ import ScreenContainer from "../components/ScreenContainer";
 import { ScreenNames } from "./ScreenNames";
 import GoogleSignInService from "../services/GoogleSignInService";
 import SplashAnimationService from "../services/SplashAnimationService";
+import NotificationService from "../services/NotificationService";
 import {
   setUserCars,
   setUserInfo,
@@ -59,12 +60,22 @@ const SplashScreen = ({ navigation }) => {
     }
   }, [animationComplete, authComplete, authSuccess, navigation]);
 
+  // Cleanup notification service when component unmounts
+  useEffect(() => {
+    return () => {
+      NotificationService.cleanup();
+    };
+  }, []);
+
   // Start animation and authentication in parallel when component mounts
   useEffect(() => {
     console.log("Splash Screen Loaded");
     firstTestServerConnectivity();
     startAnimation();
     startAuthenticationFlow();
+    
+    // Initialize notification service
+    NotificationService.initialize();
   }, []);
 
   useEffect(() => {

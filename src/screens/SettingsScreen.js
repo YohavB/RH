@@ -14,6 +14,7 @@ import CarCard from "../components/CarCard";
 import DeleteNotification from "../components/DeleteNotification";
 import { ScreenNames } from "./ScreenNames";
 import GoogleSignInService from "../services/GoogleSignInService";
+import FirebaseTest from "../components/FirebaseTest";
 
 const Settings = ({ navigation, route }) => {
   // Get the source from route params to understand where user came from
@@ -240,6 +241,19 @@ const Settings = ({ navigation, route }) => {
               >
                 <Text style={styles.addCarText}>Add another car</Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Firebase Test Section */}
+            <View style={styles.section}>
+              <SectionHeader
+                title="Firebase Test"
+                icon={
+                  <View style={styles.iconContainer}>
+                    <Text style={styles.iconText}>🔥</Text>
+                  </View>
+                }
+              />
+              <FirebaseTest />
             </View>
           </View>
         </View>

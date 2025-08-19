@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Keyboard,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Alert } from "../components/CustomAlert";
@@ -23,17 +24,68 @@ import {
   findOrCreateCar,
   getCurrentUserCarRelations,
   removeAllCarRelations,
+  updatePushNotificationToken,
 } from "../BE_Api/ApiManager";
 import UserCarsRelations from "../components/UserCarsRelations";
+import NotificationService from "../services/NotificationService";
+import { PermissionsAndroid } from "react-native";
+import { getMessaging, getApp } from "../firebase/config";
 
 const MainScreen = ({ navigation, route }) => {
   // Screen load logging and reset navigation stack
+  const [userCarsRelations, setUserCarsRelations] = useState(null);
+  const [plateNumber, setPlateNumber] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Redux state
   const {
     userInfo,
     userCars = [],
     userToken,
   } = useSelector((state) => state.user) || {};
-  const [userCarsRelations, setUserCarsRelations] = useState(null);
+
+  const getUserDisplayName = () => {
+    return `${userInfo?.firstName || 'User'}`;
+  };
+
+  const userName = getUserDisplayName();
+  const hasRegisteredCars = userCars && userCars.length > 0;
+
+  useEffect(() => {
+    const getTokenAndUpdate = async () => {
+      const pushNotificationToken = await getPushNotificationToken();
+      console.log("🔔 PUSH NOTIFICATION TOKEN !!!! :", pushNotificationToken);
+
+      if (!userInfo.pushNotificationToken || pushNotificationToken === null) {
+      console.log("user has no push notification token, requesting from user");
+      // request push notification token from user
+      //if ios, request permission
+      if (Platform.OS === "ios") {
+        requestUserPermission();
+      }
+      //if android, request permission
+      if (Platform.OS === "android") {
+        PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS).then((granted) => {
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log("You can use the POST_NOTIFICATIONS");
+          } else {
+            console.log("POST_NOTIFICATIONS permission denied");
+          }
+        });
+      }
+    }
+
+      if (!userInfo.pushNotificationToken || userInfo.pushNotificationToken !== pushNotificationToken) {
+        console.log("updating push notification token");
+        updatePushNotificationToken(pushNotificationToken);
+      }else{
+        console.log("push notification token is already up to date");
+      }
+    };
+
+    getTokenAndUpdate();
+  }, [userInfo]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -58,22 +110,53 @@ const MainScreen = ({ navigation, route }) => {
     }, [route?.params?.source])
   );
 
-  const [plateNumber, setPlateNumber] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  async function requestUserPermission() {
+    try {
+      const messaging = getMessaging(getApp());
+      const authStatus = await messaging.requestPermission({
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true, // This is crucial for sound!
+      });
+      
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    
+      if (enabled) {
+        console.log('Authorization status:', authStatus);
+        console.log('Sound permission granted:', authStatus);
+      } else {
+        console.log('Notification permission denied');
+      }
+      
+      return enabled;
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      return false;
+    }
+  }
 
-  const getUserDisplayName = () => {
-    return `${userInfo.firstName}`;
-  };
+  const getPushNotificationToken = async () => {
+    try {
+      const pushNotificationToken = await NotificationService.getToken();
+      console.log("FCM pushNotificationToken", pushNotificationToken);
+      return pushNotificationToken;
+    } catch (error) {
+      console.error("Error getting push notification token:", error);
+      return null;
+    }
+  }
 
   const getUserCarsRelation = async () => {
     const response = await getCurrentUserCarRelations();
     console.log("🚗 USER CARS RELATIONS:", response);
     setUserCarsRelations(response);
   };
-
-  const userName = getUserDisplayName();
-  const hasRegisteredCars = userCars && userCars.length > 0;
 
   const handleCameraPress = () => {
     Keyboard.dismiss();

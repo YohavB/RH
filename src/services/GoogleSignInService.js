@@ -1,8 +1,7 @@
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
-import {
-  GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { getAuth, getApp } from "../firebase/config";
+import { GoogleAuthProvider } from '@react-native-firebase/auth';
 
 class GoogleSignInService {
   constructor() {
@@ -27,7 +26,7 @@ class GoogleSignInService {
   }
 
   isSuccessResponse(response) {
-    return response && response.data;
+    return response && response.user && response.idToken;
   }
 
   isErrorWithCode(error) {
@@ -40,33 +39,47 @@ class GoogleSignInService {
 
   async signInWithGoogle() {
     try {
-      console.log("signInWithGoogle");
       await GoogleSignin.hasPlayServices();
-      const response = await GoogleSignin.signIn();
-      if (this.isSuccessResponse(response)) {
-        return { success: true, data: response.data };
+      const { idToken } = await GoogleSignin.signIn();
+      
+      // Create a Google credential with the token
+      const credential = GoogleAuthProvider.credential(idToken);
+      
+      // Sign in to Firebase with the credential using Firebase v23+ modular API
+      const auth = getAuth(getApp());
+      const userCredential = await auth.signInWithCredential(credential);
+      
+      if (userCredential && userCredential.user) {
+        return { 
+          success: true, 
+          data: {
+            user: userCredential.user,
+            idToken: idToken
+          }
+        };
       } else {
-        console.log("Sign in cancelled by user");
-        return { success: false, error: "Sign in cancelled by user" };
+        return { success: false, error: "Invalid response from Firebase Auth" };
       }
     } catch (error) {
+      console.log("signInWithGoogle error", error);
+      
       if (this.isErrorWithCode(error)) {
         switch (error.code) {
-          case statusCodes.IN_PROGRESS:
-            console.log("Sign in already in progress");
+          case 'SIGN_IN_CANCELLED':
+            return { success: false, error: "Sign in cancelled by user" };
+          case 'IN_PROGRESS':
             return { success: false, error: "Sign in already in progress" };
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            console.log("Play services not available");
+          case 'PLAY_SERVICES_NOT_AVAILABLE':
             return { success: false, error: "Play services not available" };
+          case 'SIGN_IN_REQUIRED':
+            return { success: false, error: "Sign in required" };
           default:
-            console.log("Some other error happened");
-            return { success: false, error: "Some other error happened" };
+            return { success: false, error: `Google Sign-In error: ${error.code}` };
         }
       } else {
-        console.log("An error that's not related to google sign in occurred");
         return {
           success: false,
-          error: "An error that's not related to google sign in occurred",
+          error: error.message || "An unexpected error occurred during Google Sign-In",
         };
       }
     }
@@ -74,33 +87,94 @@ class GoogleSignInService {
 
   async getGoogleCurrentUserSilently() {
     try {
-      console.log("getGoogleCurrentUserSilently");
-      const response = await GoogleSignin.signInSilently();
-      if (this.isSuccessResponse(response)) {
-        console.log("getGoogleCurrentUserSilently success");
-        return { success: true, data: response.data };
-      } else if (this.isNoSavedCredentialFoundResponse(response)) {
-        console.log("getGoogleCurrentUserSilently no saved credential found");
+      console.log("Attempting silent Google sign-in...");
+      
+      // Check if user is already signed in
+      const isSignedIn = await GoogleSignin.isSignedIn();
+      if (!isSignedIn) {
+        console.log("User not signed in to Google, silent sign-in not possible");
+        return {
+          success: false,
+          error: "User not signed in to Google"
+        };
+      }
+
+      const { idToken } = await GoogleSignin.signInSilently();
+      console.log("Silent sign-in successful, got idToken");
+      
+      // Create a Google credential with the token
+      const credential = GoogleAuthProvider.credential(idToken);
+      console.log("Created Google credential");
+      
+      // Sign in to Firebase with the credential using Firebase v23+ modular API
+      const auth = getAuth(getApp());
+      const userCredential = await auth.signInWithCredential(credential);
+      console.log("Firebase sign-in successful");
+      
+      if (userCredential && userCredential.user) {
+        return { 
+          success: true, 
+          data: {
+            user: userCredential.user,
+            idToken: idToken
+          }
+        };
+      } else {
         return { success: false, error: "No saved credential found" };
       }
     } catch (error) {
-      console.log("getGoogleCurrentUserSilently error");
-      console.log(error);
-      return {
-        success: false,
-        error: error.message || "Failed to get google current user silently",
-      };
+      console.error("Silent sign-in error details:", error);
+      console.error("Error stack:", error.stack);
+      
+      // Check for specific Google Sign-In errors
+      if (this.isErrorWithCode(error)) {
+        switch (error.code) {
+          case 'SIGN_IN_REQUIRED':
+            return { success: false, error: "Sign in required - user not authenticated" };
+          case 'IN_PROGRESS':
+            return { success: false, error: "Sign in already in progress" };
+          case 'PLAY_SERVICES_NOT_AVAILABLE':
+            return { success: false, error: "Play services not available" };
+          default:
+            return { success: false, error: `Google Sign-In error: ${error.code}` };
+        }
+      } else {
+        return {
+          success: false,
+          error: error.message || "Failed to get google current user silently",
+        };
+      }
     }
   }
 
   async signOutWithGoogle() {
     try {
+      // Sign out from Firebase using Firebase v23+ modular API
+      const auth = getAuth(getApp());
+      await auth.signOut();
+      
+      // Clear any existing sign-in state
+      await GoogleSignin.clearCachedToken();
+      
+      // Sign out from Google
       await GoogleSignin.signOut();
+      
       return { success: true };
     } catch (error) {
-      console.log("Sign out error:", error);
       return { success: false, error: error.message || "Failed to sign out" };
     }
+  }
+
+  // Get current Firebase user using Firebase v23+ modular API
+  getCurrentUser() {
+    const auth = getAuth(getApp());
+    return auth.currentUser;
+  }
+
+  // Listen to auth state changes using Firebase v23+ modular API
+  onAuthStateChanged(callback) {
+    const auth = getAuth(getApp());
+    return auth.onAuthStateChanged(callback);
   }
 }
 
