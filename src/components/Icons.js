@@ -156,3 +156,29 @@ export const CheckMarkIcon = ({ size = 24, color = Colors.mainGreen, style }) =>
     </View>
   );
 };
+
+export const ChevronLeftIcon = ({ size = 24, color = Colors.mainOrange, style }) => {
+  return (
+    <View style={style}>
+      <Svg width={size} height={size} viewBox="0 0 299 511.517" fill="none">
+        <Path
+          d="M286.421 75.262c36.893-64.702-15.581-96.094-51.926-60.145L25.08 215.793c-33.44 33.44-33.44 46.491 0 79.93L234.495 496.4c36.345 35.949 88.819 4.557 51.926-60.146L189.16 255.758l97.261-180.496z"
+          fill={color}
+        />
+      </Svg>
+    </View>
+  );
+};
+
+export const ChevronRightIcon = ({ size = 24, color = Colors.mainOrange, style }) => {
+  return (
+    <View style={style}>
+      <Svg width={size} height={size} viewBox="0 0 299 511.517" fill="none">
+        <Path
+          d="M12.579 75.262C-24.314 10.56 28.16-20.832 64.505 15.117L273.92 215.793c33.44 33.44 33.44 46.491 0 79.93L64.505 496.4c-36.345 35.949-88.819 4.557-51.926-60.146l97.261-180.496L12.579 75.262z"
+          fill={color}
+        />
+      </Svg>
+    </View>
+  );
+};

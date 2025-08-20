@@ -15,11 +15,101 @@ export default StyleSheet.create({
   userCarsRelationsList: {
     flex: 1,
   },
-  userCarsRelationItem: {
+  carouselScrollView: {
+    flex: 1,
+    borderWidth: 10,
+    borderColor: '#96CEB4', // Green
+  },
+  carouselContainer: {
+    paddingHorizontal: 20,
+    borderWidth: 10,
+    borderColor: '#FFEAA7', // Yellow
+  },
+  userCarsRelationItemFirst: {
+    marginLeft: 0,
+    borderWidth: 1,
+    borderColor: '#98D8C8', // Mint
+  },
+  userCarsRelationItemLast: {
+    marginRight: 0,
+    borderWidth: 1,
+    borderColor: '#F7DC6F', // Gold
+  },
+  carouselIndicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  carouselDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.mediumGray,
+    marginHorizontal: 4,
+  },
+  carouselDotActive: {
+    backgroundColor: Colors.mainOrange,
+    width: 10,
+    height: 10,
+  },
+  carouselNavigationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: '10%',
+  },
+  navigationButton: {
+    minWidth: 48,
+    minHeight: 48,
+    marginTop: 5,
+    borderRadius: 24,
+    backgroundColor: Colors.white,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 2,
+    borderColor: Colors.gradientOrange,
+    padding: 12,
+  },
+  navigationButtonDisabled: {
+    borderColor: Colors.mediumGray,
+    backgroundColor: Colors.inputBackground,
+    shadowOpacity: 0.05,
+    elevation: 1,
+  },
+  navigationButtonActive: {
+    backgroundColor: Colors.gradientOrange,
+    transform: [{ scale: 0.95 }],
+  },
+  scrollHintText: {
+    textAlign: 'center',
+    color: Colors.mediumGray,
+    fontSize: 14,
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  cardContainer: {
     backgroundColor: Colors.white,
     borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    padding: 10,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: Colors.gradientOrange,
   },
   userCarSection: {
     borderBottomWidth: 1,
@@ -98,6 +188,8 @@ export default StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#F8BBD9', // Light Pink
   },
   needToGoButtonText: {
     color: Colors.white,
@@ -108,7 +200,7 @@ export default StyleSheet.create({
     width: "50%",
     backgroundColor: Colors.white,
     borderWidth: 1,
-    borderColor: Colors.mainOrange,
+    borderColor: Colors.gradientOrange,
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -156,5 +248,5 @@ export default StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-  }
+  },
 });
