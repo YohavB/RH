@@ -59,6 +59,13 @@ const MainScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const getTokenAndUpdate = async () => {
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Running on iOS Simulator - Push notifications not supported');
+        console.log('📱 Please test on a physical iOS device for push notification functionality');
+        return;
+      }
+
       const pushNotificationToken = await getPushNotificationToken();
       console.log("🔔 PUSH NOTIFICATION TOKEN !!!! :", pushNotificationToken);
 
@@ -117,7 +124,15 @@ const MainScreen = ({ navigation, route }) => {
 
   async function requestUserPermission() {
     try {
-      const messaging = getMessaging(getApp());
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Cannot request notification permission on iOS Simulator');
+        console.log('📱 Please test on a physical iOS device');
+        return false;
+      }
+
+      const app = getApp();
+      const messaging = getMessaging(app);
       const authStatus = await requestPermission(messaging, {
         alert: true,
         announcement: false,
@@ -148,6 +163,13 @@ const MainScreen = ({ navigation, route }) => {
 
   const getPushNotificationToken = async () => {
     try {
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Cannot get push notification token on iOS Simulator');
+        console.log('📱 Please test on a physical iOS device');
+        return null;
+      }
+
       const pushNotificationToken = await NotificationService.getToken();
       console.log("FCM pushNotificationToken", pushNotificationToken);
       return pushNotificationToken;
@@ -234,107 +256,123 @@ const MainScreen = ({ navigation, route }) => {
   };
 
   return (
-    <ScreenContainer>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <TouchableOpacity
-            style={styles.profileButton}
-            onPress={handleProfilePress}
-          >
-            <ProfileIcon size={30} gradient={Gradients.orangeToPink} />
-          </TouchableOpacity>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={styles.welcomeContainer}>
-              <Text style={styles.welcomeText}>Welcome back,</Text>
-              <Text style={styles.nameText}>{userName}</Text>
-            </View>
+    <ScreenContainer safeArea={true}>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={handleProfilePress}
+        >
+          <ProfileIcon size={30} gradient={Gradients.orangeToPink} />
+        </TouchableOpacity>
+        
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollViewContent}
+          bounces={true}
+          alwaysBounceVertical={false}
+          style={styles.scrollView}
+          scrollEnabled={true}
+          directionalLockEnabled={true}
+          showsHorizontalScrollIndicator={false}
+          overScrollMode="never"
+          {...(Platform.OS === 'ios' && {
+            automaticallyAdjustContentInsets: false,
+            contentInsetAdjustmentBehavior: 'never',
+            contentInset: { bottom: 0 },
+          })}
+        >
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.nameText}>{userName}</Text>
+          </View>
 
-            <View style={styles.contentContainer}>
-              <View style={styles.contentContainerStyle}>
-                {!hasRegisteredCars ? (
-                  <>
-                    <Text style={styles.noCarText}>
-                      Before using {APP_CONFIG.APP_NAME} you must have a
-                      registered car.{"\n\n"}
-                      Please go to settings to add your car.
+          <View style={styles.contentContainer}>
+            <View style={styles.contentContainerStyle}>
+              {!hasRegisteredCars ? (
+                <>
+                  <Text style={styles.noCarText}>
+                    Before using {APP_CONFIG.APP_NAME} you must have a
+                    registered car.{"\n\n"}
+                    Please go to settings to add your car.
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.goToSettingsButton}
+                    onPress={handleGoToSettings}
+                  >
+                    <Text style={styles.goToSettingsButtonText}>
+                      Go to Settings
                     </Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.instructionText}>
+                    Are you blocking a car ? Or being blocked ? Let's check it
+                    out !
+                  </Text>
 
-                    <TouchableOpacity
-                      style={styles.goToSettingsButton}
-                      onPress={handleGoToSettings}
-                    >
-                      <Text style={styles.goToSettingsButtonText}>
-                        Go to Settings
-                      </Text>
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.instructionText}>
-                      Are you blocking a car ? Or being blocked ? Let's check it
-                      out !
-                    </Text>
+                  <View style={styles.cameraButtonContainer}>
+                    <CameraButton
+                      onPress={handleCameraPress}
+                      disabled={isLoading}
+                    />
+                  </View>
 
-                    <View style={styles.cameraButtonContainer}>
-                      <CameraButton
-                        onPress={handleCameraPress}
-                        disabled={isLoading}
+                  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View>
+                      <PlateNumberInput
+                        plateNumber={plateNumber}
+                        setPlateNumber={setPlateNumber}
+                        selectedCountry={selectedCountry}
+                        setSelectedCountry={setSelectedCountry}
+                        onSubmit={isButtonDisabled ? null : handleSubmit}
+                        isLoading={isLoading}
+                        style={styles.inputContainer}
+                      />
+
+                      <TouchableOpacity
+                        style={[
+                          styles.submitButton,
+                          isButtonDisabled && styles.submitButtonDisabled,
+                        ]}
+                        onPress={handleSubmit}
+                        disabled={isButtonDisabled}
+                      >
+                        <Text
+                          style={[
+                            styles.submitButtonText,
+                            isButtonDisabled && styles.submitButtonTextDisabled,
+                          ]}
+                        >
+                          Check
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableWithoutFeedback>
+
+                  {userCarsRelations && userCarsRelations.length > 0 && (
+                    <View style={styles.userCarsRelationsContainer}>
+                      <UserCarsRelations
+                        userCarsRelations={userCarsRelations}
+                        userCarLeft={userCarLeft}
                       />
                     </View>
-
-                    <PlateNumberInput
-                      plateNumber={plateNumber}
-                      setPlateNumber={setPlateNumber}
-                      selectedCountry={selectedCountry}
-                      setSelectedCountry={setSelectedCountry}
-                      onSubmit={isButtonDisabled ? null : handleSubmit}
-                      isLoading={isLoading}
-                      style={styles.inputContainer}
-                    />
-
-                    <TouchableOpacity
-                      style={[
-                        styles.submitButton,
-                        isButtonDisabled && styles.submitButtonDisabled,
-                      ]}
-                      onPress={handleSubmit}
-                      disabled={isButtonDisabled}
-                    >
-                      <Text
-                        style={[
-                          styles.submitButtonText,
-                          isButtonDisabled && styles.submitButtonTextDisabled,
-                        ]}
-                      >
-                        Check
-                      </Text>
-                    </TouchableOpacity>
-
-                    {userCarsRelations && userCarsRelations.length > 0 && (
-                      <View style={styles.userCarsRelationsContainer}>
-                        <UserCarsRelations
-                          userCarsRelations={userCarsRelations}
-                          userCarLeft={userCarLeft}
-                        />
-                      </View>
-                    )}
-                  </>
-                )}
-              </View>
+                  )}
+                </>
+              )}
             </View>
-          </ScrollView>
+          </View>
+        </ScrollView>
 
-          {isLoading && (
-            <View style={styles.loadingOverlay}>
-              <RushHourLoader color={Colors.mainOrange} />
-              <Text style={styles.loadingText}>Searching...</Text>
-            </View>
-          )}
-        </View>
-      </TouchableWithoutFeedback>
+        {isLoading && (
+          <View style={styles.loadingOverlay}>
+            <RushHourLoader color={Colors.mainOrange} />
+            <Text style={styles.loadingText}>Searching...</Text>
+          </View>
+        )}
+      </View>
     </ScreenContainer>
   );
 };

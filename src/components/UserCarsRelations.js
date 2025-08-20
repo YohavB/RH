@@ -157,7 +157,7 @@ const UserCarsRelations = ({ userCarsRelations = [], userCarLeft }) => {
         decelerationRate={0.8}
         snapToAlignment="center"
         contentContainerStyle={{
-          paddingHorizontal: (SCREEN_WIDTH - CARD_WIDTH) / 2, // center first & last card
+          paddingHorizontal: (SCREEN_WIDTH - CARD_WIDTH) / 4, // center first & last card
         }}
         renderItem={({ item, index }) => {
           if (!item || typeof item !== "object") return null;

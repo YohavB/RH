@@ -64,7 +64,7 @@ const CarCard = ({ car, onDelete, isLastCar }) => {
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Year:</Text>
-              <Text style={styles.detailValue}>{car.year}</Text>
+              <Text style={styles.detailValue}>{car.manufacturingYear}</Text>
             </View>
 
             <View style={styles.detailRow}>

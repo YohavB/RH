@@ -113,7 +113,7 @@ export interface CarDTO {
   brand: Brands;
   model: string;
   color: Colors;
-  year: number;
+  manufacturingYear: number;
   carLicenseExpireDate?: string;
   hasOwner: boolean;
 }

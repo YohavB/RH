@@ -248,7 +248,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Year:</Text>
-            <Text style={styles.detailValue}>{foundCar.year}</Text>
+            <Text style={styles.detailValue}>{foundCar.manufacturingYear}</Text>
           </View>
 
           <View style={[styles.detailRow, styles.lastDetailRow]}>

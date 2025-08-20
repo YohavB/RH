@@ -57,8 +57,6 @@ export default StyleSheet.create({
     marginBottom: 24,
   },
   cardContainer: {
-    position: "absolute",
-    top: "25%",
     width: "80%",
     borderRadius: 16,
     backgroundColor: Colors.white,
@@ -71,7 +69,6 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     padding: 10,
-    marginBottom: 32,
     borderWidth: 1,
     borderColor: Colors.mainOrange,
   },
@@ -99,7 +96,7 @@ export default StyleSheet.create({
   },
   buttonsContainer: {
     width: "100%",
-    marginTop: "auto",
+    marginTop:20,
   },
   blockingButtonsContainer: {
     display: "flex",

@@ -20,8 +20,18 @@ class NotificationService {
     if (this.isInitialized) return;
 
     try {
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Running on iOS Simulator - Push notifications are not supported');
+        console.log('📱 Please test on a physical iOS device for push notification functionality');
+        this.isInitialized = true;
+        return;
+      }
+
       // Request permission with sound enabled using Firebase v23+ modular API
-      const messaging = getMessaging(getApp());
+      const app = getApp();
+      const messaging = getMessaging(app);
+      
       const authStatus = await requestPermission(messaging, {
         alert: true,
         announcement: false,
@@ -87,7 +97,15 @@ class NotificationService {
 
   async getToken() {
     try {
-      const messaging = getMessaging(getApp());
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Cannot get FCM token on iOS Simulator');
+        console.log('📱 Please test on a physical iOS device');
+        return null;
+      }
+
+      const app = getApp();
+      const messaging = getMessaging(app);
       const token = await getFCMToken(messaging);
       console.log('FCM Token:', token);
       return token;
@@ -99,7 +117,14 @@ class NotificationService {
 
   async deleteToken() {
     try {
-      const messaging = getMessaging(getApp());
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Cannot delete FCM token on iOS Simulator');
+        return;
+      }
+
+      const app = getApp();
+      const messaging = getMessaging(app);
       await deleteFCMToken(messaging);
       console.log('FCM Token deleted');
     } catch (error) {
@@ -111,6 +136,14 @@ class NotificationService {
   async testNotification() {
     try {
       console.log('Testing notification service...');
+      
+      // Check if running on simulator
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('⚠️ Push notifications not supported on iOS Simulator');
+        console.log('📱 Please test on a physical iOS device');
+        return false;
+      }
+
       const token = await this.getToken();
       if (token) {
         console.log('✅ Notification service is working. Token:', token);

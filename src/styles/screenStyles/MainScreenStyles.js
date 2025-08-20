@@ -6,6 +6,14 @@ export default StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingBottom: 5,
+    minHeight: '100%',
+  },
   profileButton: {
     position: 'absolute',
     top: 10,
@@ -35,10 +43,12 @@ export default StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    width: '100%',
   },
   contentContainerStyle: {
     alignItems: 'center',
-    paddingBottom: 40, // Add some bottom padding for scrolling
+    paddingBottom: 20, // Reduced from 40 to match scrollViewContent
+    width: '100%',
   },
   instructionText: {
     fontSize: 16,
