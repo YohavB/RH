@@ -6,7 +6,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { Countries, getAllCountries, getCountryInfo } from "../BE_Api/ServerDTOs";
+import { Countries, getAllCountries, getCountryInfo } from "../utils/Countries";
 import { Colors } from "../styles/GlobalStyle";
 import styles from "../styles/componentStyles/CountryPickerStyles";
 import PickerIcon from "../assets/icons/earth_picker.svg";
@@ -22,7 +22,7 @@ const CountryPicker = ({ value, onValueChange, style }) => {
 
   const countryList = getAllCountries();
 
-  const selectedCountry = getCountryInfo(value);
+  const selectedCountry = value !== null ? getCountryInfo(value) : null;
 
   return (
     <View style={[styles.container, style]}>
@@ -30,7 +30,7 @@ const CountryPicker = ({ value, onValueChange, style }) => {
         style={styles.pickerButton}
         onPress={() => setModalVisible(true)}
       >
-        {selectedCountry && selectedCountry.code !== 'UNKNOWN' ? (
+        {selectedCountry && selectedCountry.code !== 'UNKNOWN' && value !== null ? (
           <>
             <Text style={styles.flagText}>{selectedCountry.flag}</Text>
             <Text style={styles.codeText}>{selectedCountry.code}</Text>
@@ -66,7 +66,7 @@ const CountryPicker = ({ value, onValueChange, style }) => {
                     <Text style={styles.countryCode}>{item.code}</Text>
                     <Text style={styles.countryName}>{item.name}</Text>
                   </View>
-                  {value === item.value && (
+                  {value !== null && value === item.value && (
                     <View style={styles.selectedIndicator} />
                   )}
                 </TouchableOpacity>

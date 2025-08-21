@@ -17,6 +17,7 @@ import CameraButton from "../components/CameraButton";
 import RushHourLoader from "../components/RushHourLoader";
 import PlateNumberInput from '../components/PlateNumberInput';
 import { APP_CONFIG } from "../config/appConfig";
+import StorageManager from "../utils/StorageManager";
 
 const AddCarScreen = ({ navigation, route }) => {
   // Screen load logging
@@ -61,6 +62,23 @@ const AddCarScreen = ({ navigation, route }) => {
     }
   }, [route.params]);
 
+  // Load default country from storage when screen loads
+  useEffect(() => {
+    const loadDefaultCountry = async () => {
+      try {
+        const storedCountry = await StorageManager.getDefaultCountry();
+        if (storedCountry !== null && selectedCountry === "") {
+          setSelectedCountry(storedCountry);
+          console.log("Default country loaded in AddCarScreen:", storedCountry);
+        }
+      } catch (error) {
+        console.error("Error loading default country:", error);
+      }
+    };
+
+    loadDefaultCountry();
+  }, [selectedCountry]);
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
     setIsFocused(false);
@@ -84,6 +102,17 @@ const AddCarScreen = ({ navigation, route }) => {
     }
 
     setIsLoading(true);
+
+    // Save the selected country as default if user doesn't have one set
+    try {
+      const currentDefault = await StorageManager.getDefaultCountry();
+      if (currentDefault === null) {
+        await StorageManager.setDefaultCountry(selectedCountry);
+        console.log("Default country saved:", selectedCountry);
+      }
+    } catch (error) {
+      console.error("Error saving default country:", error);
+    }
 
     try {
       console.log("🚗 FINDING OR CREATING CAR add car screen:", plateNumber, selectedCountry);

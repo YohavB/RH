@@ -29,12 +29,13 @@ import {
 import UserCarsRelations from "../components/UserCarsRelations";
 import NotificationService from "../services/NotificationService";
 import { PermissionsAndroid } from "react-native";
-import { 
-  getMessaging, 
-  getApp, 
-  requestPermission, 
-  AuthorizationStatus 
-} from '@react-native-firebase/messaging';
+import {
+  getMessaging,
+  getApp,
+  requestPermission,
+  AuthorizationStatus,
+} from "@react-native-firebase/messaging";
+import StorageManager from "../utils/StorageManager";
 
 const MainScreen = ({ navigation, route }) => {
   // Screen load logging and reset navigation stack
@@ -42,7 +43,7 @@ const MainScreen = ({ navigation, route }) => {
   const [plateNumber, setPlateNumber] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Redux state
   const {
     userInfo,
@@ -51,7 +52,7 @@ const MainScreen = ({ navigation, route }) => {
   } = useSelector((state) => state.user) || {};
 
   const getUserDisplayName = () => {
-    return `${userInfo?.firstName || 'User'}`;
+    return `${userInfo?.firstName || "User"}`;
   };
 
   const userName = getUserDisplayName();
@@ -60,9 +61,13 @@ const MainScreen = ({ navigation, route }) => {
   useEffect(() => {
     const getTokenAndUpdate = async () => {
       // Check if running on simulator
-      if (Platform.OS === 'ios' && __DEV__) {
-        console.log('⚠️ Running on iOS Simulator - Push notifications not supported');
-        console.log('📱 Please test on a physical iOS device for push notification functionality');
+      if (Platform.OS === "ios" && __DEV__) {
+        console.log(
+          "⚠️ Running on iOS Simulator - Push notifications not supported"
+        );
+        console.log(
+          "📱 Please test on a physical iOS device for push notification functionality"
+        );
         return;
       }
 
@@ -70,34 +75,58 @@ const MainScreen = ({ navigation, route }) => {
       console.log("🔔 PUSH NOTIFICATION TOKEN !!!! :", pushNotificationToken);
 
       if (!userInfo.pushNotificationToken || pushNotificationToken === null) {
-      console.log("user has no push notification token, requesting from user");
-      // request push notification token from user
-      //if ios, request permission
-      if (Platform.OS === "ios") {
-        requestUserPermission();
+        console.log(
+          "user has no push notification token, requesting from user"
+        );
+        // request push notification token from user
+        //if ios, request permission
+        if (Platform.OS === "ios") {
+          requestUserPermission();
+        }
+        //if android, request permission
+        if (Platform.OS === "android") {
+          PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+          ).then((granted) => {
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+              console.log("You can use the POST_NOTIFICATIONS");
+            } else {
+              console.log("POST_NOTIFICATIONS permission denied");
+            }
+          });
+        }
       }
-      //if android, request permission
-      if (Platform.OS === "android") {
-        PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS).then((granted) => {
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log("You can use the POST_NOTIFICATIONS");
-          } else {
-            console.log("POST_NOTIFICATIONS permission denied");
-          }
-        });
-      }
-    }
 
-      if (!userInfo.pushNotificationToken || userInfo.pushNotificationToken !== pushNotificationToken) {
+      if (
+        !userInfo.pushNotificationToken ||
+        userInfo.pushNotificationToken !== pushNotificationToken
+      ) {
         console.log("updating push notification token");
         updatePushNotificationToken(pushNotificationToken);
-      }else{
+      } else {
         console.log("push notification token is already up to date");
       }
     };
 
     getTokenAndUpdate();
   }, [userInfo]);
+
+  // Load default country from storage when screen loads
+  useEffect(() => {
+    const loadDefaultCountry = async () => {
+      try {
+        const storedCountry = await StorageManager.getDefaultCountry();
+        if (storedCountry !== null) {
+          setSelectedCountry(storedCountry);
+          console.log("Default country loaded:", storedCountry);
+        }
+      } catch (error) {
+        console.error("Error loading default country:", error);
+      }
+    };
+
+    loadDefaultCountry();
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -125,9 +154,11 @@ const MainScreen = ({ navigation, route }) => {
   async function requestUserPermission() {
     try {
       // Check if running on simulator
-      if (Platform.OS === 'ios' && __DEV__) {
-        console.log('⚠️ Cannot request notification permission on iOS Simulator');
-        console.log('📱 Please test on a physical iOS device');
+      if (Platform.OS === "ios" && __DEV__) {
+        console.log(
+          "⚠️ Cannot request notification permission on iOS Simulator"
+        );
+        console.log("📱 Please test on a physical iOS device");
         return false;
       }
 
@@ -142,21 +173,21 @@ const MainScreen = ({ navigation, route }) => {
         provisional: false,
         sound: true, // This is crucial for sound!
       });
-      
+
       const enabled =
         authStatus === AuthorizationStatus.AUTHORIZED ||
         authStatus === AuthorizationStatus.PROVISIONAL;
-    
+
       if (enabled) {
-        console.log('Authorization status:', authStatus);
-        console.log('Sound permission granted:', authStatus);
+        console.log("Authorization status:", authStatus);
+        console.log("Sound permission granted:", authStatus);
       } else {
-        console.log('Notification permission denied');
+        console.log("Notification permission denied");
       }
-      
+
       return enabled;
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
+      console.error("Error requesting notification permission:", error);
       return false;
     }
   }
@@ -164,9 +195,9 @@ const MainScreen = ({ navigation, route }) => {
   const getPushNotificationToken = async () => {
     try {
       // Check if running on simulator
-      if (Platform.OS === 'ios' && __DEV__) {
-        console.log('⚠️ Cannot get push notification token on iOS Simulator');
-        console.log('📱 Please test on a physical iOS device');
+      if (Platform.OS === "ios" && __DEV__) {
+        console.log("⚠️ Cannot get push notification token on iOS Simulator");
+        console.log("📱 Please test on a physical iOS device");
         return null;
       }
 
@@ -177,7 +208,7 @@ const MainScreen = ({ navigation, route }) => {
       console.error("Error getting push notification token:", error);
       return null;
     }
-  }
+  };
 
   const getUserCarsRelation = async () => {
     const response = await getCurrentUserCarRelations();
@@ -208,6 +239,18 @@ const MainScreen = ({ navigation, route }) => {
     }
 
     setIsLoading(true);
+
+    // Save the selected country as default if user doesn't have one set
+    try {
+      const currentDefault = await StorageManager.getDefaultCountry();
+      if (currentDefault === null) {
+        await StorageManager.setDefaultCountry(selectedCountry);
+        console.log("Default country saved:", selectedCountry);
+      }
+    } catch (error) {
+      console.error("Error saving default country:", error);
+    }
+
     try {
       console.log("🚗 FINDING OR CREATING CAR:", plateNumber, selectedCountry);
       const foundCar = await findOrCreateCar(plateNumber, selectedCountry);
@@ -264,7 +307,7 @@ const MainScreen = ({ navigation, route }) => {
         >
           <ProfileIcon size={30} gradient={Gradients.orangeToPink} />
         </TouchableOpacity>
-        
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -276,9 +319,9 @@ const MainScreen = ({ navigation, route }) => {
           directionalLockEnabled={true}
           showsHorizontalScrollIndicator={false}
           overScrollMode="never"
-          {...(Platform.OS === 'ios' && {
+          {...(Platform.OS === "ios" && {
             automaticallyAdjustContentInsets: false,
-            contentInsetAdjustmentBehavior: 'never',
+            contentInsetAdjustmentBehavior: "never",
             contentInset: { bottom: 0 },
           })}
         >

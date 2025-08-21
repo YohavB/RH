@@ -14,17 +14,20 @@ import CarCard from "../components/CarCard";
 import DeleteNotification from "../components/DeleteNotification";
 import { ScreenNames } from "./ScreenNames";
 import GoogleSignInService from "../services/GoogleSignInService";
+import CountryPicker from "../components/CountryPicker";
+import StorageManager from "../utils/StorageManager";
 
 const Settings = ({ navigation, route }) => {
   // Get the source from route params to understand where user came from
   const source = route.params?.source;
-  
+
   const dispatch = useDispatch();
   const { userInfo, userCars = [] } = useSelector((state) => state.user) || {};
 
   const [deletedCar, setDeletedCar] = useState(null);
   const [showDeleteNotification, setShowDeleteNotification] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [defaultCountry, setDefaultCountry] = useState(null);
 
   // Use real user data from Redux
   const getUserData = () => {
@@ -53,7 +56,23 @@ const Settings = ({ navigation, route }) => {
 
   useEffect(() => {
     console.log("🚗 IS DELETING:", isDeleting);
-  },[isDeleting]);
+  }, [isDeleting]);
+
+  // Load default country from storage
+  useEffect(() => {
+    const loadDefaultCountry = async () => {
+      try {
+        const storedCountry = await StorageManager.getDefaultCountry();
+        if (storedCountry !== null) {
+          setDefaultCountry(storedCountry);
+        }
+      } catch (error) {
+        console.error("Error loading default country:", error);
+      }
+    };
+
+    loadDefaultCountry();
+  }, []);
 
   // Handle deleting a car
   const handleDeleteCar = async (car) => {
@@ -65,7 +84,7 @@ const Settings = ({ navigation, route }) => {
 
     try {
       const response = await removeCarFromUser(car.id, userInfo.id);
-      
+
       if (response) {
         setDeletedCar({
           brand: car.brand,
@@ -107,61 +126,73 @@ const Settings = ({ navigation, route }) => {
     navigation.goBack();
   };
 
+  // Handle default country change
+  const handleDefaultCountryChange = async (country) => {
+    try {
+      setDefaultCountry(country);
+      await StorageManager.setDefaultCountry(country);
+      console.log("Default country saved:", country);
+    } catch (error) {
+      console.error("Error saving default country:", error);
+      Alert.alert(
+        "Error",
+        "Failed to save default country setting. Please try again.",
+        [{ text: "OK" }]
+      );
+    }
+  };
+
   const signOutWithGoogle = async () => {
     // Show confirmation dialog before signing out
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              console.log("Starting sign out process...");
-              
-              // Sign out from Google
-              const result = await GoogleSignInService.signOutWithGoogle();
-              
-              if (result.success) {
-                console.log("Google sign out successful");
-                
-                // Clear all user data from Redux store
-                dispatch(setUserInfo(null));
-                dispatch(setUserCars([]));
-                dispatch(setAuthToken(""));
-                
-                console.log("User data cleared from Redux store");
-                
-                // Navigate back to login screen
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: ScreenNames.LOGIN }],
-                });
-              } else {
-                console.log("Google sign out failed:", result.error);
-                Alert.alert(
-                  "Sign Out Error",
-                  "Failed to sign out from Google. Please try again.",
-                  [{ text: "OK" }]
-                );
-              }
-            } catch (error) {
-              console.log("Sign out error:", error);
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            console.log("Starting sign out process...");
+
+            // Sign out from Google
+            const result = await GoogleSignInService.signOutWithGoogle();
+
+            if (result.success) {
+              console.log("Google sign out successful");
+
+              // Clear all user data from Redux store
+              dispatch(setUserInfo(null));
+              dispatch(setUserCars([]));
+              dispatch(setAuthToken(""));
+
+              console.log("User data cleared from Redux store");
+
+              // Navigate back to login screen
+              navigation.reset({
+                index: 0,
+                routes: [{ name: ScreenNames.LOGIN }],
+              });
+            } else {
+              console.log("Google sign out failed:", result.error);
               Alert.alert(
                 "Sign Out Error",
-                "An unexpected error occurred while signing out. Please try again.",
+                "Failed to sign out from Google. Please try again.",
                 [{ text: "OK" }]
               );
             }
-          },
+          } catch (error) {
+            console.log("Sign out error:", error);
+            Alert.alert(
+              "Sign Out Error",
+              "An unexpected error occurred while signing out. Please try again.",
+              [{ text: "OK" }]
+            );
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -190,8 +221,22 @@ const Settings = ({ navigation, route }) => {
 
                 <InfoField label="Email:" value={userData.email} />
 
-                <TouchableOpacity style={styles.googleButton} onPress={signOutWithGoogle}>
-                    <Text style={styles.googleButtonText}>Sign out</Text>
+                <InfoField
+                  label="Default Plate Recognition Country:"
+                  value={
+                    <CountryPicker
+                      value={defaultCountry}
+                      onValueChange={handleDefaultCountryChange}
+                      style={styles.defaultCountryPicker}
+                    />
+                  }
+                />
+
+                <TouchableOpacity
+                  style={styles.googleButton}
+                  onPress={signOutWithGoogle}
+                >
+                  <Text style={styles.googleButtonText}>Sign out</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -199,7 +244,11 @@ const Settings = ({ navigation, route }) => {
             {/* Car Details Section */}
             <View style={styles.section}>
               <SectionHeader
-                title={userCars && userCars.length > 1 ? "Cars Details" : "Car Details"}
+                title={
+                  userCars && userCars.length > 1
+                    ? "Cars Details"
+                    : "Car Details"
+                }
                 icon={
                   <View style={styles.iconContainer}>
                     <CarIcon />
@@ -219,9 +268,7 @@ const Settings = ({ navigation, route }) => {
                 ))
               ) : (
                 <View style={styles.noCarsContainer}>
-                  <Text style={styles.noCarsText}>
-                    No cars added yet.
-                  </Text>
+                  <Text style={styles.noCarsText}>No cars added yet.</Text>
                   <Text style={styles.noCarsText}>
                     You must add a car to start using the app.
                   </Text>

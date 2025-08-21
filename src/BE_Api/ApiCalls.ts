@@ -1,8 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { store } from "../redux/store";
 import { 
-  Countries, 
   UserDTO, 
   CarDTO, 
   AuthResponseDTO, 
@@ -17,6 +15,7 @@ import {
   ErrorResponse,
   UserCarSituation
 } from "./ServerDTOs";
+import { Countries } from "../utils/Countries";
 import { getApiUrl, isDevelopmentMode } from "../config/env";
 import { setAuthToken } from "../redux/actions";
 

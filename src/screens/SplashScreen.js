@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Text, View, Animated } from "react-native";
+import { Text, View, Animated, StatusBar } from "react-native";
 import { Alert } from "../components/CustomAlert";
 import { LinearGradient } from "expo-linear-gradient";
 import { Gradients } from "../styles/GlobalStyle";
@@ -221,6 +221,7 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <ScreenContainer safeArea={false}>
+      <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
       <LinearGradient
         colors={Gradients.orangeToPink.colors}
         style={styles.container}

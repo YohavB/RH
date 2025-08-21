@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StatusBar } from "react-native";
+import { View, Text, TouchableOpacity, StatusBar, ScrollView, Platform } from "react-native";
 import { Alert } from "../components/CustomAlert";
 import { useSelector, useDispatch } from "react-redux";
 import { setCarRelations, setUserCars } from "../redux/actions";
@@ -225,6 +225,23 @@ const CarConfirmationScreen = ({ navigation, route }) => {
           </Text>
         </View>
 
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollViewContent}
+          bounces={true}
+          alwaysBounceVertical={false}
+          style={styles.scrollView}
+          scrollEnabled={true}
+          directionalLockEnabled={true}
+          showsHorizontalScrollIndicator={false}
+          overScrollMode="never"
+          {...(Platform.OS === "ios" && {
+            automaticallyAdjustContentInsets: false,
+            contentInsetAdjustmentBehavior: "never",
+            contentInset: { bottom: 0 },
+          })}
+        >
         <View style={styles.cardContainer}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Plate #:</Text>
@@ -336,6 +353,7 @@ const CarConfirmationScreen = ({ navigation, route }) => {
             </View>
           )}
         </View>
+        </ScrollView>
       </View>
     </ScreenContainer>
   );

@@ -3,7 +3,6 @@ import {
   View,
   TextInput,
 } from 'react-native';
-import { Colors } from '../styles/GlobalStyle';
 import styles from '../styles/componentStyles/PlateNumberInputStyles';
 import CountryPicker from './CountryPicker';
 

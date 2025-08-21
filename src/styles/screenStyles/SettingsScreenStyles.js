@@ -117,4 +117,7 @@ export default StyleSheet.create({
     fontFamily: Fonts.medium,
     color: Colors.white,
   },
+  defaultCountryPicker: {
+    alignSelf: "flex-end",
+  },
 });
