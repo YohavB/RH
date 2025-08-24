@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175 175">
   <!-- Background -->
-  <rect width="150" height="150" rx="12" fill="url(#paint0_linear_455_2002)"/>
+  <rect width="175" height="175" rx="12" fill="url(#paint0_linear_455_2002)"/>
   
   <!-- 3 Rectangles aligned as 2x2 grid (bottom-left missing) -->
-  <g transform="translate(46.5, 35)">
+  <g transform="translate(59, 47.5)">
     <!-- Top row -->
     <rect x="0" y="0" width="26" height="37" rx="2" fill="white"/>
     <rect x="31" y="0" width="26" height="37" rx="2" fill="white"/>
@@ -13,7 +13,7 @@
   </g>
 
   <defs>
-    <linearGradient id="paint0_linear_455_2002" x1="75" y1="0" x2="74.96" y2="163.3" gradientUnits="userSpaceOnUse">
+    <linearGradient id="paint0_linear_455_2002" x1="87.5" y1="0" x2="87.5" y2="175" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FF9E4E"/>
       <stop offset="1" stop-color="#ED726B"/>
     </linearGradient>

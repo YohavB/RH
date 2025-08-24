@@ -27,14 +27,7 @@ import {
   updatePushNotificationToken,
 } from "../BE_Api/ApiManager";
 import UserCarsRelations from "../components/UserCarsRelations";
-import NotificationService from "../services/NotificationService";
-import { PermissionsAndroid } from "react-native";
-import {
-  getMessaging,
-  getApp,
-  requestPermission,
-  AuthorizationStatus,
-} from "@react-native-firebase/messaging";
+import FCMTokenService from "../services/FCMTokenService";
 import StorageManager from "../utils/StorageManager";
 
 const MainScreen = ({ navigation, route }) => {
@@ -45,11 +38,7 @@ const MainScreen = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Redux state
-  const {
-    userInfo,
-    userCars = [],
-    userToken,
-  } = useSelector((state) => state.user) || {};
+  const { userInfo, userCars = [], fcmToken } = useSelector((state) => state.user) || {};
 
   const getUserDisplayName = () => {
     return `${userInfo?.firstName || "User"}`;
@@ -59,56 +48,7 @@ const MainScreen = ({ navigation, route }) => {
   const hasRegisteredCars = userCars && userCars.length > 0;
 
   useEffect(() => {
-    const getTokenAndUpdate = async () => {
-      // Check if running on simulator
-      if (Platform.OS === "ios" && __DEV__) {
-        console.log(
-          "⚠️ Running on iOS Simulator - Push notifications not supported"
-        );
-        console.log(
-          "📱 Please test on a physical iOS device for push notification functionality"
-        );
-        return;
-      }
-
-      const pushNotificationToken = await getPushNotificationToken();
-      console.log("🔔 PUSH NOTIFICATION TOKEN !!!! :", pushNotificationToken);
-
-      if (!userInfo.pushNotificationToken || pushNotificationToken === null) {
-        console.log(
-          "user has no push notification token, requesting from user"
-        );
-        // request push notification token from user
-        //if ios, request permission
-        if (Platform.OS === "ios") {
-          requestUserPermission();
-        }
-        //if android, request permission
-        if (Platform.OS === "android") {
-          PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-          ).then((granted) => {
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-              console.log("You can use the POST_NOTIFICATIONS");
-            } else {
-              console.log("POST_NOTIFICATIONS permission denied");
-            }
-          });
-        }
-      }
-
-      if (
-        !userInfo.pushNotificationToken ||
-        userInfo.pushNotificationToken !== pushNotificationToken
-      ) {
-        console.log("updating push notification token");
-        updatePushNotificationToken(pushNotificationToken);
-      } else {
-        console.log("push notification token is already up to date");
-      }
-    };
-
-    getTokenAndUpdate();
+    setupFCMToken();
   }, [userInfo]);
 
   // Load default country from storage when screen loads
@@ -151,63 +91,8 @@ const MainScreen = ({ navigation, route }) => {
     }, [route?.params?.source])
   );
 
-  async function requestUserPermission() {
-    try {
-      // Check if running on simulator
-      if (Platform.OS === "ios" && __DEV__) {
-        console.log(
-          "⚠️ Cannot request notification permission on iOS Simulator"
-        );
-        console.log("📱 Please test on a physical iOS device");
-        return false;
-      }
-
-      const app = getApp();
-      const messaging = getMessaging(app);
-      const authStatus = await requestPermission(messaging, {
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true, // This is crucial for sound!
-      });
-
-      const enabled =
-        authStatus === AuthorizationStatus.AUTHORIZED ||
-        authStatus === AuthorizationStatus.PROVISIONAL;
-
-      if (enabled) {
-        console.log("Authorization status:", authStatus);
-        console.log("Sound permission granted:", authStatus);
-      } else {
-        console.log("Notification permission denied");
-      }
-
-      return enabled;
-    } catch (error) {
-      console.error("Error requesting notification permission:", error);
-      return false;
-    }
-  }
-
-  const getPushNotificationToken = async () => {
-    try {
-      // Check if running on simulator
-      if (Platform.OS === "ios" && __DEV__) {
-        console.log("⚠️ Cannot get push notification token on iOS Simulator");
-        console.log("📱 Please test on a physical iOS device");
-        return null;
-      }
-
-      const pushNotificationToken = await NotificationService.getToken();
-      console.log("FCM pushNotificationToken", pushNotificationToken);
-      return pushNotificationToken;
-    } catch (error) {
-      console.error("Error getting push notification token:", error);
-      return null;
-    }
+  const setupFCMToken = async () => {
+    await FCMTokenService.setupAndSyncToken(userInfo, updatePushNotificationToken);
   };
 
   const getUserCarsRelation = async () => {
@@ -267,9 +152,7 @@ const MainScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error("Error searching car:", error);
-      Alert.alert("Error", "Failed to find car. Please try again.", [
-        { text: "OK" },
-      ]);
+      Alert.alert("Error", "Failed to find car. Please try again.", [{ text: "OK" }]);
     } finally {
       setIsLoading(false);
     }
@@ -301,10 +184,7 @@ const MainScreen = ({ navigation, route }) => {
   return (
     <ScreenContainer safeArea={true}>
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.profileButton}
-          onPress={handleProfilePress}
-        >
+        <TouchableOpacity style={styles.profileButton} onPress={handleProfilePress}>
           <ProfileIcon size={30} gradient={Gradients.orangeToPink} />
         </TouchableOpacity>
 
@@ -335,32 +215,22 @@ const MainScreen = ({ navigation, route }) => {
               {!hasRegisteredCars ? (
                 <>
                   <Text style={styles.noCarText}>
-                    Before using {APP_CONFIG.APP_NAME} you must have a
-                    registered car.{"\n\n"}
+                    Before using {APP_CONFIG.APP_NAME} you must have a registered car.{"\n\n"}
                     Please go to settings to add your car.
                   </Text>
 
-                  <TouchableOpacity
-                    style={styles.goToSettingsButton}
-                    onPress={handleGoToSettings}
-                  >
-                    <Text style={styles.goToSettingsButtonText}>
-                      Go to Settings
-                    </Text>
+                  <TouchableOpacity style={styles.goToSettingsButton} onPress={handleGoToSettings}>
+                    <Text style={styles.goToSettingsButtonText}>Go to Settings</Text>
                   </TouchableOpacity>
                 </>
               ) : (
                 <>
                   <Text style={styles.instructionText}>
-                    Are you blocking a car ? Or being blocked ? Let's check it
-                    out !
+                    Are you blocking a car ? Or being blocked ? Let's check it out !
                   </Text>
 
                   <View style={styles.cameraButtonContainer}>
-                    <CameraButton
-                      onPress={handleCameraPress}
-                      disabled={isLoading}
-                    />
+                    <CameraButton onPress={handleCameraPress} disabled={isLoading} />
                   </View>
 
                   <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

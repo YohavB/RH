@@ -9,6 +9,7 @@ export const SET_GOOGLE_ID_TOKEN = "SET_GOOGLE_ID_TOKEN";
 export const SET_CAR_RELATIONS = "SET_CAR_RELATIONS";
 export const ADD_CAR_RELATION = "ADD_CAR_RELATION";
 export const CLEAR_CAR_RELATIONS = "CLEAR_CAR_RELATIONS";
+export const SET_FCM_TOKEN = "SET_FCM_TOKEN";
 export const LOGOUT = "LOGOUT";
 
 // Action Creators with proper typing
@@ -46,6 +47,11 @@ export interface ClearCarRelationsAction {
   type: typeof CLEAR_CAR_RELATIONS;
 }
 
+export interface SetFcmTokenAction {
+  type: typeof SET_FCM_TOKEN;
+  payload: string | null;
+}
+
 export interface LogoutAction {
   type: typeof LOGOUT;
 }
@@ -58,6 +64,7 @@ export type UserActionTypes =
     | SetCarRelationsAction
     | AddCarRelationAction
     | ClearCarRelationsAction
+    | SetFcmTokenAction
     | LogoutAction;
 
 export const setUserInfo = (userInfo: UserDTO) => (dispatch: Dispatch<UserActionTypes>) => {
@@ -105,6 +112,13 @@ export const addCarRelation = (carRelation: CarRelationsDTO) => (dispatch: Dispa
 export const clearCarRelations = () => (dispatch: Dispatch<UserActionTypes>) => {
   dispatch({
     type: CLEAR_CAR_RELATIONS,
+  });
+};
+
+export const setFcmToken = (token: string | null) => (dispatch: Dispatch<UserActionTypes>) => {
+  dispatch({
+    type: SET_FCM_TOKEN,
+    payload: token,
   });
 };
 

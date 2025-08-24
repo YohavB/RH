@@ -29,6 +29,10 @@ export default StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
+  iconText: {
+    fontSize: 20,
+    color: Colors.mainOrange,
+  },
   icon: {
     width: 20,
     height: 20,
@@ -116,6 +120,40 @@ export default StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.medium,
     color: Colors.white,
+  },
+  sectionDescription: {
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.textLight,
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  testButton: {
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: Colors.mainOrange,
+    marginTop: 12,
+    alignSelf: "stretch",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  testButtonText: {
+    fontSize: 14,
+    fontFamily: Fonts.medium,
+    color: Colors.white,
+    textAlign: "center",
+  },
+  copyButton: {
+    backgroundColor: "#4CAF50",
+    marginTop: 8,
+    marginBottom: 16,
   },
   defaultCountryPicker: {
     alignSelf: "flex-end",

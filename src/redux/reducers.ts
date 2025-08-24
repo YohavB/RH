@@ -1,4 +1,4 @@
-import { UserActionTypes, SET_USER_INFO, SET_USER_CARS, SET_AUTH_TOKEN, SET_CAR_RELATIONS, ADD_CAR_RELATION, CLEAR_CAR_RELATIONS, LOGOUT, SET_GOOGLE_ID_TOKEN } from "./actions";
+import { UserActionTypes, SET_USER_INFO, SET_USER_CARS, SET_AUTH_TOKEN, SET_CAR_RELATIONS, ADD_CAR_RELATION, CLEAR_CAR_RELATIONS, LOGOUT, SET_GOOGLE_ID_TOKEN, SET_FCM_TOKEN } from "./actions";
 import { UserDTO, CarDTO, CarRelationsDTO } from "../BE_Api/ServerDTOs";
 
 // Define the optimized state interface
@@ -8,6 +8,7 @@ interface UserState {
   userCars: CarDTO[];
   carRelations: CarRelationsDTO[];
   googleIdToken: string | null;
+  fcmToken: string | null; // Store FCM token locally
 }
 
 const initialState: UserState = {
@@ -16,6 +17,7 @@ const initialState: UserState = {
   userCars: [],
   carRelations: [],
   googleIdToken: null,
+  fcmToken: null,
 };
 
 function userReducer(state = initialState, action: UserActionTypes): UserState {
@@ -55,6 +57,8 @@ function userReducer(state = initialState, action: UserActionTypes): UserState {
       };
     case CLEAR_CAR_RELATIONS:
       return { ...state, carRelations: [] };
+    case SET_FCM_TOKEN:
+      return { ...state, fcmToken: action.payload };
     case LOGOUT:
       console.log('🚗 CAR STORE CLEARED: User logged out');
       return initialState;
